@@ -1,6 +1,12 @@
-
 *.swp
+modules/*.o 
 
 cpp/testing
 cpp/test_rmt
 cpp/test_spins
+
+
+CustomTicks.m
+*.mod
+*.o
+*.bkp
