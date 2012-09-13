@@ -6,6 +6,7 @@ cpp/test_rmt
 cpp/test_spins
 
 
+external
 CustomTicks.m
 *.mod
 *.o
