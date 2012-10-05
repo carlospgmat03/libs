@@ -78,6 +78,7 @@ Concurrence::usage = "Concurrence of a 2 qubit density matrix density matrix"
 Purity::usage = "Purity of a 2 qubit density matrix density matrix"
 Proyector::usage = "Gives the density matrix rho=|Psi><Psi| corresponging to |Psi>, or rho=|Phi><Psi| se se le dan dos argumentos: Proyector[Phi, Psi]"
 KrausOperatorsForSuperUnitaryEvolution::usage = "Gives the Kraus Operators for a given unitary and a given state of the environement"
+ApplyKrausOperators::usage = "Apply a set of Kraus Operors, (for example fro the output of KrausOperatorsForSuperUnitaryEvolution to a state. Synthaxis is ApplyKrausOperators[Operators_, rho_]. "
 vonNeumannEntropy::usage = "con Neumann entropy of a Matrix vonNeumannEntropy[r_]"
 Bell::usage = "Bell[n] state gives a maximally entangled state of the type 
 sum_i^n |ii\>. Bell[ ] gives |00> + |11>" 
@@ -368,6 +369,9 @@ Pauli[Indices_List] := KroneckerProduct @@ (Pauli /@ Indices)
 (* {{{ Proyector *)
 Proyector[psi_, phi_] := Outer[Times, psi, Conjugate[phi]]
 Proyector[psi_] := Proyector[psi, psi]
+(* }}} *)
+(* {{{ *) ApplyKrausOperators[Operators_, rho_] := 
+ Total[#.rho.Dagger[#] & /@ Operators]
 (* }}} *)
 (* {{{ *) KrausOperatorsForSuperUnitaryEvolution[psienv_, U_] := 
   Module[{Nenv, Ntotal, Nsub},
