@@ -420,6 +420,13 @@ itpp::cmat exponentiate(const itpp::cmat& Matrix){ // {{{
   revision = itpp::norm(Matrix -
       V*itpp::diag(eigenvalues)* V.hermitian_transpose())/itpp::norm(Matrix);
   if (revision > 10e-12 || !exito){
+    std::cerr << "Matrix=" << Matrix << std::endl;  
+    std::cerr << "Eigenvalores=" << eigenvalues << std::endl;  
+    std::cerr << "Ortonormalidad de eigenvectores=" << itpp::norm(V*V.hermitian_transpose()-itpp::eye_c(Matrix.size())) << std::endl;  
+    std::cerr << "Ortonormalidad de eigenvectores, matriz completa=\n" << abs(V*V.hermitian_transpose()) << std::endl;  
+    for (int i=0; i<Matrix.rows(); i++){
+      std::cerr << "Ecuacion de eigengectores sirve? i=" << i << ", " << norm(Matrix*V.get_col(i)-eigenvalues(i)*V.get_col(i)) << std::endl;  
+    }
     std::cerr << "Algun pedo en exponentiate! \nRevision=" << revision 
       <<"Normas, "<<itpp::norm(Matrix) << ", " << exito << std::endl; 
     std::cerr << "La rutina de lapack tiene pedos cuando esta muy sparse la matriz,\n"
@@ -1340,6 +1347,26 @@ itpp::vec BellState(int dim=4){// {{{
     for (int j=0; j<state.size()/4; j++){
       n=cfpmath::merge_two_numbers(3, j, mask); 
       state(n)=phi*state(n);
+    }
+    return;
+  } // }}}
+itpp::mat hadamard_matrix(){// {{{
+    itpp::mat tmp(2,2);
+    tmp=1;
+    tmp(1,1)=-1;
+    tmp=tmp/sqrt(2.);
+    return tmp;
+  } //}}}
+  void apply_hadamard(itpp::cvec& state, int position){// {{{
+    itpp::ivec pos(2);
+    itpp::cvec moco;
+    itpp::mat h=hadamard_matrix();
+    for (int i=0; i<state.size()/2; i++){
+      pos(0)=cfpmath::merge_two_numbers(0,i,cfpmath::pow_2(position));
+      pos(1)=cfpmath::merge_two_numbers(1,i,cfpmath::pow_2(position));
+      moco= h*state(pos);
+      state(pos(0))= moco(0);
+      state(pos(1))= moco(1);
     }
     return;
   } // }}}

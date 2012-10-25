@@ -72,6 +72,19 @@ int main(int argc, char* argv[]) { //{{{
       cout << real(state(i)) << " " << real(-Im*state(i)) << endl;
     }
     // }}}
+  } else if(option=="test_hadamard") { // {{{
+    int dim=pow_2(qubits.getValue());
+    cvec state(dim);
+    double x,y;
+    for (int i=0; i<dim; i++){
+      cin >> x >> y ;
+      state(i) = complex<double>(x,y) ;
+    }
+    apply_hadamard(state,position.getValue());
+    for (int i=0; i<dim; i++){
+      cout << real(state(i)) << " " << real(-Im*state(i)) << endl;
+    }
+    // }}}
   } else if(option=="test_apply_chain") {// {{{
     int dim=pow_2(qubits.getValue());
     cvec state(dim);
