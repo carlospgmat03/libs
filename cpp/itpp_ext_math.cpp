@@ -95,7 +95,7 @@ template <class Num_T> double compare(const itpp::Array<Num_T >& a1, const itpp:
 } //}}}
 // }}}
 // Reordering, replacing, inequalities {{{
-  bool vector_greater_than(const itpp::ivec& v, const itpp::ivec& w){ // {{{
+bool vector_greater_than(const itpp::ivec& v, const itpp::ivec& w){ // {{{
   if (v.size() > w.size()){
     return true;
   } else if( v.size() < w.size()){
@@ -110,8 +110,8 @@ template <class Num_T> double compare(const itpp::Array<Num_T >& a1, const itpp:
     }
     return false;
   }
-  
-  } //}}}
+
+} //}}}
 template <class Num_T> itpp::Array<Num_T >  Replace(const itpp::Array<Num_T > v, Num_T old, Num_T nuevo){ // {{{
   itpp::Array<Num_T > tmp=v;
   for (int i=0; i<v.size(); i++){
@@ -119,39 +119,39 @@ template <class Num_T> itpp::Array<Num_T >  Replace(const itpp::Array<Num_T > v,
       tmp(i)=nuevo;
     }
   }
-//   return;
+  //   return;
   return tmp;
 } //}}}
-  itpp::Array<itpp::ivec> sort(const itpp::Array<itpp::ivec>& input){ // {{{
-//     http://en.wikipedia.org/wiki/Bubble_sort
-    itpp::Array<itpp::ivec> tmp(0), result(0);
-    itpp::ivec moco;
-    bool swaped;
-    for (int size=0; result.size() != input.size() ;size++){
-//       std::cerr << "size " << size <<"\n";
-      for (int i = 0; i< input.size(); i++){
-        if (input(i).size() == size){tmp = itpp::concat(tmp,input(i));}
-      }
-      swaped=true;
-//       std::cerr << " analizing size " << size <<"\n";
-      while ( (swaped) && tmp.size() >1 ){
-        swaped=false;
-//         std::cerr << " New pass " <<"\n";
-        for (int i=0; i<tmp.size() -1; i++){
-//           std::cerr << "Analizing positions " << i <<" and "<<i+1 <<"\n";
-          if ( vector_greater_than(tmp(i),tmp(i+1)) ){
-//             std::cerr << tmp(i) << " ?>?" << tmp(i+1)  <<"\n";
-            moco=tmp(i); tmp(i)=tmp(i+1); tmp(i + 1)=moco;
-            swaped=true;
-          }
-        }
-      
-      }
-      result = itpp::concat(tmp,result);
-      tmp.set_size(0);
+itpp::Array<itpp::ivec> sort(const itpp::Array<itpp::ivec>& input){ // {{{
+  //     http://en.wikipedia.org/wiki/Bubble_sort
+  itpp::Array<itpp::ivec> tmp(0), result(0);
+  itpp::ivec moco;
+  bool swaped;
+  for (int size=0; result.size() != input.size() ;size++){
+    //       std::cerr << "size " << size <<"\n";
+    for (int i = 0; i< input.size(); i++){
+      if (input(i).size() == size){tmp = itpp::concat(tmp,input(i));}
     }
-    return result;
-  } //}}}
+    swaped=true;
+    //       std::cerr << " analizing size " << size <<"\n";
+    while ( (swaped) && tmp.size() >1 ){
+      swaped=false;
+      //         std::cerr << " New pass " <<"\n";
+      for (int i=0; i<tmp.size() -1; i++){
+        //           std::cerr << "Analizing positions " << i <<" and "<<i+1 <<"\n";
+        if ( vector_greater_than(tmp(i),tmp(i+1)) ){
+          //             std::cerr << tmp(i) << " ?>?" << tmp(i+1)  <<"\n";
+          moco=tmp(i); tmp(i)=tmp(i+1); tmp(i + 1)=moco;
+          swaped=true;
+        }
+      }
+
+    }
+    result = itpp::concat(tmp,result);
+    tmp.set_size(0);
+  }
+  return result;
+} //}}}
 template <class Num_T> itpp::Array<Num_T > Flatten(const itpp::Array<itpp::Array<Num_T > >& vct){ // {{{
   itpp::Array<Num_T > tmp(0); 
   for (int i=0; i<vct.size(); i++){ 
@@ -189,15 +189,15 @@ template <class Num_T> itpp::Array<Num_T > CircularRotateLeft(const itpp::Array<
   return tmp;
 } //}}}
 itpp::cmat Reorder_state_tensor_form(itpp::cvec vector,int which){ // {{{
-//   std::cout << "@Reorder_state_tensor_form -2" << std::endl;
+  //   std::cout << "@Reorder_state_tensor_form -2" << std::endl;
   int dim1 = cfpmath::pow_2(cfpmath::BitCount(which)); 
-//   std::cout << "@Reorder_state_tensor_form -1" << std::endl;
+  //   std::cout << "@Reorder_state_tensor_form -1" << std::endl;
   int dim2 = vector.size()/dim1;
-//   std::cout << "@Reorder_state_tensor_form 0" << std::endl;
+  //   std::cout << "@Reorder_state_tensor_form 0" << std::endl;
   int qubits=cfpmath::log_base_2(vector.size());
   itpp::cmat out(dim2,dim1); out=0.;
   int col, row; 
-//   std::cout << "@Reorder_state_tensor_form 1" << std::endl;
+  //   std::cout << "@Reorder_state_tensor_form 1" << std::endl;
   for (int j=0; j<vector.size(); j++){
     cfpmath::extract_digits(j,qubits,col,row,which);
     out(row,col)=vector(j);
@@ -1300,6 +1300,30 @@ template <class Num_T> void apply_sigma_x(itpp::Vec<Num_T>& state, int target_bi
   }
 //   std::cout << "state" << state << "\n";
 }// }}}
+template <class Num_T> void apply_sigma_y(itpp::Vec<Num_T>& state, int target_bit){// {{{
+  int pos_1, pos_2;
+  std::complex<double> Im(0.,1.);
+  Num_T x;
+  for (int i=0; i<state.size()/2; i++){
+    pos_1 = cfpmath::merge_two_numbers(0, i, cfpmath::pow_2(target_bit));
+    pos_2 = cfpmath::set_bit(pos_1,target_bit);
+//     std::cout << "i="<< i << ", pos_1="<< pos_1 << ", pos_2="<< pos_2 << "\n";
+    x=state(pos_1);
+    state(pos_1)=-Im*state(pos_2);
+    state(pos_2)=Im*x;
+//     std::cout << "state(pos_1)="<< state(pos_1) << ", state(pos_2)="<< state(pos_2)  << "\n";
+  }
+//   std::cout << "state" << state << "\n";
+}// }}}
+template <class Num_T> void apply_sigma_z(itpp::Vec<Num_T>& state, int target_bit){// {{{
+  int pos;
+  Num_T x;
+  for (int i=0; i<state.size()/2; i++){
+    pos = cfpmath::set_bit(pos_1,target_bit);
+    state(pos)=-state(pos);
+  }
+//   std::cout << "state" << state << "\n";
+}// }}}
 itpp::cmat exp_minus_i_b_sigma(itpp::vec b){// {{{
   // From sakurai eq (3.2.44) we have that
   // exp(- i \sigma \cdot n \phi/2) =
@@ -1340,48 +1364,67 @@ itpp::vec BellState(int dim=4){// {{{
 }// }}}
 // }}}
 // Quantum Evolution {{{
-  void apply_inverse_Rk(itpp::cvec& state, int k, int position1, int position2){// {{{
-    std::complex<double> phi=exp(-std::complex<double>(0,1)*2.*itpp::pi/double(cfpmath::pow_2(k)));
-    int mask = cfpmath::pow_2(position1) + cfpmath::pow_2(position2);
-    int n;
-    for (int j=0; j<state.size()/4; j++){
-      n=cfpmath::merge_two_numbers(3, j, mask); 
-      state(n)=phi*state(n);
-    }
-    return;
-  } // }}}
+void apply_inverse_Rk(itpp::cvec& state, int k, int position1, int position2){// {{{
+  std::complex<double> phi=exp(-std::complex<double>(0,1)*2.*itpp::pi/double(cfpmath::pow_2(k)));
+  int mask = cfpmath::pow_2(position1) + cfpmath::pow_2(position2);
+  int n;
+  for (int j=0; j<state.size()/4; j++){
+    n=cfpmath::merge_two_numbers(3, j, mask); 
+    state(n)=phi*state(n);
+  }
+  return;
+} // }}}
 itpp::mat hadamard_matrix(){// {{{
-    itpp::mat tmp(2,2);
-    tmp=1;
-    tmp(1,1)=-1;
-    tmp=tmp/sqrt(2.);
-    return tmp;
-  } //}}}
-  void apply_hadamard(itpp::cvec& state, int position){// {{{
-    itpp::ivec pos(2);
-    itpp::cvec moco;
-    itpp::mat h=hadamard_matrix();
-    for (int i=0; i<state.size()/2; i++){
-      pos(0)=cfpmath::merge_two_numbers(0,i,cfpmath::pow_2(position));
-      pos(1)=cfpmath::merge_two_numbers(1,i,cfpmath::pow_2(position));
-      moco= h*state(pos);
-      state(pos(0))= moco(0);
-      state(pos(1))= moco(1);
+  itpp::mat tmp(2,2);
+  tmp=1;
+  tmp(1,1)=-1;
+  tmp=tmp/sqrt(2.);
+  return tmp;
+} //}}}
+void apply_gate(itpp::cvec& state, int nwhich, itpp::cmat gate){// {{{
+  int qs=cfpmath::BitCount(nwhich);
+  int qs2=cfpmath::pow_2(qs);
+  if ( (gate.rows() != qs2) || (gate.rows() != qs2)){
+    std::cerr << " toy cansado en el aeropuerto rutina apply_gate" << std::endl;
+    abort();
+
+  }
+  itpp::cvec moco;
+  itpp::ivec pos(qs2);
+  for (int i=0; i<state.size()/qs2; i++){
+    for (int j=0; j<qs2; j++){
+      pos(j)=cfpmath::merge_two_numbers(j,i,nwhich);
     }
-    return;
-  } // }}}
+    moco=gate*state(pos);
+    state(pos)=moco;
+  }
+  return;
+}// }}}
+void apply_hadamard(itpp::cvec& state, int position){// {{{
+  itpp::ivec pos(2);
+  itpp::cvec moco;
+  itpp::mat h=hadamard_matrix();
+  for (int i=0; i<state.size()/2; i++){
+    pos(0)=cfpmath::merge_two_numbers(0,i,cfpmath::pow_2(position));
+    pos(1)=cfpmath::merge_two_numbers(1,i,cfpmath::pow_2(position));
+    moco= h*state(pos);
+    state(pos(0))= moco(0);
+    state(pos(1))= moco(1);
+  }
+  return;
+} // }}}
 itpp::cvec GetState(itpp::cmat& U, itpp::vec& eigenvalues, itpp::cvec& psi_0, double t){ // {{{
   itpp::cmat U_dagger = itpp::hermitian_transpose(U);
   itpp::cvec psi_0_prime = U_dagger*psi_0;
   itpp::cvec psi_t_prime = elem_mult(exp(-eigenvalues * t * std::complex<double>(0.,1.)),psi_0_prime);
   itpp::cvec psi_t = U* psi_t_prime;
 
-//   cout << "In GetState, test_unitarity(U)=" <<  test_unitarity(U) << endl;
-//   cout << "In GetState, test_unitarity(U_dagger)=" <<  test_unitarity(U_dagger) << endl;
-//   cout << "In GetState, norm(psi_0)=" <<  norm(psi_0) << endl;
-//   cout << "In GetState, norm(psi_0_prime)=" <<  norm(psi_0_prime) << endl;
-//   cout << "In GetState, norm(psi_t)=" <<  norm(psi_t) << endl;
-//   abort(); 
+  //   cout << "In GetState, test_unitarity(U)=" <<  test_unitarity(U) << endl;
+  //   cout << "In GetState, test_unitarity(U_dagger)=" <<  test_unitarity(U_dagger) << endl;
+  //   cout << "In GetState, norm(psi_0)=" <<  norm(psi_0) << endl;
+  //   cout << "In GetState, norm(psi_0_prime)=" <<  norm(psi_0_prime) << endl;
+  //   cout << "In GetState, norm(psi_t)=" <<  norm(psi_t) << endl;
+  //   abort(); 
   return psi_t;
 
 } // }}}

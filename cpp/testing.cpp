@@ -197,6 +197,59 @@ int main(int argc, char* argv[]){
 
 //     all_bit_rotations(i1.getValue(), i2.getValue()) ;
   // }}}
+  } else if (option == "test_arbitrary_2_qubit_gate") { // {{{
+    int q=i1.getValue();
+    int d=pow_2(q);
+    cvec state(d);
+
+    state=RandomState(d); 
+
+    i1=0;
+    i2=2;
+    Array<cmat> SingleQubitGates(0);
+
+    SingleQubitGates=concat(sigma(0), SingleQubitGates);
+    SingleQubitGates=concat(sigma(1), SingleQubitGates);
+    SingleQubitGates=concat(sigma(2), SingleQubitGates);
+    SingleQubitGates=concat(sigma(3), SingleQubitGates);
+      
+    // combinaciones de single qubit gates, leugo controles. 
+
+    for (int i1=0; i1< SingleQubitGates.size(); i1++){
+      for (int i2=0; i2< SingleQubitGates.size(); i2++){
+//         TwoQubitGates=concat(TwoQubitGates, TensorProduct(SingleQubitGates(i0), SingleQubitGates);
+        
+
+
+    }
+      
+      , state_out;
+    cmat H(d,d), eigenvectors;
+    for (int i=0; i<d; i++){
+      cin >> x  >> y ;
+      state(i)=x+std::complex<double>(0,1)*y;
+    }
+    for (int i=0; i<d; i++){
+      for (int j=0; j<d; j++){
+        cin >> x  >> y ;
+        H(i,j)=x+std::complex<double>(0,1)*y;
+      }
+    }
+//     state_out= H*state;
+    
+    eig_sym(H,lambda, eigenvectors);
+    state_out = GetState(eigenvectors, lambda, state, t);
+    for (int i=0; i<state_out.size(); i++){
+      cout << real(state_out(i)) << " " << imag(state_out(i)) <<endl;
+    }
+//     for (int i=0; i<rho.cols(); i++){
+//       for (int j=0; j<rho.cols(); j++){
+//         cout << real(rho(i,j)) << " " << imag(rho(i,j)) <<endl;
+//       }
+//     }
+
+//     all_bit_rotations(i1.getValue(), i2.getValue()) ;
+  // }}}
   } else if (option == "nichts") { // {{{
   // }}}
   } else { // {{{

@@ -208,8 +208,9 @@ cout <<norm(state-state_out_eduardo) << endl;
       << "base rotacional extendida a un qubit" << endl;
     int q=qubits.getValue(); // con i1=2 hay problemas
     int d=pow_2(q);
-    vec b=itpp::randu(3), local_b=itpp::randu(3);double  J=itpp::randu(), J_interaction=itpp::randu();
-    b=1.; local_b=0.; J=0.; J_interaction=0.;
+    vec b=itpp::randu(3), local_b=itpp::randu(3);
+//     double  J=itpp::randu(), J_interaction=itpp::randu(); J=0.; J_interaction=0.;
+    b=1.; local_b=0.; 
     b=vec_3(pi/2.,0.,0.);
     Array<cvec> state_q(2);
     cvec state_r, state_l;
