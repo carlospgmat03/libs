@@ -480,7 +480,6 @@ itpp::cmat UDiagUdagger(const itpp::cmat& U, const itpp::cvec& E){ // {{{
   }
   return Result;
 } // }}}
-
 template <class Num_T> itpp::Mat<Num_T> Proyector(const itpp::Vec<Num_T>& psi){ // {{{
   int n=psi.size();
   itpp::Mat<Num_T> p(n,n);
@@ -1046,6 +1045,308 @@ void UpDownMostIndexFermionicMatrix(itpp::cmat& MatrixEven, itpp::cmat& MatrixOd
 }
 // }}}
 // Quantum Info, and advanced functions {{{
+// Some important matrices of operations and states
+itpp::cmat sigma(itpp::ivec is){ // {{{
+  int qubits=is.size();
+  itpp::Array<itpp::cmat> sigmas(qubits);
+  if (qubits==0){
+
+    return itpp::mat_1x1( std::complex<double> (1,0));
+  }
+  for (int i=0; i<qubits; i++){
+    sigmas(qubits-i-1)=sigma(is(i));
+  }
+  return TensorProduct(sigmas);
+} // }}}
+itpp::cmat sigma(int i){ // {{{
+  std::complex<double> imaginary(0,1), c0(0.,0.);
+  switch (i) {
+    case 0:
+      return itpp::to_cmat(itpp::mat_2x2(1, 0, 0, 1));
+    case 1:
+      return itpp::to_cmat(itpp::mat_2x2(0, 1, 1, 0));
+    case 2:
+      return itpp::mat_2x2(c0, -imaginary, imaginary, c0);
+    case 3:
+      return itpp::to_cmat(itpp::mat_2x2(1, 0, 0, -1));
+    default:
+      std::cout << "Sigma not found. i=" << i << "\n"; 
+      abort(); 
+  }
+} // }}}
+itpp::cmat sigma(itpp::vec b){ // {{{
+  if (b.size()==3){
+    return b(0)*sigma(1)+b(1)*sigma(2)+ b(2)*sigma(3);
+  } else {
+    std::cout << "Sigma not found 89p790as7dfu.\n";
+    abort(); 
+  }
+} // }}}
+itpp::cmat sigma(itpp::vec b, int position, int total){ // {{{
+  itpp::cmat tmp = sigma(b);
+  if (position==total-1){
+    tmp=TensorProduct(tmp,itpp::eye_c(cfpmath::pow_2(total-1)));
+  } else if (position==0){
+    tmp=TensorProduct(itpp::eye_c(cfpmath::pow_2(total-1)),tmp);
+  } else if (0<position && position<total-1){
+    tmp=TensorProduct(tmp,itpp::eye_c(cfpmath::pow_2(position)));
+    tmp=TensorProduct(itpp::eye_c(cfpmath::pow_2(total-position-1)),tmp);
+  } else {
+    std::cout << "Sigma not found asdfa \n";
+    abort(); 
+  }
+  return tmp;
+} // }}}
+itpp::mat hadamard_matrix(){// {{{
+  itpp::mat tmp(2,2);
+  tmp=1;
+  tmp(1,1)=-1;
+  tmp=tmp/sqrt(2.);
+  return tmp;
+} //}}}
+itpp::ivec diagonal_sigma_z(int encoded_positions, int qubits){ // {{{
+  itpp::ivec tmp(cfpmath::pow_2(qubits));
+  tmp=1;
+//   std::cout << "Encoded positions = " << encoded_positions << std::endl; 
+  for (int i=0; i<cfpmath::pow_2(qubits); i++){
+//     std::cout << "i="<<i<<", i&encoded_positions = " << (i&encoded_positions) << std::endl;
+    if (cfpmath::parity_sum_digits_base_2(i&encoded_positions)){
+      tmp(i)=-1;
+    }
+  }
+  return tmp;
+} // }}}
+itpp::Mat<std::complex<double> > Werner(const double alpha){// {{{
+	itpp::Mat<std::complex<double>  > tmp(4,4);
+ 	tmp=0.;
+	tmp(0,0)=tmp(3,3)=(2-alpha)/4;
+	tmp(1,1)=tmp(2,2)=alpha/4;
+	tmp(0,3)=tmp(3,0)=(1-alpha)/2;
+	return tmp;
+}// }}}
+itpp::cvec RandomState(unsigned int dim){ // {{{
+  itpp::cvec tmp=itpp::randn_c(dim);
+  return tmp/norm(tmp);
+} // }}}
+itpp::cvec BasisState(unsigned int dim, unsigned int basis_number){ // {{{
+  itpp::cvec tmp(dim);
+  tmp.zeros();
+  tmp(basis_number)=1;
+  return tmp;
+} // }}}
+itpp::vec BellState(int dim=4){// {{{
+  itpp::vec tmp(dim);
+  tmp.zeros();
+  tmp(0)=1;
+  tmp(dim-1)=1;
+  return tmp/sqrt(2.);
+}// }}}
+itpp::cmat exp_minus_i_b_sigma(itpp::vec b){// {{{
+  // From sakurai eq (3.2.44) we have that
+  // exp(- i \sigma \cdot n \phi/2) =
+  //  cos(\phi/2) \openone -  i sin(\phi/2) \sigma \cdot n
+  //
+  // exp(- i \sigma \cdot n \theta) =
+  //  cos(\theta) \openone -  i sin(\theta) \sigma \cdot n
+  double theta=itpp::norm(b);
+//   std::cout << theta << std::endl;
+  std::complex<double> I(0,1);
+  itpp::vec n=b/theta;
+  return cos(theta)*sigma(0)-I*sin(theta)*sigma(n);
+}// }}}
+itpp::cmat magnetic(itpp::vec b, int total){// {{{
+  itpp::cmat tmp(cfpmath::pow_2(total),cfpmath::pow_2(total));
+  tmp=0.;
+  for (int i=0; i<total; i++){
+    tmp=tmp+sigma(b, i, total);
+  }
+  return tmp;
+}// }}}
+// Apply operations
+template <class Num_T> void apply_sigma_x(itpp::Vec<Num_T>& state, int target_bit){// {{{
+
+  int pos_1, pos_2;
+  Num_T x;
+  for (int i=0; i<state.size()/2; i++){
+    pos_1 = cfpmath::merge_two_numbers(0, i, cfpmath::pow_2(target_bit));
+    pos_2 = cfpmath::set_bit(pos_1,target_bit);
+//     std::cout << "i="<< i << ", pos_1="<< pos_1 << ", pos_2="<< pos_2 << ", target_bit=" << target_bit << "\n";
+    x=state(pos_1);
+    state(pos_1)=state(pos_2);
+    state(pos_2)=x;
+//     std::cout << "state(pos_1)="<< state(pos_1) << ", state(pos_2)="<< state(pos_2)  << "\n";
+  }
+//    std::cout << "state" << state << "\n";
+return;
+}// }}}
+template <class Num_T> void apply_sigma_y(itpp::Vec<Num_T>& state, int target_bit){// {{{
+  int pos_1, pos_2;
+  std::complex<double> Im(0.,1.);
+  Num_T x;
+  for (int i=0; i<state.size()/2; i++){
+    pos_1 = cfpmath::merge_two_numbers(0, i, cfpmath::pow_2(target_bit));
+    pos_2 = cfpmath::set_bit(pos_1,target_bit);
+//     std::cout << "i="<< i << ", pos_1="<< pos_1 << ", pos_2="<< pos_2 << "\n";
+    x=state(pos_1);
+    state(pos_1)=-Im*state(pos_2);
+    state(pos_2)=Im*x;
+//     std::cout << "state(pos_1)="<< state(pos_1) << ", state(pos_2)="<< state(pos_2)  << "\n";
+  }
+//   std::cout << "state" << state << "\n";
+}// }}}
+template <class Num_T> void apply_sigma_z(itpp::Vec<Num_T>& state, int target_bit){// {{{
+  int pos;
+  Num_T x;
+  for (int i=0; i<state.size()/2; i++){
+    pos = cfpmath::set_bit(target_bit,target_bit);
+    state(pos)=-state(pos);
+  }
+//   std::cout << "state" << state << "\n";
+}// }}}
+void apply_gate(itpp::cvec& state, int nwhich, itpp::cmat gate){// {{{
+  int qs=cfpmath::BitCount(nwhich);
+  int qs2=cfpmath::pow_2(qs);
+  if ( (gate.rows() != qs2) || (gate.rows() != qs2)){
+    std::cerr << " toy cansado en el aeropuerto rutina apply_gate" << std::endl;
+    abort();
+
+  }
+  itpp::cvec moco;
+  itpp::ivec pos(qs2);
+  for (int i=0; i<state.size()/qs2; i++){
+    for (int j=0; j<qs2; j++){
+      pos(j)=cfpmath::merge_two_numbers(j,i,nwhich);
+    }
+//     std::cout << "pos=" << pos << std::endl;
+    moco=gate*state(pos);
+//     std::cout << "moco=" << moco << std::endl;
+    for (int j=0; j<qs2; j++){
+      state(pos(j))=moco(j);
+    }
+//     std::cout << "state(pos)=" << state(pos) << std::endl;
+    
+  }
+//   std::cout << "gate" << gate << std::endl;
+//   std::cout << "este deberia estar rotado" << state << std::endl;
+  return;
+}// }}}
+void apply_hadamard(itpp::cvec& state, int position){// {{{
+  itpp::ivec pos(2);
+  itpp::cvec moco;
+  itpp::mat h=hadamard_matrix();
+  for (int i=0; i<state.size()/2; i++){
+    pos(0)=cfpmath::merge_two_numbers(0,i,cfpmath::pow_2(position));
+    pos(1)=cfpmath::merge_two_numbers(1,i,cfpmath::pow_2(position));
+    moco= h*state(pos);
+    state(pos(0))= moco(0);
+    state(pos(1))= moco(1);
+  }
+  return;
+} // }}}
+void apply_sigma(itpp::cvec state, itpp::vec b, int PositionQubit){ // {{{
+
+ abort();
+} // }}}
+void apply_sigma(itpp::cvec& state, int Pauli_i, int PositionQubit){ // {{{
+//   std::cout << "Por entrar en el lio PositionQubit=" << PositionQubit << ", Pauli_i=" << Pauli_i <<  std::endl;
+  if (Pauli_i==1){
+    apply_sigma_x(state, PositionQubit);
+  } else if (Pauli_i==2) {
+    apply_sigma_y(state, PositionQubit);
+  } else if (Pauli_i==3) {
+    apply_sigma_z(state, PositionQubit);
+  } 
+  return;
+} // }}}
+itpp::cmat multiply_by_sigma_leftmost_qubit(const itpp::cmat& A, int sigma_label){ // {{{
+if (sigma_label==0){
+  return A;
+}
+int n=A.cols();
+itpp::cmat B(n,n);
+if (sigma_label==1) {
+  B.set_submatrix(0  ,0,A.get_rows(n/2,n-1  ));
+  B.set_submatrix(n/2,0,A.get_rows(0,  n/2-1));
+  return B;
+} else if (sigma_label==2) {
+  std::complex<double> I(0.,1.);
+  B.set_submatrix(0  ,0,-I*A.get_rows(n/2,n-1  ));
+  B.set_submatrix(n/2,0, I*A.get_rows(0,  n/2-1));
+
+//   std::cout << "En la rutina A=" << A.get_rows(n/2,n-1) << std::endl;
+//   std::cout << "En la rutina B=" << B(0,n/2-1,0,n-1) << std::endl;
+  return B;
+
+} else if (sigma_label==3) {
+  B.set_submatrix(0  ,0, A.get_rows(0,n/2-1));
+  B.set_submatrix(n/2,0,-A.get_rows(n/2,n-1));
+//   B(n/2,n-1,0,n-1)=-A.get_rows(n/2,n-1); 
+//   B(0,n/2-1,0,n-1)=A.get_rows(0,n/2-1);
+  return B;
+} else {
+  std::cerr << "sigma_label=" << sigma_label<<", not valid. aborting"<<std::endl;
+  abort();
+}
+
+
+} // }}}
+void apply_inverse_Rk(itpp::cvec& state, int k, int position1, int position2){// {{{
+  std::complex<double> phi=exp(-std::complex<double>(0,1)*2.*itpp::pi/double(cfpmath::pow_2(k)));
+  int mask = cfpmath::pow_2(position1) + cfpmath::pow_2(position2);
+  int n;
+  for (int j=0; j<state.size()/4; j++){
+    n=cfpmath::merge_two_numbers(3, j, mask); 
+    state(n)=phi*state(n);
+  }
+  return;
+} // }}}
+// Quantum information functions on states
+double InverseParticipationRatio(const itpp::cvec& psi){ // {{{
+  double tmp=0.;
+  for (int i=0; i<psi.size();i++){
+    tmp+=std::pow(abs(psi(i)),4);
+  }
+  return tmp;
+
+} // }}}
+double Concurrence(const itpp::Mat<std::complex<double>  > rho){ // {{{
+	itpp::Mat<std::complex<double> > rho_tilde(4,4);
+	for (unsigned int i1=0;i1<4;i1++){
+		for (unsigned int i2=0;i2<4;i2++){
+			rho_tilde(i1,i2)=conj(rho(3-i1,3-i2));
+			if( ((cfpmath::BitCount(i1)+cfpmath::BitCount(i2) )%2) == 1){
+				rho_tilde(i1,i2)=-rho_tilde(i1,i2);
+			}
+		}
+	}
+	rho_tilde=rho*rho_tilde;
+	itpp::Vec<double> eigenvalues=real(eig(rho_tilde));
+	if (max(eigenvalues)<0){
+		return 0.;
+	}
+	else{
+		return 2*sqrt(max(eigenvalues))-sum(sqrt(abs(eigenvalues)));
+	}
+} // }}}
+double ConcurrenceFromPure(const itpp::cvec psi){ // {{{
+	return 2*abs(psi(1)*psi(2)-psi(0)*psi(3));
+} // }}}
+double vonNeumann(const itpp::vec lambda){// {{{
+	double tmp=0;
+	for (int i=0; i<lambda.size(); i++){tmp+=cfpmath::h_function(lambda(i));}
+	return tmp/log(lambda.size());
+}// }}}
+double Purity(const itpp::Mat<std::complex<double> >& rho){// {{{
+	double P=0;
+	for (int i =0; i< rho.rows(); i++){
+		P += abs(dot (rho.get_col(i),rho.get_row(i)));
+	}
+	return P;
+}// }}}
+double Purity(const itpp::vec& eigenvalues){// {{{
+        return dot(eigenvalues,eigenvalues);
+}// }}}
+// Others
 itpp::mat LambdaMatrixQubitRight(itpp::cmat U){ // {{{ Quantum channel for a single qubit, slow
   itpp::mat Lambda(3,3);
   int n=U.cols();
@@ -1134,285 +1435,8 @@ itpp::cvec OperatorToVectorPauliBasis(itpp::cmat rho){ // {{{
   }
   return r;
 } // }}}
-itpp::ivec diagonal_sigma_z(int encoded_positions, int qubits){ // {{{
-  itpp::ivec tmp(cfpmath::pow_2(qubits));
-  tmp=1;
-//   std::cout << "Encoded positions = " << encoded_positions << std::endl; 
-  for (int i=0; i<cfpmath::pow_2(qubits); i++){
-//     std::cout << "i="<<i<<", i&encoded_positions = " << (i&encoded_positions) << std::endl;
-    if (cfpmath::parity_sum_digits_base_2(i&encoded_positions)){
-      tmp(i)=-1;
-    }
-  }
-  return tmp;
-} // }}}
-itpp::cmat sigma(itpp::ivec is){ // {{{
-  int qubits=is.size();
-  itpp::Array<itpp::cmat> sigmas(qubits);
-  if (qubits==0){
-
-    return itpp::mat_1x1( std::complex<double> (1,0));
-  }
-  for (int i=0; i<qubits; i++){
-    sigmas(qubits-i-1)=sigma(is(i));
-  }
-  return TensorProduct(sigmas);
-} // }}}
-itpp::cmat sigma(int i){ // {{{
-  std::complex<double> imaginary(0,1), c0(0.,0.);
-  switch (i) {
-    case 0:
-      return itpp::to_cmat(itpp::mat_2x2(1, 0, 0, 1));
-    case 1:
-      return itpp::to_cmat(itpp::mat_2x2(0, 1, 1, 0));
-    case 2:
-      return itpp::mat_2x2(c0, -imaginary, imaginary, c0);
-    case 3:
-      return itpp::to_cmat(itpp::mat_2x2(1, 0, 0, -1));
-    default:
-      std::cout << "Sigma not found. i=" << i << "\n"; 
-      abort(); 
-  }
-} // }}}
-itpp::cmat sigma(itpp::vec b){ // {{{
-  if (b.size()==3){
-    return b(0)*sigma(1)+b(1)*sigma(2)+ b(2)*sigma(3);
-  } else {
-    std::cout << "Sigma not found 89p790as7dfu.\n";
-    abort(); 
-  }
-} // }}}
-itpp::cmat sigma(itpp::vec b, int position, int total){ // {{{
-  itpp::cmat tmp = sigma(b);
-  if (position==total-1){
-    tmp=TensorProduct(tmp,itpp::eye_c(cfpmath::pow_2(total-1)));
-  } else if (position==0){
-    tmp=TensorProduct(itpp::eye_c(cfpmath::pow_2(total-1)),tmp);
-  } else if (0<position && position<total-1){
-    tmp=TensorProduct(tmp,itpp::eye_c(cfpmath::pow_2(position)));
-    tmp=TensorProduct(itpp::eye_c(cfpmath::pow_2(total-position-1)),tmp);
-  } else {
-    std::cout << "Sigma not found asdfa \n";
-    abort(); 
-  }
-  return tmp;
-} // }}}
-void apply_sigma(itpp::cvec state, itpp::vec b, int PositionQubit){ // {{{
-
- abort();
-} // }}}
-itpp::cmat multiply_by_sigma_leftmost_qubit(const itpp::cmat& A, int sigma_label){ // {{{
-if (sigma_label==0){
-  return A;
-}
-int n=A.cols();
-itpp::cmat B(n,n);
-if (sigma_label==1) {
-  B.set_submatrix(0  ,0,A.get_rows(n/2,n-1  ));
-  B.set_submatrix(n/2,0,A.get_rows(0,  n/2-1));
-  return B;
-} else if (sigma_label==2) {
-  std::complex<double> I(0.,1.);
-  B.set_submatrix(0  ,0,-I*A.get_rows(n/2,n-1  ));
-  B.set_submatrix(n/2,0, I*A.get_rows(0,  n/2-1));
-
-//   std::cout << "En la rutina A=" << A.get_rows(n/2,n-1) << std::endl;
-//   std::cout << "En la rutina B=" << B(0,n/2-1,0,n-1) << std::endl;
-  return B;
-
-} else if (sigma_label==3) {
-  B.set_submatrix(0  ,0, A.get_rows(0,n/2-1));
-  B.set_submatrix(n/2,0,-A.get_rows(n/2,n-1));
-//   B(n/2,n-1,0,n-1)=-A.get_rows(n/2,n-1); 
-//   B(0,n/2-1,0,n-1)=A.get_rows(0,n/2-1);
-  return B;
-} else {
-  std::cerr << "sigma_label=" << sigma_label<<", not valid. aborting"<<std::endl;
-  abort();
-}
-
-
-} // }}}
-double InverseParticipationRatio(const itpp::cvec& psi){ // {{{
-  double tmp=0.;
-  for (int i=0; i<psi.size();i++){
-    tmp+=std::pow(abs(psi(i)),4);
-  }
-  return tmp;
-
-} // }}}
-double Concurrence(const itpp::Mat<std::complex<double>  > rho){ // {{{
-	itpp::Mat<std::complex<double> > rho_tilde(4,4);
-	for (unsigned int i1=0;i1<4;i1++){
-		for (unsigned int i2=0;i2<4;i2++){
-			rho_tilde(i1,i2)=conj(rho(3-i1,3-i2));
-			if( ((cfpmath::BitCount(i1)+cfpmath::BitCount(i2) )%2) == 1){
-				rho_tilde(i1,i2)=-rho_tilde(i1,i2);
-			}
-		}
-	}
-	rho_tilde=rho*rho_tilde;
-	itpp::Vec<double> eigenvalues=real(eig(rho_tilde));
-	if (max(eigenvalues)<0){
-		return 0.;
-	}
-	else{
-		return 2*sqrt(max(eigenvalues))-sum(sqrt(abs(eigenvalues)));
-	}
-} // }}}
-double ConcurrenceFromPure(const itpp::cvec psi){ // {{{
-	return 2*abs(psi(1)*psi(2)-psi(0)*psi(3));
-} // }}}
-double vonNeumann(const itpp::vec lambda){// {{{
-	double tmp=0;
-	for (int i=0; i<lambda.size(); i++){tmp+=cfpmath::h_function(lambda(i));}
-	return tmp/log(lambda.size());
-}// }}}
-itpp::Mat<std::complex<double> > Werner(const double alpha){// {{{
-	itpp::Mat<std::complex<double>  > tmp(4,4);
- 	tmp=0.;
-	tmp(0,0)=tmp(3,3)=(2-alpha)/4;
-	tmp(1,1)=tmp(2,2)=alpha/4;
-	tmp(0,3)=tmp(3,0)=(1-alpha)/2;
-	return tmp;
-}// }}}
-double Purity(const itpp::Mat<std::complex<double> >& rho){// {{{
-	double P=0;
-	for (int i =0; i< rho.rows(); i++){
-		P += abs(dot (rho.get_col(i),rho.get_row(i)));
-	}
-	return P;
-}// }}}
-double Purity(const itpp::vec& eigenvalues){// {{{
-        return dot(eigenvalues,eigenvalues);
-}// }}}
-template <class Num_T> void apply_sigma_x(itpp::Vec<Num_T>& state, int target_bit){// {{{
-  int pos_1, pos_2;
-  Num_T x;
-  for (int i=0; i<state.size()/2; i++){
-    pos_1 = cfpmath::merge_two_numbers(0, i, cfpmath::pow_2(target_bit));
-    pos_2 = cfpmath::set_bit(pos_1,target_bit);
-//     std::cout << "i="<< i << ", pos_1="<< pos_1 << ", pos_2="<< pos_2 << "\n";
-    x=state(pos_1);
-    state(pos_1)=state(pos_2);
-    state(pos_2)=x;
-//     std::cout << "state(pos_1)="<< state(pos_1) << ", state(pos_2)="<< state(pos_2)  << "\n";
-  }
-//   std::cout << "state" << state << "\n";
-}// }}}
-template <class Num_T> void apply_sigma_y(itpp::Vec<Num_T>& state, int target_bit){// {{{
-  int pos_1, pos_2;
-  std::complex<double> Im(0.,1.);
-  Num_T x;
-  for (int i=0; i<state.size()/2; i++){
-    pos_1 = cfpmath::merge_two_numbers(0, i, cfpmath::pow_2(target_bit));
-    pos_2 = cfpmath::set_bit(pos_1,target_bit);
-//     std::cout << "i="<< i << ", pos_1="<< pos_1 << ", pos_2="<< pos_2 << "\n";
-    x=state(pos_1);
-    state(pos_1)=-Im*state(pos_2);
-    state(pos_2)=Im*x;
-//     std::cout << "state(pos_1)="<< state(pos_1) << ", state(pos_2)="<< state(pos_2)  << "\n";
-  }
-//   std::cout << "state" << state << "\n";
-}// }}}
-template <class Num_T> void apply_sigma_z(itpp::Vec<Num_T>& state, int target_bit){// {{{
-  int pos;
-  Num_T x;
-  for (int i=0; i<state.size()/2; i++){
-    pos = cfpmath::set_bit(pos_1,target_bit);
-    state(pos)=-state(pos);
-  }
-//   std::cout << "state" << state << "\n";
-}// }}}
-itpp::cmat exp_minus_i_b_sigma(itpp::vec b){// {{{
-  // From sakurai eq (3.2.44) we have that
-  // exp(- i \sigma \cdot n \phi/2) =
-  //  cos(\phi/2) \openone -  i sin(\phi/2) \sigma \cdot n
-  //
-  // exp(- i \sigma \cdot n \theta) =
-  //  cos(\theta) \openone -  i sin(\theta) \sigma \cdot n
-  double theta=itpp::norm(b);
-//   std::cout << theta << std::endl;
-  std::complex<double> I(0,1);
-  itpp::vec n=b/theta;
-  return cos(theta)*sigma(0)-I*sin(theta)*sigma(n);
-}// }}}
-itpp::cmat magnetic(itpp::vec b, int total){// {{{
-  itpp::cmat tmp(cfpmath::pow_2(total),cfpmath::pow_2(total));
-  tmp=0.;
-  for (int i=0; i<total; i++){
-    tmp=tmp+sigma(b, i, total);
-  }
-  return tmp;
-}// }}}
-itpp::cvec RandomState(unsigned int dim){ // {{{
-  itpp::cvec tmp=itpp::randn_c(dim);
-  return tmp/norm(tmp);
-} // }}}
-itpp::cvec BasisState(unsigned int dim, unsigned int basis_number){ // {{{
-  itpp::cvec tmp(dim);
-  tmp.zeros();
-  tmp(basis_number)=1;
-  return tmp;
-} // }}}
-itpp::vec BellState(int dim=4){// {{{
-  itpp::vec tmp(dim);
-  tmp.zeros();
-  tmp(0)=1;
-  tmp(dim-1)=1;
-  return tmp/sqrt(2.);
-}// }}}
 // }}}
 // Quantum Evolution {{{
-void apply_inverse_Rk(itpp::cvec& state, int k, int position1, int position2){// {{{
-  std::complex<double> phi=exp(-std::complex<double>(0,1)*2.*itpp::pi/double(cfpmath::pow_2(k)));
-  int mask = cfpmath::pow_2(position1) + cfpmath::pow_2(position2);
-  int n;
-  for (int j=0; j<state.size()/4; j++){
-    n=cfpmath::merge_two_numbers(3, j, mask); 
-    state(n)=phi*state(n);
-  }
-  return;
-} // }}}
-itpp::mat hadamard_matrix(){// {{{
-  itpp::mat tmp(2,2);
-  tmp=1;
-  tmp(1,1)=-1;
-  tmp=tmp/sqrt(2.);
-  return tmp;
-} //}}}
-void apply_gate(itpp::cvec& state, int nwhich, itpp::cmat gate){// {{{
-  int qs=cfpmath::BitCount(nwhich);
-  int qs2=cfpmath::pow_2(qs);
-  if ( (gate.rows() != qs2) || (gate.rows() != qs2)){
-    std::cerr << " toy cansado en el aeropuerto rutina apply_gate" << std::endl;
-    abort();
-
-  }
-  itpp::cvec moco;
-  itpp::ivec pos(qs2);
-  for (int i=0; i<state.size()/qs2; i++){
-    for (int j=0; j<qs2; j++){
-      pos(j)=cfpmath::merge_two_numbers(j,i,nwhich);
-    }
-    moco=gate*state(pos);
-    state(pos)=moco;
-  }
-  return;
-}// }}}
-void apply_hadamard(itpp::cvec& state, int position){// {{{
-  itpp::ivec pos(2);
-  itpp::cvec moco;
-  itpp::mat h=hadamard_matrix();
-  for (int i=0; i<state.size()/2; i++){
-    pos(0)=cfpmath::merge_two_numbers(0,i,cfpmath::pow_2(position));
-    pos(1)=cfpmath::merge_two_numbers(1,i,cfpmath::pow_2(position));
-    moco= h*state(pos);
-    state(pos(0))= moco(0);
-    state(pos(1))= moco(1);
-  }
-  return;
-} // }}}
 itpp::cvec GetState(itpp::cmat& U, itpp::vec& eigenvalues, itpp::cvec& psi_0, double t){ // {{{
   itpp::cmat U_dagger = itpp::hermitian_transpose(U);
   itpp::cvec psi_0_prime = U_dagger*psi_0;
