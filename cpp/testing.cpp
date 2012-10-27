@@ -204,8 +204,7 @@ int main(int argc, char* argv[]){
     double total_error = 0.;
     
     state=RandomState(d); 
-    state = 0.;
-    state(0)=1.;
+//     state = 0.; state(1)=1.;
 
 //     Array<cmat> SingleQubitGates(0);
 
@@ -250,6 +249,76 @@ int main(int argc, char* argv[]){
         }
       } // }}}
     }
+    cout << "Error total = " << total_error << endl; 
+      
+  // }}}
+  } else if (option == "test_arbitrary_2_qubit_gate") { // {{{
+//     cout << "in option test_arbitrary_2_qubit_gate 1" << endl;
+    int q=i1.getValue();
+    int d=pow_2(q);
+    cvec state(d), state_1,state_2;
+    double total_error = 0.;
+    Array<cmat> SingleQubitGates(5);
+    SingleQubitGates(0)=sigma(0);
+    SingleQubitGates(1)=sigma(1);
+    SingleQubitGates(2)=sigma(2);
+    SingleQubitGates(3)=sigma(3);
+    SingleQubitGates(4)=to_cmat(hadamard_matrix());
+    int ns=SingleQubitGates.size();
+    
+//     cout << "in option test_arbitrary_2_qubit_gate 2" << endl;
+    state=RandomState(d); 
+//     state = 0.;
+//     state(0)=1.;
+
+    // las dos posibles combinacoines de sigmas, 
+    // hadamard tensor identidad
+    // las compuertas controladas
+    // el swap
+
+    // All single qubit gates combined
+    for (int t1=0; t1<q; t1++){ for (int t2=0; t2<t1; t2++){ // {{{
+//       cout << "adsfa " << t1 << endl;
+      for (int i1=0; i1<ns; i1++){ for (int i2=0; i2<ns; i2++){
+//         cout << "adsfa (t1, t2, i1, i2)=(" << t1 << "," << t2 << "," << i1 << ","  << i2 << ")"<< endl;
+        state_1 = state;
+        state_2 = state;
+        apply_gate(state_1, 1<<t1, SingleQubitGates(i1));
+        apply_gate(state_1, 1<<t2, SingleQubitGates(i2));
+        apply_gate(state_2, (1<<t1)+(1<<t2), TensorProduct(SingleQubitGates(i1),SingleQubitGates(i2)));
+        total_error += norm(state_1-state_2);
+        if (total_error > 0.000000000001){ // {{{
+          cout << total_error << endl;
+          cout << "sigma("<<i1<<") en "<< t1 << ", sigma("<<i2<<") en "<< t2 << endl;
+          cout << "Estado original=" << state << endl;
+          cout << "state_1=" << state_1 << endl;
+          cout << "state_2=" << state_2 << endl;
+          abort();
+        } //}}}
+      } } 
+    } }// }}}
+//     cout << "Error total en sigmas = " << total_error << endl; 
+
+    // Swap gates
+    for (int t1=0; t1<q; t1++){ for (int t2=0; t2<t1; t2++){ // {{{
+      if (t1==t2){
+        continue;
+      }
+//       cout << t1 << t2 << endl;
+      state_1 = state;
+      state_2 = state;
+      apply_swap(state_1, t1, t2);
+      apply_gate(state_2, (1<<t1)+(1<<t2),to_cmat(swap_matrix()));
+      total_error += norm(state_1-state_2);
+        if (total_error > 0.000000000001){ // {{{
+          cout << total_error << endl;
+//           cout << "sigma("<<i1<<") en "<< t1 << ", sigma("<<i2<<") en "<< t2 << endl;
+          cout << "Estado original=" << state << endl;
+          cout << "state_1=" << state_1 << endl;
+          cout << "state_2=" << state_2 << endl;
+          abort();
+        } //}}}
+    } }// }}}
     cout << "Error total = " << total_error << endl; 
       
   // }}}

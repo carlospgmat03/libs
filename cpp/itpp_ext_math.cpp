@@ -165,6 +165,13 @@ template <class Num_T> itpp::Array<Num_T > Shuffle(const itpp::Array<Num_T >& vc
   for (int i=1; i<v.size(); i++){ v.swap(i,itpp::randi(0,i)); }
   return v;
 } //}}}
+template <class Num_T> void swap(itpp::Vec<Num_T >& v, int& p1, int& p2){ // {{{
+  Num_T x;
+  x=v(p1);
+  v(p1)=v(p2);
+  v(p2)=x;
+  return ;
+} //}}}
 template <class Num_T> itpp::Array<Num_T > CircularRotateRight(const itpp::Array<Num_T >& v){ // {{{
   itpp::Array<Num_T > tmp=v;
   tmp.shift_right(Last(tmp)); 
@@ -1104,6 +1111,15 @@ itpp::mat hadamard_matrix(){// {{{
   tmp=tmp/sqrt(2.);
   return tmp;
 } //}}}
+itpp::mat swap_matrix(){// {{{
+  itpp::mat tmp(4,4);
+  tmp=0.;
+  tmp(0,0)=1;
+  tmp(1,2)=1;
+  tmp(2,1)=1;
+  tmp(3,3)=1;
+  return tmp;
+} //}}}
 itpp::ivec diagonal_sigma_z(int encoded_positions, int qubits){ // {{{
   itpp::ivec tmp(cfpmath::pow_2(qubits));
   tmp=1;
@@ -1198,16 +1214,50 @@ template <class Num_T> void apply_sigma_z(itpp::Vec<Num_T>& state, int target_bi
   int pos;
   Num_T x;
   for (int i=0; i<state.size()/2; i++){
-    pos = cfpmath::set_bit(target_bit,target_bit);
+    pos = cfpmath::merge_two_numbers(1, i, cfpmath::pow_2(target_bit));
+//     pos = cfpmath::set_bit(target_bit,target_bit);
     state(pos)=-state(pos);
   }
 //   std::cout << "state" << state << "\n";
 }// }}}
+void apply_sigma(itpp::cvec state, itpp::vec b, int PositionQubit){ // {{{
+
+ abort();
+} // }}}
+void apply_sigma(itpp::cvec& state, int Pauli_i, int PositionQubit){ // {{{
+//   std::cout << "Por entrar en el lio PositionQubit=" << PositionQubit << ", Pauli_i=" << Pauli_i <<  std::endl;
+  if (Pauli_i==1){
+    apply_sigma_x(state, PositionQubit);
+  } else if (Pauli_i==2) {
+    apply_sigma_y(state, PositionQubit);
+  } else if (Pauli_i==3) {
+
+    apply_sigma_z(state, PositionQubit);
+  } 
+  return;
+} // }}}
 void apply_gate(itpp::cvec& state, int nwhich, itpp::cmat gate){// {{{
+  // This gate has to be applied with care. Notice for example that
+  // with nwhich=3=11, the gate XY and YX are different. We are assuming
+  // that the user has taken care of ordering the incoming gate 
+  // carefully. For example, if you want to apply H in qubit 0 and
+  // Y gate in qubit 2, you sould set 
+  // nwhich = 1 0 1 = 5
+  // and then set gate = YH
+  // since HY will give you an incorrect result. Moreover, if you want 
+  // to apply a controled gate, it is not good to put
+  // 1 (oplus) U
+  // if the control qubit is ?????? I dont know, but there is a correct
+  // and an incorrect way of putting it. !! see the testing routine
+  // to set it up-. 
+  //
   int qs=cfpmath::BitCount(nwhich);
   int qs2=cfpmath::pow_2(qs);
   if ( (gate.rows() != qs2) || (gate.rows() != qs2)){
-    std::cerr << " toy cansado en el aeropuerto rutina apply_gate" << std::endl;
+    std::cerr << "Error apply_gate" << std::endl;
+    std::cerr << "gate.rows()=" << gate.rows() << std::endl;
+    std::cerr << "qs2=" << qs2 << std::endl;
+    std::cerr << "nwhich=" << nwhich << std::endl;
     abort();
 
   }
@@ -1241,21 +1291,6 @@ void apply_hadamard(itpp::cvec& state, int position){// {{{
     state(pos(0))= moco(0);
     state(pos(1))= moco(1);
   }
-  return;
-} // }}}
-void apply_sigma(itpp::cvec state, itpp::vec b, int PositionQubit){ // {{{
-
- abort();
-} // }}}
-void apply_sigma(itpp::cvec& state, int Pauli_i, int PositionQubit){ // {{{
-//   std::cout << "Por entrar en el lio PositionQubit=" << PositionQubit << ", Pauli_i=" << Pauli_i <<  std::endl;
-  if (Pauli_i==1){
-    apply_sigma_x(state, PositionQubit);
-  } else if (Pauli_i==2) {
-    apply_sigma_y(state, PositionQubit);
-  } else if (Pauli_i==3) {
-    apply_sigma_z(state, PositionQubit);
-  } 
   return;
 } // }}}
 itpp::cmat multiply_by_sigma_leftmost_qubit(const itpp::cmat& A, int sigma_label){ // {{{
@@ -1297,6 +1332,16 @@ void apply_inverse_Rk(itpp::cvec& state, int k, int position1, int position2){//
   for (int j=0; j<state.size()/4; j++){
     n=cfpmath::merge_two_numbers(3, j, mask); 
     state(n)=phi*state(n);
+  }
+  return;
+} // }}}
+void apply_swap(itpp::cvec& state, int position1, int position2){// {{{
+  int mask = cfpmath::pow_2(position1) + cfpmath::pow_2(position2);
+  int n1, n2;
+  for (int j=0; j<state.size()/4; j++){
+    n1=cfpmath::merge_two_numbers(2, j, mask); 
+    n2=cfpmath::merge_two_numbers(1, j, mask); 
+    swap(state, n1, n2);
   }
   return;
 } // }}}
