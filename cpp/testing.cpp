@@ -265,19 +265,14 @@ int main(int argc, char* argv[]){
     SingleQubitGates(3)=sigma(3);
     SingleQubitGates(4)=to_cmat(hadamard_matrix());
     int ns=SingleQubitGates.size();
-    
+    cmat cu;
 //     cout << "in option test_arbitrary_2_qubit_gate 2" << endl;
     state=RandomState(d); 
-//     state = 0.;
-//     state(0)=1.;
+//     state = 0.; state(1)=1.;
+    // las compuertas controladas, c-Pauli y c-R_k
 
-    // las dos posibles combinacoines de sigmas, 
-    // hadamard tensor identidad
-    // las compuertas controladas
-    // el swap
-
-    // All single qubit gates combined
-    for (int t1=0; t1<q; t1++){ for (int t2=0; t2<t1; t2++){ // {{{
+    // All single qubit gates combined  {{{
+    for (int t1=0; t1<q; t1++){ for (int t2=0; t2<t1; t2++){ // 
 //       cout << "adsfa " << t1 << endl;
       for (int i1=0; i1<ns; i1++){ for (int i2=0; i2<ns; i2++){
 //         cout << "adsfa (t1, t2, i1, i2)=(" << t1 << "," << t2 << "," << i1 << ","  << i2 << ")"<< endl;
@@ -297,10 +292,8 @@ int main(int argc, char* argv[]){
         } //}}}
       } } 
     } }// }}}
-//     cout << "Error total en sigmas = " << total_error << endl; 
-
-    // Swap gates
-    for (int t1=0; t1<q; t1++){ for (int t2=0; t2<t1; t2++){ // {{{
+    // Swap gates {{{
+    for (int t1=0; t1<q; t1++){ for (int t2=0; t2<t1; t2++){ 
       if (t1==t2){
         continue;
       }
@@ -319,6 +312,57 @@ int main(int argc, char* argv[]){
           abort();
         } //}}}
     } }// }}}
+    // control not gates {{{
+//     cout << "Working on the cnot gate" << endl;
+    for (int c=0; c<q; c++){ for (int t=0; t<q; t++){ 
+      if (c==t){
+        continue;
+      }
+//       cout << "c=" << c << ", t=" << t << endl;
+      for (int i=0; i<ns; i++){ 
+        state_1 = state; state_2 = state;
+//         apply_control_u(state, c, t, SingleQubitGates(i));
+//         cu = control_u_matrix( SingleQubitGates(i));
+        apply_cnot(state_1, c, t);
+        cu = to_cmat(cnot_matrix());
+        if (c<t){
+          cu=swap_matrix()*cu*swap_matrix();
+        }
+//         cout << "cu=" << cu << endl;
+        apply_gate(state_2, (1<<c)+(1<<t),cu);
+        total_error += norm(state_1-state_2);
+        if (total_error > 0.000000000001){ // {{{
+          cout << total_error << endl;
+          //           cout << "sigma("<<i1<<") en "<< t1 << ", sigma("<<i2<<") en "<< t2 << endl;
+          cout << "Control, target = " << c << ", " << t  << endl;
+          cout << "Estado original=" << state << endl;
+          cout << "state_1=" << state_1 << endl;
+          cout << "state_2=" << state_2 << endl;
+          abort();
+        } //}}}
+      }
+    } }// }}}
+//     // control Pauli gates {{{
+//     for (int c=0; c<q; c++){ for (int t=0; t<q; t++){ 
+//       if (c==t){
+//         continue;
+//       }
+//       for (int i=0; i<ns; i++){ 
+//         state_1 = state; state_2 = state;
+//         apply_control_u(state, c, t, SingleQubitGates(i));
+//         cu = control_u_matrix( SingleQubitGates(i));
+//         apply_gate(state_2, (1<<t1)+(1<<t2),cu);
+//         total_error += norm(state_1-state_2);
+//         if (total_error > 0.000000000001){ // {{{
+//           cout << total_error << endl;
+//           //           cout << "sigma("<<i1<<") en "<< t1 << ", sigma("<<i2<<") en "<< t2 << endl;
+//           cout << "Estado original=" << state << endl;
+//           cout << "state_1=" << state_1 << endl;
+//           cout << "state_2=" << state_2 << endl;
+//           abort();
+//         } //}}}
+//       }
+//     } }// }}}
     cout << "Error total = " << total_error << endl; 
       
   // }}}

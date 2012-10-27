@@ -1120,6 +1120,15 @@ itpp::mat swap_matrix(){// {{{
   tmp(3,3)=1;
   return tmp;
 } //}}}
+itpp::mat cnot_matrix(){// {{{
+  itpp::mat tmp(4,4);
+  tmp=0.;
+  tmp(0,0)=1;
+  tmp(1,1)=1;
+  tmp(2,3)=1;
+  tmp(3,2)=1;
+  return tmp;
+} //}}}
 itpp::ivec diagonal_sigma_z(int encoded_positions, int qubits){ // {{{
   itpp::ivec tmp(cfpmath::pow_2(qubits));
   tmp=1;
@@ -1341,6 +1350,21 @@ void apply_swap(itpp::cvec& state, int position1, int position2){// {{{
   for (int j=0; j<state.size()/4; j++){
     n1=cfpmath::merge_two_numbers(2, j, mask); 
     n2=cfpmath::merge_two_numbers(1, j, mask); 
+    swap(state, n1, n2);
+  }
+  return;
+} // }}}
+void apply_cnot(itpp::cvec& state, int control, int target){// {{{
+  int mask = cfpmath::pow_2(control) + cfpmath::pow_2(target);
+  int n1, n2;
+  for (int j=0; j<state.size()/4; j++){
+    if(control < target){
+      n1=cfpmath::merge_two_numbers(1, j, mask); 
+      n2=cfpmath::merge_two_numbers(3, j, mask); 
+    } else if (control > target) {
+      n1=cfpmath::merge_two_numbers(2, j, mask); 
+      n2=cfpmath::merge_two_numbers(3, j, mask); 
+    }
     swap(state, n1, n2);
   }
   return;
