@@ -1129,6 +1129,14 @@ itpp::mat cnot_matrix(){// {{{
   tmp(3,2)=1;
   return tmp;
 } //}}}
+itpp::cmat control_u_matrix(itpp::cmat& u){// {{{
+  itpp::cmat tmp(4,4);
+  tmp=0.;
+  tmp(0,0)=1;
+  tmp(1,1)=1;
+  tmp.set_submatrix(2,2,u);
+  return tmp;
+} //}}}
 itpp::ivec diagonal_sigma_z(int encoded_positions, int qubits){ // {{{
   itpp::ivec tmp(cfpmath::pow_2(qubits));
   tmp=1;
@@ -1366,6 +1374,26 @@ void apply_cnot(itpp::cvec& state, int control, int target){// {{{
       n2=cfpmath::merge_two_numbers(3, j, mask); 
     }
     swap(state, n1, n2);
+  }
+  return;
+} // }}}
+void apply_control_u(itpp::cvec& state, int control, int target, itpp::cmat& u){// {{{
+  int mask = cfpmath::pow_2(control) + cfpmath::pow_2(target);
+  itpp::cvec moco;
+  int n1, n2;
+  itpp::ivec pos(2);
+  for (int j=0; j<state.size()/4; j++){
+    if(control < target){
+      pos(0)=cfpmath::merge_two_numbers(1, j, mask); 
+      pos(1)=cfpmath::merge_two_numbers(3, j, mask); 
+    } else if (control > target) {
+      pos(0)=cfpmath::merge_two_numbers(2, j, mask); 
+      pos(1)=cfpmath::merge_two_numbers(3, j, mask); 
+    }
+    moco=u*state(pos);
+    for (int j=0; j<2; j++){
+      state(pos(j))=moco(j);
+    }
   }
   return;
 } // }}}

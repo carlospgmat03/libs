@@ -342,27 +342,35 @@ int main(int argc, char* argv[]){
         } //}}}
       }
     } }// }}}
-//     // control Pauli gates {{{
-//     for (int c=0; c<q; c++){ for (int t=0; t<q; t++){ 
-//       if (c==t){
-//         continue;
-//       }
-//       for (int i=0; i<ns; i++){ 
-//         state_1 = state; state_2 = state;
-//         apply_control_u(state, c, t, SingleQubitGates(i));
-//         cu = control_u_matrix( SingleQubitGates(i));
-//         apply_gate(state_2, (1<<t1)+(1<<t2),cu);
-//         total_error += norm(state_1-state_2);
-//         if (total_error > 0.000000000001){ // {{{
-//           cout << total_error << endl;
-//           //           cout << "sigma("<<i1<<") en "<< t1 << ", sigma("<<i2<<") en "<< t2 << endl;
-//           cout << "Estado original=" << state << endl;
-//           cout << "state_1=" << state_1 << endl;
-//           cout << "state_2=" << state_2 << endl;
-//           abort();
-//         } //}}}
-//       }
-//     } }// }}}
+    // control pauli gates {{{
+//     cout << "Working on the cnot gate" << endl;
+    for (int c=0; c<q; c++){ for (int t=0; t<q; t++){ 
+      if (c==t){
+        continue;
+      }
+//       cout << "c=" << c << ", t=" << t << endl;
+      for (int i=0; i<ns; i++){ 
+        state_1 = state; state_2 = state;
+        apply_control_u(state_1, c, t, SingleQubitGates(i));
+        cu = control_u_matrix( SingleQubitGates(i));
+//         cout << cu << endl;
+        if (c<t){
+          cu=swap_matrix()*cu*swap_matrix();
+        }
+//         cout << "cu=" << cu << endl;
+        apply_gate(state_2, (1<<c)+(1<<t),cu);
+        total_error += norm(state_1-state_2);
+        if (total_error > 0.000000000001){ // {{{
+          cout << total_error << endl;
+          //           cout << "sigma("<<i1<<") en "<< t1 << ", sigma("<<i2<<") en "<< t2 << endl;
+          cout << "Control, target = " << c << ", " << t  << endl;
+          cout << "Estado original=" << state << endl;
+          cout << "state_1=" << state_1 << endl;
+          cout << "state_2=" << state_2 << endl;
+          abort();
+        } //}}}
+      }
+    } }// }}}
     cout << "Error total = " << total_error << endl; 
       
   // }}}
