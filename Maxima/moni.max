@@ -1,0 +1,409 @@
+/*
+   This is "moni.max", which contains the integration formulas for monomial
+   integrals over all three classical groups, the orthogonal group, the unitary
+   group and the unitary-symplectic group.
+
+   It needs the functions pochhammer and multinomial. We therefore load the 
+   following extentions:   
+   --------------------------------------------------------------------------*/
+if not(pochhammer(1,1) = 1) then load("orthopoly");
+if not(multinomial(1,[1]) = 1) then load("sym");
+/* --------------------------------------------------------------------------
+
+   moni.max is divided into two parts. In the first part, we provide the
+   functions to compute the one-vector integrals over the classical groups.
+   We denote with `d' the matrix-dimension of the group, though in the case
+   of the unitary-symplectic group the matrix-dimension is 2d. Furthermore,
+   `m', `n', `m1', `m2', `n1', `n2' denote column vectors of dimension d. These
+   column vectors are passed to the respective functions in the form of lists
+   of non-negative integers. The functions for the one-vector integrals have
+   the following names:
+
+   For the orthogonal case:
+      orth1(d,m)  This function gives the value of the integral <m>. It however
+                  assumes that m contains only even integers. Otherwise it
+                  gives the wrong answer.
+
+      orth2(d,m)  gives the value of the integral                        <m>
+
+   For the unitary case:
+      unit1(d,m)  gives the value of the monomial integral              <m|m>
+
+      unit2(d,m,n)  gives the value of the monomial integral            <n|m>
+
+   For the unitary-symplectic case:
+      symp1(d,m1,m2)  gives the value of the monomial integral         /m2|m1\
+                                                                       \m1|m2/ 
+
+      symp2(d,m1,m2,n1,n2) gives the value of the monomial integral    /n2|m1\
+                                                                       \n1|m2/
+
+   ----------------------------------------------------------------------------
+   The second part contains the functions to compute the general R-vector
+   integrals. Normally, one should use the following three functions:
+
+      for the orthogonal group:         orth(d,mm)
+      for the unitary group:            unit(d,mm,nn)
+      for the unitary-symplectic group: symp(d,[mm1,mm2,nn1,nn2])
+
+   where d is the matrix-dimension of the group in the orthogonal and the
+   unitary case, whereas in the unitary-symplectic case, the matrix-dimension
+   is 2d. The variables `mm', `nn', `mm1',`mm2',`nn1',`nn2' are lists of
+   column vectors, i.e. lists of lists of non-negative integers. In the 
+   notation of our paper:
+
+      orth(d,mm)= <mm>
+
+      unit(d,mm,nn)= <mm|nn>
+                                 /nn2|mm1\
+      symp(d,[mm1,mm2,nn1,nn2])= \nn1|mm2/
+
+   Note that trailing zeros in the column vectors need not be specified. Thus
+   to calculate the monomial integral <M> for 
+
+      / 1 1 0 \
+      | 0 1 1 |   we can type: orth(d,[[1,0,0,1],[1,1,0,0],[0,1,1,2]]);
+   M= | 0 0 1 |
+      \ 1 0 2 /   or equivalently: orth(d,[[1,0,0,1],[1,1],[0,1,1,2]]);
+
+
+   --------------------------------------------------------------------------
+   Part 1
+   --------------------------------------------------------------------------*/
+
+phv(a,m):= product(pochhammer(a,m[i]),i,1,length(m));
+
+alleven(m):= block([mi,isev], 
+   isev: true, 
+   for mi in m do isev: isev and evenp(mi),
+   return(isev)
+);
+
+/* -----------------------------One-vector averages for the orthogonal group */
+orth1(d,m):= block([bm],
+   bm: lsum(i,i,m),
+   return(factor(phv(1/2,m/2)/pochhammer(d/2,bm/2)))
+);
+
+orth2(d,m):= block(
+   if not(alleven(m)) then return(0) else return(orth1(d,m))
+);
+
+/* ------------------------------- One-vector averages for the unitary group */
+unit1(d,m):= block([bm],
+   bm: lsum(i,i,m),
+   return(product(m[i]!, i,1,length(m))/pochhammer(d,bm))
+);
+
+unit2(d,m,n):= block(
+   if m#n then return(0) else return(unit1(d,m))
+); 
+
+/* -------------------- One-vector averages for the unitary-symplectic group */
+symp1(d,m1,m2):= block([bm],
+   bm: lsum(i,i,m1) + lsum(i,i,m2),
+   return( product(m1[i]!, i,1,length(m1))*
+      product(m2[i]!, i,1,length(m2))/pochhammer(2*d,bm))
+);
+
+symp2(d,m1,m2,n1,n2):= block(
+   if (m1#n1)or(m2#n2) then return(0) else return(symp1(d,m1,m2))
+);
+
+/* --------------------------------------------------------------------------
+   Part 2
+   --------------------------------------------------------------------------
+   2.1 General functions                                                     */
+
+/* Returns the list of column-vector sums for the matrix kk. kk must be a
+   list of column-vectors of equal lengths.                                  */
+colsums(kk):= block([r,l],   
+   r: length(kk),
+   l: length(kk[1]),
+   makelist(sum(kk[i][j],j,1,l),i,1,r)
+);
+
+/* Returns the list of row-vector sums for the matrix kk. kk must be a list
+   of column-vectors of equal lenghts.                                       */
+rowsums(kk):= block([r,l],
+   r: length(kk),
+   l: length(kk[1]),
+   makelist(sum(kk[i][j],i,1,r),j,1,l)
+);
+
+/* Vector-multinomial of the matrix mm with respect to the vector m. mm must
+   be a list of column vectors of equal length, m must be a single column 
+   vector. Then the function returns the product of multinomial coefficients
+   (m_i| mm_i1, mm_i2, .., mm_ir) where r is the number of column vectors.   */
+multinv(m,mm):= block([r,l,mmp],
+   r: length(mm),
+   l: length(mm[1]),
+   mmp: makelist( makelist(mm[i][j],i,1,r),j,1,l),
+   product( multinomial(m[i],mmp[i]),i,1,l)
+);
+
+/* This returns the value of the function B(a,b;z_1,z_2) as defined in our
+   article.                                                                  */
+bb(a,b,x,y):= (-1)**(a-b)*pochhammer(x,b)
+              *pochhammer(x,a-b)/pochhammer(x-y,a);
+
+/* --------------------------------------------------------------------------
+   2.2 Vector and Matrix counter                                             
+
+   These counter are implemented in the form of functions which increment the
+   vectors or matrices by one elementary unit, each time they are called. This
+   implies that the set of vectors (matrices) to go through has some order. 
+   When the counter is called with the greatest element in that order, the
+   counter return an empty list. Usage is: `m: counter(m);'                  */
+
+/* Counts through all vectors kap with non-zero components with the 
+   restriction that forall i: kap_i <= m_i.                                  */
+incv1(kap_in,m):= block([kap,l,i,j],
+   kap: copylist(kap_in),
+   l: length(m),
+   i:0,
+   loop,
+   i: i+1,
+   if i>l then return([]),
+   if (kap[i]=m[i]) then go(loop),
+   for j:1 thru i-1 do kap[j]: 0,
+   kap[i]: kap[i] + 1,
+   return(kap)
+);
+
+/* Counts through all vectors kap with non-zero components with the
+   restriction that forall i: kap_i <= m_i and that sum_i kap_i is even.     */
+incv2(kap_in,m):= block([kap],
+   kap: copylist(kap_in),
+   loop,
+   kap: incv1(kap,m),
+   if kap=[] then return([]),
+   if evenp(lsum(i,i,kap)) then return(kap) else go(loop)
+);
+
+/* Counts through all matrices kk with non-zero integer entries under the
+   restriction that their row-sums are less or equal m (element wise). Uses
+   incv1(..) to increment the individual column vectors.                     */
+preincm1(kk_in,m):= block([kk,r,dm,i,j],
+   kk: copylist(kk_in),
+   r: length(kk),
+   i:0,
+   loop,
+   i: i+1,
+   if i>r then return([]),
+   if i<r then dm: m - rowsums(rest(kk,i)) else dm: m,
+   if (kk[i] = dm) then go(loop),
+   for j:1 thru i-1 do kk[j]: 0*kk[j],
+   kk[i]: incv1(kk[i],dm),
+   return(kk)
+);
+
+/* Counts through all matrices kk with non-zero integer entries under the
+   restrictions that their row-sums are less or equal m (element wise) and 
+   that the column-sums are even. Using incv2(..) to increment the individual 
+   column vectors, the latter requirement is fulfilled automatically.        */
+preincm2(kk_in,m):= block([kk,r,dm,i,j],
+   kk: copylist(kk_in),
+   r: length(kk),
+   i:0,
+   loop,
+   i: i+1,
+   if i>r then return([]),
+   if i<r then dm: m - rowsums(rest(kk,i)) else dm: m, 
+   if (kk[i] = dm) then go(loop),
+   for j:1 thru i-1 do kk[j]: 0*kk[j],
+   kk[i]: incv2(kk[i],dm),
+   return(kk) 
+);
+
+/* Counts through all matrices kk with the row-sums held fixed. The ordering
+   is such that kk with the first r-1 column-vectors being zero is the 
+   smallest element, and kk with the last r-1 column-vectors being zero the 
+   largest. Therefore, the counting should start with kk, where the first
+   r-1 column-vectors are zero (r is the number of column vectors in kk).    */
+incm1(kk):= block([m,r,rkk],
+   m: rowsums(kk),
+   r: length(kk),
+   rkk: preincm1(rest(kk,-1),m),
+   if rkk=[] then return([]),
+   return(endcons(m-rowsums(rkk),rkk))
+);
+
+/* Counts through all matrices kk in the same way as incm1(..). It observes
+   however the additional requirement that all column-sums should be even. 
+   This is achieved by simply replace the preincm1(..) by preincm2(..).      */
+incm2(kk):= block([m,r,rkk],
+   m: rowsums(kk),
+   r: length(kk),
+   rkk: preincm2(rest(kk,-1),m),
+   if rkk=[] then return([]),
+   return(endcons(m-rowsums(rkk),rkk))
+);
+
+/* --------------------------------------------------------------------------
+   2.3 The functions to compute the monomial integrals
+
+   For each of the three classical groups, we define two functions to compute
+   the monomial integrals. One is ment as a user-friendly interface, while the
+   other is used internally, in order to implement the recursive evaluation of
+   the desired monomial integrals. The user-friendly interfaces are 
+
+      orth(d,mm), unit(d,mm,nn), and symp(d,[mm1,mm2,nn1,nn2])
+
+   as introduced above, whereas their internal homologues are
+
+      intorth(d,mm), intunit(d,mm), and intsymp(d,[mm1,mm2,nn1,nn2]).        */
+
+intorth(d,mm):= block([r,l,m,bm],
+   r: length(mm),
+   if r=1 then return(orth2(d,mm[1])),
+   l: length(mm[1]),
+   m: mm[r],
+   bm: lsum(i,i,m),
+   if evenp(bm) then block([kk,res,bkk,bkap,mmp],
+      kk: copylist(0*mm),
+      kk[r]: copylist(m),
+      res: 0,
+      loop,
+         if not(alleven(kk[r])) then go(iloop),
+         bkk: colsums(kk),
+         bkap: bkk[r],
+         bkk: rest(bkk,-1),
+         mmp: copylist(rest(mm+kk,-1)),
+         res: res + bb(bm/2,bkap/2,d/2,(r-1)/2)*multinv(m,kk)*orth1(d,kk[r])
+              *orth1(d,bkk)*intorth(d,mmp),
+      iloop,
+      kk: incm2(kk),
+      if kk#[] then go(loop),
+      return(res)
+   ) else return(0)
+);
+
+orth(d,mm_in):= block([mm,r,lv,l],
+   mm: copylist(mm_in),
+   r: length(mm),
+   lv: map(length,mm),
+   l: lmax(lv),
+   for i:1 thru r do (for j:(lv[i]+1) thru l do mm[i]: endcons(0,mm[i])),
+   factor(intorth(d,mm))
+);
+
+
+intunit(d,mm,nn):= block([r,l,m,bm,n],
+   r: length(mm),
+   if (r = 1) then return(unit2(d,mm[1],nn[1])),
+   l: length(mm[1]),
+   m: mm[r],
+   bm: lsum(i,i,m),
+   n: nn[r],
+   if (bm = lsum(i,i,n)) then block([kk,res,bkk,bkap,ll,bll,mmp,nnp],
+      kk: copylist(0*mm),
+      kk[r]: copylist(m),
+      res: 0,
+      loop,
+         bkk: colsums(kk),
+         bkap: bkk[r],
+         bkk: rest(bkk,-1),
+         ll: copylist(0*nn),
+         ll[r]: copylist(n),
+         iloop,
+            if (ll[r] # kk[r]) then go(iiloop),
+            bll: rest(colsums(ll),-1),
+            if (bll # bkk) then go(iiloop),
+
+            mmp: copylist(rest(mm+kk,-1)),
+            nnp: copylist(rest(nn+ll,-1)),
+            res: res + bb(bm,bkap,d,r-1)*multinv(m,kk)*multinv(n,ll)
+                 *unit1(d,kk[r])*unit1(d,bkk)*intunit(d,mmp,nnp),
+         iiloop,
+         ll: incm1(ll),
+         if ll#[] then go(iloop),
+      kk: incm1(kk),
+      if kk#[] then go(loop),
+      return(res)
+   ) else return(0)
+);
+
+unit(d,mm_in,nn_in):= block([mm,nn,r],
+   mm: copylist(mm_in),
+   nn: copylist(nn_in),
+   r: length(mm),
+   if (r # length(nn)) then block(
+      print("Warning: mm and nn have different lengths"),
+      return(0)
+   ) else block([l],
+      l: max(lmax(map(length,mm)),lmax(map(length,nn))),
+      for i:1 thru r do for j:length(mm[i]) thru l-1 do 
+         mm[i]: copylist(endcons(0,mm[i])),
+      for i:1 thru r do for j:length(nn[i]) thru l-1 do 
+         nn[i]: copylist(endcons(0,nn[i])),
+      factor(intunit(d,mm,nn))
+   )
+);
+
+
+intsymp(d,mmm):= block([r,l,m,n,bm],
+   r: length(mmm[1]),
+   if r=1 then return(symp2(d,mmm[1][1],mmm[2][1],mmm[3][1],mmm[4][1])),
+   l: length(mmm[1][1]),
+   m: copylist(append(mmm[1][r],mmm[2][r])),
+   n: copylist(append(mmm[3][r],mmm[4][r])),
+   bm: lsum(i,i,m),
+   if (bm = lsum(i,i,n)) then block([k0,kk,ll,res,bkk,bkap,bll,mmmp,s],
+      k0: makelist(0,i,1,2*l),
+      kk: makelist(k0,i,1,2*r-2),
+      kk: endcons(m,kk),
+      res: 0,
+      loop,
+         bkk: copylist(colsums(kk)),
+         bkap: bkk[2*r-1],
+         bkk: copylist(rest(bkk,-1)),
+         ll: makelist(k0,i,1,2*r-2),
+         ll: endcons(n,ll),
+         iloop,
+            if (kk[2*r-1] # ll[2*r-1]) then go(iiloop),
+            bll: rest(colsums(ll),-1),
+            if (bkk # bll) then go(iiloop),
+       
+            block([i,kk1,kk1p,ll1,ll1p,kk2,kk2p,ll2,ll2p],
+               kk1: makelist( makelist(kk[i][j],j,1,l), i,r,2*r-2),
+               kk1p: makelist( makelist(kk[i][j],j,l+1,2*l), i,r,2*r-2),
+               ll2p: makelist( makelist(kk[i][j],j,1,l), i,1,r-1),
+               ll2: makelist( makelist(kk[i][j],j,l+1,2*l), i,1,r-1),
+               ll1: makelist( makelist(ll[i][j],j,1,l), i,r,2*r-2),
+               ll1p: makelist( makelist(ll[i][j],j,l+1,2*l), i,r,2*r-2),
+               kk2p: makelist( makelist(ll[i][j],j,1,l), i,1,r-1),
+               kk2: makelist( makelist(ll[i][j],j,l+1,2*l), i,1,r-1),
+
+               s: (-1)**(lsum(i,i,colsums(kk1p))+lsum(i,i,colsums(ll1p))),
+               mmmp: copylist(
+                  [rest(mmm[1],-1)+kk1+kk2, rest(mmm[2],-1)+kk1p+kk2p,
+                   rest(mmm[3],-1)+ll1+ll2, rest(mmm[4],-1)+ll1p+ll2p ])
+            ),  
+            res: res + s*bb(bm,bkap,2*d,2*r-2)*multinv(m,kk)*multinv(n,ll)
+                 *unit1(2*d,kk[2*r-1])*unit1(2*d,bkk)*intsymp(d,mmmp),
+         iiloop,
+         ll: incm1(ll),
+         if ll#[] then go(iloop),
+      kk: incm1(kk),
+      if kk#[] then go(loop),
+      return(res)
+   ) else return(0)
+);
+
+symp(d,mmm_in):= block([mmm,r,i,l],
+   mmm: copylist(mmm_in),
+   r: lmax(map(length,mmm)),
+   l: 0,
+   for i:1 thru 4 do block([j],
+      for j: length(mmm[i]) thru r-1 do 
+         mmm[i]: copylist(endcons([],mmm[i])),
+      l: max(l,lmax(map(length,mmm[i])))
+   ),
+   for i:1 thru 4 do block([j,k],
+      for j:1 thru r do for k: length(mmm[i][j]) thru l-1 do 
+         mmm[i][j]: copylist(endcons(0,mmm[i][j]))
+   ),
+   factor(intsymp(d,mmm))
+);
+
