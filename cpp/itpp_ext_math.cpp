@@ -443,6 +443,32 @@ itpp::cmat exponentiate(const itpp::cmat& Matrix){ // {{{
   tmp = V*itpp::diag(itpp::exp(eigenvalues))* V.hermitian_transpose();
   return tmp;
 } // }}}
+itpp::cmat exponentiate_nonsym(const itpp::cmat& Matrix){ // {{{
+// template <class Num_T> itpp::Mat<Num_T> exponentiate(itpp::Mat<Num_T> Matrix){
+  //Calculates exp(H) for NON-HERMITIAN matrix
+  double how_real_symmetric = test_real_symmetric(Matrix);
+  if (how_real_symmetric < 10e-14){
+    return itpp::to_cmat(exponentiate_real_symmetric(itpp::real(Matrix)));
+  }
+
+  itpp::cmat tmp;
+  itpp::cvec eigenvalues;
+  itpp::cmat V;
+  itpp::cmat invV;
+  bool exito = itpp::eig(Matrix, eigenvalues, V);
+  bool exito2 = itpp::inv(V,invV);
+  double revition; 
+  revition = itpp::norm(Matrix -
+      (V*itpp::diag(eigenvalues)* invV));
+  if (revition > 10e-12 || !exito){
+    std::cerr << "Algun xxx pedo en exponentiate " << revition << ", " << exito << std::endl; 
+    std::cerr << "La rutina de lapack tiene pedos cuando esta muy sparse la matriz,\n"
+      <<"por ejemplo un elemento del modelo de free fermions con 2D en primeros vecinos" << std::endl; 
+    abort();
+  }
+  tmp = V*itpp::diag(itpp::exp(eigenvalues))* invV;
+  return tmp;
+} // }}}
 itpp::cmat exponentiate(const itpp::mat& Matrix){ // {{{
 // template <class Num_T> itpp::Mat<Num_T> exponentiate(itpp::Mat<Num_T> Matrix){
   //Calculates exp(H)
