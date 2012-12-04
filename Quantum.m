@@ -95,6 +95,8 @@ Hadamard::usage="Hadamard[] gate, Hadamard[QubitToApply, Total"
 (* {{{ Quantum channels *)
 JamiolkowskiStateToOperatorChoi::usage = "JamiolkowskiStateToOperatorChoi[Rho] applies the Jamiolkovski isomorphism as 
                                           is understood in Geometry of Quantum States pgs. 241, 243, 266"
+JamiolkowskiOperatorChoiToState::usage = "JamiolkowskiOperatorChoiToState[O] applies the inverse Jamiolkovski isomorphism as 
+                                          is understood in Geometry of Quantum States"
 (* }}} *)
 Begin["`Private`"] 
 (* {{{ Bitwise manipulation and basic math*)
@@ -480,13 +482,15 @@ End[]
 EndPackage[]
 (* }}} *)
 (* {{{ Quantum channels *)
-JamiolkowskiStateToOperatorChoi[\[Rho]_?MatrixQ] := Sqrt[Length[\[Rho]]] Reshuffle[\[Rho]]
-Reshuffle[\[CapitalPhi]_?MatrixQ] := Module[{Dim, mn, \[Mu]\[Nu], m, \[Mu], n, \[Nu]},
-   Dim = Sqrt[Length[\[CapitalPhi]]];
+JamiolkowskiStateToOperatorChoi[Rho_?MatrixQ] := Sqrt[Length[Rho]] Reshuffle[Rho]
+JamiolkowskiOperatorChoiToState[O_?MatrixQ] := Reshuffle[O]/Sqrt[Length[O]]
+
+Reshuffle[Phi_?MatrixQ] := Module[{Dim, mn, MuNu, m, Mu, n, Nu},
+   Dim = Sqrt[Length[Phi]];
    Table[ {m, n} = IntegerDigits[mn, Dim, 2];
-    {\[Mu], \[Nu]} = IntegerDigits[\[Mu]\[Nu], Dim, 2];
-    \[CapitalPhi][[FromDigits[{m, \[Mu]}, Dim] + 1, 
-     FromDigits[{n, \[Nu]}, Dim] + 1]], {mn, 0, 
-     Dim^2 - 1}, {\[Mu]\[Nu] , 0, Dim^2 - 1}]];
+    {Mu, Nu} = IntegerDigits[MuNu, Dim, 2];
+    Phi[[FromDigits[{m, Mu}, Dim] + 1, 
+     FromDigits[{n, Nu}, Dim] + 1]], {mn, 0, 
+     Dim^2 - 1}, {MuNu , 0, Dim^2 - 1}]];
 (* }}} *)
 (* }}} *)
