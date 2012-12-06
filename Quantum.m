@@ -312,10 +312,6 @@ ControlNot[QubitControl_Integer, QubitTarget_Integer, NumeroACambiar_Integer] :=
 (* }}} *)
 (* {{{ *) ToSuperOperatorSpacePauliBasis[r_?MatrixQ] := Module[{Qubits},
   Qubits = Log[2, Length[r]];
-  Chop[Table[ Tr[r.Pauli[IntegerDigits[i, 4, Qubits]]], {i, 0, Power[Length[r], 2] - 1}]]]
-(* }}} *)
-(* {{{ *) ToSuperOperatorSpacePauliBasis[r_?MatrixQ] := Module[{Qubits},
-  Qubits = Log[2, Length[r]];
   Chop[Table[ Tr[r.Pauli[IntegerDigits[i, 4, Qubits]]/Power[2.,Qubits/2]], {i, 0, Power[Length[r], 2] - 1}]]]
 (* }}} *)
 (* {{{ *) FromSuperOperatorSpacePauliBasis[r_?VectorQ] := Module[{Qubits},
