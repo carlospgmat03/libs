@@ -1,7 +1,6 @@
 (* {{{ *) BeginPackage["Quantum`"]
 (* {{{ TODO
 Crear un swap matrix en el mismo espiritu que la CNOT. 
-
 }}} *)
 (* {{{ Bitwise manipulation and basic math*)
 ExtractDigits::usage = "Extract the digits of a number in its binary form. Same in spirity as exdig in math.f90
@@ -30,6 +29,7 @@ MergeTwoIntegers::usage = "MergeTwoIntegers[na_, nb_, ndigits_]
 xlog2x::usage = "Calculates x Log[2, x], but if x is 0, takes the correct limit"
 (* }}} *)
 (* {{{ Random States and matrices*)
+TwoRandomOrhtogonalStates::usage = "TwoRandomOrhtogonalStates[dim_] creates two random states orthogonal to each other using gram schmidt process. It is useful for creating states that provide a maximally mixed state in a qubit"
 RandomState::usage = "A random state RandomState[dim_Integer]"
 RandomGaussianComplex::usage = "RandomGaussianComplex[] gives a complex random number with Gaussian distribution
    centered at 0 and with width 1"
@@ -133,6 +133,13 @@ Begin["`Private`"]
 (* }}} *)
 (* }}} *)
 (* {{{ Random States and matrices*)
+(* {{{ *) TwoRandomOrhtogonalStates[dim_] := Module[{psi1, psi2, prepsi2},
+  psi1 = RandomState[dim];
+  prepsi2 = RandomState[dim];
+  prepsi2 = prepsi2 - Dot[Conjugate[psi1], prepsi2] psi1;
+  psi2 = #/Norm[#] &[prepsi2];
+  {psi1, psi2}]
+(* }}} *)
 (* {{{ *) RandomState[dim_Integer] := #/(Sqrt[Conjugate[#].#])&[Table[ RandomGaussianComplex[], {i, dim}]]; 
 (* }}} *)
 (* {{{ *) RandomGaussianComplex[] := #[[1]] + #[[2]] I &[RandomReal[NormalDistribution[], {2}]];
