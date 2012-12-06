@@ -99,8 +99,9 @@ JamiolkowskiStateToOperatorChoi::usage = "JamiolkowskiStateToOperatorChoi[Rho] a
 JamiolkowskiOperatorChoiToState::usage = "JamiolkowskiOperatorChoiToState[O] applies the inverse Jamiolkovski isomorphism as is understood in Geometry of Quantum States"
 TransformationMatrixPauliBasisToComputationalBasis::usage = "The matrix that allows to tranform, in superoperator space, from the Pauli basis (the GellMann basis for dimension 2 modulo order) to the computational basis, aka the Choi basis"
 Reshuffle::usage = "Apply the reshufle operation as undestood in Geometry of Quantum States, pags 260-262, and 264"
+RandomTracePreservingMapChoiBasis::usage = "Creates a singlequbit random trace preserving map"
 (* }}} *)
-
+(* }}} *)
 Begin["`Private`"] 
 (* {{{ Bitwise manipulation and basic math*)
 (* {{{ *) ExtractDigits[NumberIn_, LocationDigits_] := Module[{AuxArray, NumberOfDigits}, 
@@ -504,6 +505,15 @@ Reshuffle[Phi_?MatrixQ] := Module[{Dim, mn, MuNu, m, Mu, n, Nu},
     Phi[[FromDigits[{m, Mu}, Dim] + 1, 
      FromDigits[{n, Nu}, Dim] + 1]], {mn, 0, 
      Dim^2 - 1}, {MuNu , 0, Dim^2 - 1}]];
+
+
+RandomTracePreservingMapChoiBasis[] := Module[{psi},
+  psi = Total[
+     MapThread[
+      TensorProduct, {TwoRandomOrhtogonalStates[8], 
+       TwoRandomOrhtogonalStates[2]}]]/Sqrt[2];
+  Reshuffle[2 PartialTrace[Proyector[psi], 3]]
+  ]
 (* }}} *)
 End[] 
 EndPackage[]
