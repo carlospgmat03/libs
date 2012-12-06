@@ -64,6 +64,8 @@ ApplyGate::usage = "ApplyGate[U_, State_, TargetQubit_]"
 ApplyChannel::usage = "Apply Quantum Channel to an operator"
 ControlNotMatrix::usage = "Get the control not matrix ControlNotMatrix[QubitControl_Integer, QubitTarget_Integer, NumberOfQubits_Integer]"
 QuantumDotProduct::usage = "Dot Product in which the first thing is congutate. Yields the true Psi1 dot Psi2" 
+ToSuperOperatorSpaceComputationalBasis::usage = "ToSuperOperatorSpaceComputationalBasis[rho_] converts a density matrix rho to superoperator space, where it is a vector, and the basis in the superoperator space is the computational basis, which is the same (or at least similar) to the Choi basis"
+FromSuperOperatorSpaceComputationalBasis::usage = "FromSuperOperatorSpaceComputationalBasis[rho_?VectorQ] converts a density matrix rho from superoperator space, where it is a vector, and the basis in the superoperator space is the computational basis, which is the same (or at least similar) to the Choi basis to the normal space, where it is a matrix"
 FromSuperOperatorSpacePauliBasis::usage = "FromSuperOperatorSpacePauliBasis[r_?VectorQ] maps a vetor to a density, as the inverse of ToSuperOperatorSpacePauliBasis"
 ToSuperOperatorSpacePauliBasis::usage = "ToSuperOperatorSpacePauliBasis[r_?MatrixQ] maps a density
 matrix to superoperator space using the Pauli matrices and tensor products"
@@ -309,6 +311,12 @@ ControlNot[QubitControl_Integer, QubitTarget_Integer, NumeroACambiar_Integer] :=
   FromDigits[NumeroEnBinario, 2]]
 (* }}} *)
 (* {{{ *) QuantumDotProduct[Psi1_?VectorQ, Psi2_?VectorQ] :=  Dot[Conjugate[Psi1], Psi2]
+(* }}} *)
+(* {{{ *) ToSuperOperatorSpaceComputationalBasis[rho_?MatrixQ] := 
+            Flatten[rho]
+(* }}} *)
+(* {{{ *) FromSuperOperatorSpaceComputationalBasis[rho_?VectorQ] := 
+ Partition[rho, Sqrt[Length[rho]]]
 (* }}} *)
 (* {{{ *) ToSuperOperatorSpacePauliBasis[r_?MatrixQ] := Module[{Qubits},
   Qubits = Log[2, Length[r]];
