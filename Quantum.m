@@ -94,12 +94,13 @@ BasisState::usage="BasisState[BasisNumber_,Dimension_] gives a state of the comp
 numbered from 0 to Dimension-1"
 Hadamard::usage="Hadamard[] gate, Hadamard[QubitToApply, Total"
 (* }}} *)
-(* {{{ Quantum channels *)
-JamiolkowskiStateToOperatorChoi::usage = "JamiolkowskiStateToOperatorChoi[Rho] applies the Jamiolkovski isomorphism as 
-                                          is understood in Geometry of Quantum States pgs. 241, 243, 266"
-JamiolkowskiOperatorChoiToState::usage = "JamiolkowskiOperatorChoiToState[O] applies the inverse Jamiolkovski isomorphism as 
-                                          is understood in Geometry of Quantum States"
+(* {{{ Quantum channels and basis transformations *)
+JamiolkowskiStateToOperatorChoi::usage = "JamiolkowskiStateToOperatorChoi[Rho] applies the Jamiolkovski isomorphism as is understood in Geometry of Quantum States pgs. 241, 243, 266"
+JamiolkowskiOperatorChoiToState::usage = "JamiolkowskiOperatorChoiToState[O] applies the inverse Jamiolkovski isomorphism as is understood in Geometry of Quantum States"
+TransformationMatrixPauliBasisToComputationalBasis::usage = "The matrix that allows to tranform, in superoperator space, from the Pauli basis (the GellMann basis for dimension 2 modulo order) to the computational basis, aka the Choi basis"
+Reshuffle::usage = "Apply the reshufle operation as undestood in Geometry of Quantum States, pags 260-262, and 264"
 (* }}} *)
+
 Begin["`Private`"] 
 (* {{{ Bitwise manipulation and basic math*)
 (* {{{ *) ExtractDigits[NumberIn_, LocationDigits_] := Module[{AuxArray, NumberOfDigits}, 
@@ -490,9 +491,11 @@ Proyector[psi_] := Proyector[psi, psi]
 (* {{{  *) BasisState[BasisNumber_,Dimension_] := Table[If[i == BasisNumber, 1, 0], {i, 0, Dimension - 1}]
 (* }}} *)
 (* }}} *)
-(* {{{ Quantum channels *)
+(* {{{ Quantum channels and basis transformations *)
 JamiolkowskiStateToOperatorChoi[Rho_?MatrixQ] := Sqrt[Length[Rho]] Reshuffle[Rho]
 JamiolkowskiOperatorChoiToState[O_?MatrixQ] := Reshuffle[O]/Sqrt[Length[O]]
+TransformationMatrixPauliBasisToComputationalBasis[] := {{1/Sqrt[2], 0, 0, 1/Sqrt[2]}, {0, 1/Sqrt[2], (-I)/Sqrt[2], 0}, {0, 1/Sqrt[2], I/Sqrt[2], 0}, 
+ {1/Sqrt[2], 0, 0, -(1/Sqrt[2])}};
 
 Reshuffle[Phi_?MatrixQ] := Module[{Dim, mn, MuNu, m, Mu, n, Nu},
    Dim = Sqrt[Length[Phi]];
