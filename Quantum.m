@@ -482,8 +482,6 @@ Proyector[psi_] := Proyector[psi, psi]
 (* }}} *)
 (* {{{  *) BasisState[BasisNumber_,Dimension_] := Table[If[i == BasisNumber, 1, 0], {i, 0, Dimension - 1}]
 (* }}} *)
-End[] 
-EndPackage[]
 (* }}} *)
 (* {{{ Quantum channels *)
 JamiolkowskiStateToOperatorChoi[Rho_?MatrixQ] := Sqrt[Length[Rho]] Reshuffle[Rho]
@@ -497,4 +495,6 @@ Reshuffle[Phi_?MatrixQ] := Module[{Dim, mn, MuNu, m, Mu, n, Nu},
      FromDigits[{n, Nu}, Dim] + 1]], {mn, 0, 
      Dim^2 - 1}, {MuNu , 0, Dim^2 - 1}]];
 (* }}} *)
+End[] 
+EndPackage[]
 (* }}} *)
