@@ -100,6 +100,7 @@ JamiolkowskiOperatorChoiToState::usage = "JamiolkowskiOperatorChoiToState[O] app
 TransformationMatrixPauliBasisToComputationalBasis::usage = "The matrix that allows to tranform, in superoperator space, from the Pauli basis (the GellMann basis for dimension 2 modulo order) to the computational basis, aka the Choi basis"
 Reshuffle::usage = "Apply the reshufle operation as undestood in Geometry of Quantum States, pags 260-262, and 264"
 RandomTracePreservingMapChoiBasis::usage = "Creates a singlequbit random trace preserving map"
+AveragePurityChannelPauliBasis::usage = "Calculates the average final purity given that the initial states are pure, and chosen with the Haar measure. "
 (* }}} *)
 (* }}} *)
 Begin["`Private`"] 
@@ -514,6 +515,7 @@ RandomTracePreservingMapChoiBasis[] := Module[{psi},
        TwoRandomOrhtogonalStates[2]}]]/Sqrt[2];
   Reshuffle[2 PartialTrace[Proyector[psi], 3]]
   ]
+AveragePurityChannelPauliBasis[Lambda_] := Total[Power[Lambda[[All, 1]], 2]]/2 + Power[Norm[Lambda[[2 ;;, 2 ;;]], "Frobenius"], 2]/6
 (* }}} *)
 End[] 
 EndPackage[]
