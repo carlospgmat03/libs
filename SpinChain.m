@@ -4,6 +4,8 @@ ApplyMagnetickKick::usage = "ApplyMagnetickKick[state_, b_, Target_] or ApplyMag
 ApplyIsing::usage = "ApplyIsing[state_, J_, Position1_, Position2_]"
 (* }}} *)
 (* {{{ Full topologies*)
+ApplyIsingChain::usage="Se hace la topologia de una cadena. Solo la parte de Ising"
+ApplyChain::usage="Se hace la topologia de una cadena."
 ApplyCommonEnvironment::usage="Se refiere a la topologia (a) del PRL de n-body Bell en PRA."
 (* }}} *)
 Begin["`Private`"] 
@@ -23,6 +25,7 @@ Begin["`Private`"]
   Qubits = Log[2, Length[state]];
   statenew = state;
   For[QubitToAdress = 0, QubitToAdress < Qubits, QubitToAdress++, 
+   (*Print["en el loop QubitToAdress="<>ToString[QubitToAdress]];*)
    statenew = ApplyMagnetickKick[statenew, b, QubitToAdress]];
   statenew]
 (* }}} *)
@@ -36,24 +39,23 @@ Begin["`Private`"]
     statenew[[i + 1]] = Conjugate[scalar] statenew[[i + 1]]]];
   statenew]
 (* }}} *)
-(* {{{ *) ApplyIsing[state_?VectorQ, J_] := Module[{Qubits, statenew, QubitToAdress},
-  Qubits = Log[2, Length[state]];
-  statenew = state;
-  For[QubitToAdress = 0, QubitToAdress < Qubits-1, QubitToAdress++, 
-   statenew = ApplyIsing[statenew, J[[QubitToAdress+1]], QubitToAdress, QubitToAdress+1]];
-  statenew = ApplyIsing[statenew, J[[QubitToAdress+1]], Qubits-1,0];
-  statenew]
- Module[{scalar, i, statenew},
-  scalar = Exp[-I J];
-  statenew = state;
-  For[i = 0, i < Length[state], i++,
-   If[BitGet[i, Position1] == BitGet[i, Position2], 
-    statenew[[i + 1]] = scalar statenew[[i + 1]], 
-    statenew[[i + 1]] = Conjugate[scalar] statenew[[i + 1]]]];
-  statenew]
-(* }}} *)
 (* }}} *)
 (* {{{ Full topologies *)
+(* {{{ *) ApplyIsingChain[state_?VectorQ, J_] := Module[{Qubits, statenew, QubitToAdress},
+  Qubits = Log[2, Length[state]];
+  statenew=state;
+  For[q=0, q<Qubits-1, q++, 
+    statenew = ApplyIsing[statenew, J, q, q+1];
+  ];
+  statenew = ApplyIsing[statenew, J, 0 , Qubits-1];
+  statenew]
+(* }}} *)
+(* {{{ *) ApplyChain[state_?VectorQ, J_, b_] := Module[{statenew},
+ statenew = state;
+ statenew = ApplyIsingChain[statenew, J];
+ statenew = ApplyMagnetickKick[statenew, b];
+ statenew ]
+(* }}} *)
 (* {{{ *) ApplyCommonEnvironment[state_?VectorQ, b_, Jenv_, Jcoupling_] := 
  Module[{statenew, J, qubits}, qubits = Log[2, Length[state]];
   J = Table[Jenv, {qubits}];
