@@ -1200,6 +1200,14 @@ itpp::vec BellState(int dim=4){// {{{
   tmp(dim-1)=1;
   return tmp/sqrt(2.);
 }// }}}
+itpp::vec BellState(double theta){// {{{
+  int dim=4;
+  itpp::vec tmp(dim);
+  tmp.zeros();
+  tmp(0)=cos(theta);
+  tmp(dim-1)=sin(theta);
+  return tmp;
+}// }}}
 itpp::cmat exp_minus_i_b_sigma(itpp::vec b){// {{{
   // From sakurai eq (3.2.44) we have that
   // exp(- i \sigma \cdot n \phi/2) =

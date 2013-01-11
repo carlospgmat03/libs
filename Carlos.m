@@ -1,4 +1,3 @@
-
 BeginPackage["Carlos`"] ;
 
 MyAverage::usage = 
@@ -18,11 +17,6 @@ Instruction::usage =
 
 Norma::usage = "This function gives the norm of a list of numbers";
 
-(*
-Histogram::usage="Input format is Histogram[data_,bins_,min_,max_], outputs a histogram";
-NormalHistogram::usage="Input format is NormalHistogram[data_,bins_,min_,max_], outputs a normalized histogram";
-*)
-
 ColorCoding::usage="This recieves 2 integer inputs, and outputs a 
 	graphic to read the number that represents each Hue";
 BlockDiagonalMatrix::usage="Gives a block diagonal matrix from a list"
@@ -35,6 +29,12 @@ ColumnAddKeepFirst::usage="To add to matrices, keeping the first column of the f
 ReadListUncomment::usage="igual a ReadList[] pero quita todo lo que comienze con #"
 NumberList::usage="Number a list, i.e. prepend with an intenger from 1 to the Length of the list"
 
+
+HistogramListPoints::usage="Shows the points that would correspond to a Histogram. Accepts
+the same options as Histogram and HistogramList. Usage HistogramListPoints[data] or
+HistogramListPoints[data, bspec] or HistogramList[data,bspec,hspec]"
+
+(* {{{ Symbols and legends *)
 MySymbol::usage="Para poner simbolos. Tiene defauls. Es el recomendado ahora"
 SymbolNumber::usage="Option for MySymbol"
 Coordinate::usage="Option for MySymbol"
@@ -68,8 +68,7 @@ LegendBox[
 "
 
 Alignment::usage="Option for LegendBox and MyLegend"
-GraphicsDirectives::usage="Option for Histogram"
-
+(* }}} *)
 (* {{{ Geometry *)
 EllipseCharacteristics::usage="Get center, angle of rotation and semiaxis of an elipse. EllipseCharacteristics[poly_, vars_]
  For example, EllipseCharacteristics[4 x^2 - 4 x y + 7 y^2 + 12 x + 6 y - 9, {x, y}]"
@@ -77,7 +76,6 @@ EllipseCharacteristics::usage="Get center, angle of rotation and semiaxis of an 
 
 
 (* }}} *)
-
 Begin["`private`"];
 
 (*  Geometry *)
@@ -93,6 +91,9 @@ EllipseCharacteristics[poly_, vars_] :=  (* {{{ *)
    1/Sqrt[-Eigenvalues[Am]/cl2[[1, 1]]]}
   ]/; PolynomialQ[poly, vars] (* }}} *)
 (*  *)
+
+HistogramListPoints[data_, Options___] :=Transpose[{Drop[(#[[1]] + RotateLeft[#[[1]]])/
+      2, -1], #[[2]]} &[HistogramList[data, Options]]]
 
 RandomUnitVector[n_] := Module[{v},
   v = RandomReal[NormalDistribution[0, 1], n];

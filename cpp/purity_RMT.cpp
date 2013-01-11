@@ -49,6 +49,16 @@ namespace PurityRMT{
     }
     return tmp;
   } // }}}
+  itpp::Mat<std::complex<double> > WeakCoupingHamiltonian(int dim_env, int dim_cen, double lambda){// {{{
+    // The structure of the Hilbert space is 
+    // mcH=mcH_\env \otimes H_\cen
+    // H= H_{env} \otimes 1 + \lambda V_{\env,\cen}
+    itpp::Mat<std::complex<double> > tmp(4*dim_env,4*dim_env);
+    tmp=kron(itpp::diag(itpp::to_cvec(RMT::FlatSpectrumGUE(dim_env,0.1))),
+        itpp::eye_c(dim_cen))
+      + lambda*RMT::RandomGUE(dim_cen*dim_env,"sigma_offdiag=1");
+    return tmp;
+  } // }}}
   itpp::Mat<std::complex<double> > TwoQubitCommonEnvironment(int dim_env, itpp::vec lambda){// {{{
     // The structure of the Hilbert space is 
     // H=H_\env \otimes H_1 \otimes H_0
