@@ -15,6 +15,14 @@ itpp::cvec OperatorToVectorPauliBasis(itpp::cmat );
 itpp::cmat multiply_by_sigma_leftmost_qubit(const itpp::cmat& A, int sigma_label);
 } // }}}
 namespace itppextmath{ // {{{
+  itpp::mat rotation_matrix(double theta){
+    itpp::mat R(2,2);
+    R(0,0)=cos(theta);
+    R(1,1)=R(0,0);
+    R(1,0)=sin(theta);
+    R(0,1)=-R(1,0);
+    return R;
+  }
 // Inquiry {{{
 double compare(const itpp::cmat& A, const itpp::cmat& B){ // {{{
   return itpp::norm(A - B);
@@ -558,6 +566,23 @@ void PrintCompactHermitian(itpp::Mat<std::complex<double> >& rho){
 }
 // }}}
 // Bit manipulation {{{
+itpp::ivec IntegerDigits(int n,int base=2, int length=0){// {{{
+  int number=n;
+  int size=length;
+  if (length==0){
+    size = cfpmath::integer_part_log(base,n);
+  }
+  itpp::ivec result(size);
+  result=0;
+
+  int counter=0;
+  while (n!=0 && counter<size){
+    result(counter) = number%base;
+    number=(number - result(counter))/base;
+    counter ++;
+  }
+  return result;
+}// }}}
 int bvec_to_int(itpp::bvec bool_array){// {{{
   int tmp=0;
   for (int i=0; i<bool_array.size(); i++){
@@ -609,6 +634,15 @@ template <class Num_T> itpp::Mat<Num_T > ArrayToMatrix(const itpp::Array<itpp::V
   }
   return tmp; 
   
+}// }}}
+template <class Num_T> itpp::Mat<Num_T > OuterSum(const itpp::Vec<Num_T >& A, const itpp::Vec<Num_T >& B){// {{{
+  itpp::Mat<Num_T > tmp(A.size(), B.size());
+  for (int iA=0; iA<A.size(); iA++){
+    for (int iB=0; iB<A.size(); iB++){
+      tmp(iA, iB)=A(iA)+B(iB);
+    }
+  }
+  return tmp; 
 }// }}}
 template <class Num_T> itpp::Array<Num_T > Outer(const itpp::Array<Num_T >& A, const itpp::Array<Num_T >& B){// {{{
   itpp::Array<Num_T > tmp(0);
@@ -1783,23 +1817,6 @@ template <class Num_T> itpp::ivec waist(const itpp::Array<Num_T >& A){// {{{
     tmp(i) = A(i).size();
   }
   return tmp;
-}// }}}
-itpp::ivec IntegerDigits(int n,int base=2, int length=0){// {{{
-  int number=n;
-  int size=length;
-  if (length==0){
-    size = cfpmath::integer_part_log(base,n);
-  }
-  itpp::ivec result(size);
-  result=0;
-
-  int counter=0;
-  while (n!=0 && counter<size){
-    result(counter) = number%base;
-    number=(number - result(counter))/base;
-    counter ++;
-  }
-  return result;
 }// }}}
 // }}}
 // Pretty printing {{{
