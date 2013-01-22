@@ -14,7 +14,7 @@ namespace cfpmath{// {{{
   double h_function(double x){// {{{
     if (x<=0.) return 0. ;
     if (x>=1.) return 0. ;
-    return -x*std::log(x);
+    return -x*std::log2(x);
   }// }}}
   double linear_interval(int iterator, int max_iterator, double min, double max){// {{{
     return min + iterator*(max-min)/(max_iterator-1);
