@@ -1501,6 +1501,10 @@ double vonNeumann(const itpp::vec lambda){// {{{
 	for (int i=0; i<lambda.size(); i++){tmp+=cfpmath::h_function(lambda(i));}
 	return tmp/log(lambda.size());
 }// }}}
+double vonNeumann(const itpp::cmat rho){// {{{
+  itpp::Vec<double> eigenvalues=real(eig(rho));
+  return vonNeumann(eigenvalues);
+} // }}}
 double Purity(const itpp::Mat<std::complex<double> >& rho){// {{{
 	double P=0;
 	for (int i =0; i< rho.rows(); i++){
