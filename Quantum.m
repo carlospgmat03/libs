@@ -81,7 +81,7 @@ Purity::usage = "Purity of a 2 qubit density matrix density matrix"
 Proyector::usage = "Gives the density matrix rho=|Psi><Psi| corresponging to |Psi>, or rho=|Phi><Psi| se se le dan dos argumentos: Proyector[Phi, Psi]"
 KrausOperatorsForSuperUnitaryEvolution::usage = "Gives the Kraus Operators for a given unitary and a given state of the environement"
 ApplyKrausOperators::usage = "Apply a set of Kraus Operors, (for example fro the output of KrausOperatorsForSuperUnitaryEvolution to a state. Synthaxis is ApplyKrausOperators[Operators_, rho_]. "
-vonNeumannEntropy::usage = "con Neumann entropy of a Matrix vonNeumannEntropy[r_]"
+vonNeumannEntropy::usage = "von Neumann entropy of a density Matrix, or a list of vectors. Usage vonNeumannEntropy[r_]"
 Bell::usage = "Bell[n] state gives a maximally entangled state of the type 
 sum_i^n |ii\>. Bell[ ] gives |00> + |11>" 
 StateToBlochSphere::usage="Get the Bloch sphere point of a mixed state"
