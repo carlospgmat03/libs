@@ -1,3 +1,6 @@
+module phase_space_routines
+implicit none
+contains
 subroutine wigner_from_state(phi,wigner) !{{{
   implicit none
   complex(kind(1d0)), intent(in)   :: phi(0:)
@@ -30,6 +33,7 @@ subroutine state2kirk(n,phi,tip,tiq,rho,ndim,workfft) ! {{{
 ! on entry phi(j)=<j|phi> in the coordinate rep. (unchanged on exit)
 ! on exit rho(k,n) containd the Kirkwood rep. rho(k,n)=<k|rho|n>/<k|n>
 ! normalization is such that sum_{k,n}=1        
+      integer n, ndim, k, i
       complex*16 phi(0:n-1),rho(0:ndim-1,0:ndim-1)
       complex*16 workfft(2*n+16),del,work(0:n-1)
       real*8 tip,tiq      
@@ -50,7 +54,7 @@ subroutine state2kirk(n,phi,tip,tiq,rho,ndim,workfft) ! {{{
 	 end do
       end do                !rho(k,i)=<k|phi><phi|i>/<k|i>
       return
-      end ! }}}
+      end subroutine state2kirk! }}}
 subroutine kirk2wig(idir,n,a,lda,nr,wig,ldwig,workfft) ! {{{
 ! transforms the kirkwood rep of a to the first irreducible
 ! quarter of the wigner  function
@@ -62,6 +66,7 @@ subroutine kirk2wig(idir,n,a,lda,nr,wig,ldwig,workfft) ! {{{
 ! 
 ! idir=1 implies a is the kirkwood rep
 ! idir=-1 implies a is the antikirk.     
+      integer n, idir, lda, nr, ldwig, ik, in, iq, ip
       complex*16 a(0:lda-1,0:lda-1),wig(0:ldwig-1,0:ldwig-1)
       complex*16 ipi,temp,workfft(n+16)
       ipi=dcmplx(0.d0,4.d0*atan2(1.d0,1.d0))     !i*pi 
@@ -82,10 +87,10 @@ subroutine kirk2wig(idir,n,a,lda,nr,wig,ldwig,workfft) ! {{{
       end do
       nr=2
       return
-      end      !}}}
+      end   subroutine kirk2wig   !}}}
 subroutine zfft1d(dir,n,a,stride,workfft) ! {{{
 ! converts the sgi calls to dxml calls' implements non normalized FFT'      
-integer dir
+integer dir, n, stride
 integer*8 plan
 character*1 ty
 complex(8) workfft(0:n-1)
@@ -112,7 +117,7 @@ subroutine zfft2d(dir,n1,n2,a,lda,workfft) ! {{{
 !      include'dxmldef.for'   
       INTEGER,PARAMETER:: FFTW_ESTIMATE=64
       INTEGER,PARAMETER:: FFTW_MEASURE=0
-
+integer n1, n2, lda
       integer*4 dir,status,dim,SIGN
       integer*4 nn(2),HOWMANY,IDIST,ODIST
       integer*4 ISTRIDE,OSTRIDE
@@ -151,3 +156,4 @@ work(1:lda,1:lda)=a(0:lda-1,0:lda-1)
 !!a=a/sqrt(1.d0*n1*n2)
       return
       end subroutine zfft2d ! }}}
+end module phase_space_routines
