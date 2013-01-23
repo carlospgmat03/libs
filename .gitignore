@@ -4,6 +4,7 @@ modules/*.o
 cpp/testing
 cpp/test_rmt
 cpp/test_spins
+phasespace/wigner
 
 
 external
