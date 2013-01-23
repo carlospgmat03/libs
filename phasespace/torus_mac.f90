@@ -14,7 +14,7 @@ subroutine state2kirk(n,phi,tip,tiq,rho,ndim,workfft) ! {{{
           work(i)=phi(i)*exp(-del*tip*i)
       end do
 !             write(6,*) "work(0)",work(0)
-       call zfft1di(n,workfft)	  
+!        call zfft1di(n,workfft)	  
        call zfft1d(-1,n,work(0),1,workfft)
 !        write(6,*) "work(0)",work(0)
 !       print*,"SI buenas"
@@ -26,50 +26,6 @@ subroutine state2kirk(n,phi,tip,tiq,rho,ndim,workfft) ! {{{
       end do                !rho(k,i)=<k|phi><phi|i>/<k|i>
       return
       end ! }}}
-subroutine kirk(idir,n,a,lda,workfft) ! {{{
-! goes back and forth between kirkwood and antikirkwood
-! idir=1 assumes a(k,n)=<k|a|n>/<k|n> on input and produces a(n,k) on
-! output
-! idir=-1 assumes a(n,k) and produces a(k,n)  
-! two su!essive calls should reproduce the original
-! notice that the fourier transform should NOT be normalized
-! but the output satisfies sum_{n,k}=1
-! workfft should be initialized by a call to zfft2di(n,n,workfft)
-! it uses as working space the vector a(n,*)
-! it is used mainly by prop_kirk to propagate kirkwood matrices by kicked maps 
-! if a is hermitian then kirk and antikirk are hermitian conjugates.  
-      complex*16 a(0:lda-1,0:lda-1),workfft(2*n+16),den
-      den=dcmplx(0.d0,8.d0*atan2(1.d0,1.d0)/n)   !2*i*pi
-      do j=0,n-1
-         a(n,j)=cdexp(-j*den)          !n'th roots of unity....
-      end do
-      if(idir.eq.1)then
-        do i=0,n-1
-          do k=0,n-1
-             a(i,k)=a(i,k)*a(n,mod(i*k,n))
-	   end do  
-        end do
-        call zfft2d(1,n,n,a,lda,workfft)
-        do i=0,n-1
-          do k=0,n-1
-             a(i,k)=a(i,k)*a(n,mod(i*k,n))/n
-	   end do  
-        end do
-      else if(idir.eq.-1)then
-        do i=0,n-1
-          do k=0,n-1
-             a(i,k)=a(i,k)*dconjg(a(n,mod(i*k,n)))
-	   end do  
-        end do
-        call zfft2d(-1,n,n,a,lda,workfft)
-        do i=0,n-1
-          do k=0,n-1
-             a(i,k)=a(i,k)*dconjg(a(n,mod(i*k,n)))/n
-	   end do  
-        end do
-      end if	
-      return
-      end !}}}
 subroutine kirk2wig(idir,n,a,lda,nr,wig,ldwig,workfft) ! {{{
 ! transforms the kirkwood rep of a to the first irreducible
 ! quarter of the wigner  function
@@ -102,11 +58,6 @@ subroutine kirk2wig(idir,n,a,lda,nr,wig,ldwig,workfft) ! {{{
       nr=2
       return
       end      !}}}
-subroutine zfft1di(n,workfft) ! {{{
-!  converts the calls of sgi complib to fftw on MAC OSX     
-complex*16 workfft(2*n+16)
-return
-end subroutine zfft1di !}}}
 subroutine zfft1d(dir,n,a,stride,workfft) ! {{{
 ! converts the sgi calls to dxml calls' implements non normalized FFT'      
 integer dir
@@ -131,10 +82,6 @@ call dfftw_execute(plan)
 call dfftw_destroy_plan(plan)       
 return 
 end subroutine zfft1d !}}}
-subroutine zfft2di(n,m,workfft) !{{{
-complex*16 workfft(n)
-return
-end subroutine zfft2di ! }}}
 subroutine zfft2d(dir,n1,n2,a,lda,workfft) ! {{{
 ! converts the sgi calls to fftw calls on Mac OSX
 !      include'dxmldef.for'   
