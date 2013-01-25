@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       157,          7]
-NotebookDataLength[      9031,        263]
-NotebookOptionsPosition[      8459,        239]
-NotebookOutlinePosition[      8796,        254]
-CellTagsIndexPosition[      8753,        251]
+NotebookDataLength[      3518,        102]
+NotebookOptionsPosition[      3099,         83]
+NotebookOutlinePosition[      3436,         98]
+CellTagsIndexPosition[      3393,         95]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -56,167 +56,18 @@ Cell[BoxData[{
   ";"}], "\[IndentingNewLine]", 
  RowBox[{
   RowBox[{"TestMyWignerFunction", "=", 
-   RowBox[{
-    RowBox[{"ReadList", "[", 
-     RowBox[{
-     "\"\<!cat prueba_estado_entrada.txt|./wigner\>\"", ",", "Number", ",", 
-      RowBox[{"RecordLists", "\[Rule]", "True"}]}], "]"}], "[", 
-    RowBox[{"[", 
-     RowBox[{"All", ",", "3"}], "]"}], "]"}]}], ";", 
+   RowBox[{"ReadList", "[", 
+    RowBox[{
+    "\"\<!cat prueba_estado_entrada.txt|./wigner\>\"", ",", "Number", ",", 
+     RowBox[{"RecordLists", "\[Rule]", "True"}]}], "]"}]}], ";", 
   RowBox[{"Norm", "[", 
-   RowBox[{"BenchmarkWignerFunction", "-", "TestMyWignerFunction"}], 
+   RowBox[{"BenchmarkMyWignerFunction", "-", "TestMyWignerFunction"}], 
    "]"}]}]}], "Input",
  CellChangeTimes->{{3.567877842183984*^9, 3.5678778505926733`*^9}, {
-  3.567877944629561*^9, 3.56787802130276*^9}}],
+  3.567877944629561*^9, 3.56787802130276*^9}, {3.567956655165732*^9, 
+  3.56795665566854*^9}, {3.567974666810253*^9, 3.567974671865645*^9}}],
 
-Cell[BoxData[
- RowBox[{
-  StyleBox[
-   RowBox[{"Thread", "::", "tdlen"}], "MessageName"], 
-  RowBox[{
-  ":", " "}], "\<\"Objects of unequal length in \
-\[NoBreak]\\!\\(\\(\\({1.68845615526880262999999999999999999999970156411369`\
-17.227489787641225*^-8, \
-0.0004435887186455794279999999999999999999998665097202698102`17.\
-646980492634306, \\(\\(\[LeftSkeleton] 47 \[RightSkeleton]\\)\\), \
-0.0003332838061454829149999999999999999999999330422461750184`17.\
-52281421233285, \\(\\(\[LeftSkeleton] 9950 \[RightSkeleton]\\)\\)}\\)\\) + \
-\\(\\({}\\)\\)\\)\[NoBreak] cannot be combined. \\!\\(\\*ButtonBox[\\\"\
-\[RightSkeleton]\\\", ButtonStyle->\\\"Link\\\", ButtonFrame->None, \
-ButtonData:>\\\"paclet:ref/message/Thread/tdlen\\\", ButtonNote -> \
-\\\"Thread::tdlen\\\"]\\)\"\>"}]], "Message", "MSG",
- CellChangeTimes->{3.567944758669628*^9}],
-
-Cell[BoxData[
- InterpretationBox[
-  TagBox[
-   PanelBox[GridBox[{
-      {
-       StyleBox[
-        StyleBox[
-         DynamicBox[ToBoxes[
-           FEPrivate`FrontEndResource["FEStrings", "sizeExplanation"], 
-           StandardForm],
-          ImageSizeCache->{370., {3., 11.}}],
-         StripOnInput->False,
-         DynamicUpdating->True], "Panel",
-        StripOnInput->False,
-        Background->None]},
-      {
-       ItemBox[
-        TagBox[
-         RowBox[{"Norm", "[", 
-          RowBox[{
-           RowBox[{"{", "}"}], "+", 
-           RowBox[{"{", 
-            RowBox[{
-            "1.68845615526880262999999999999999999999970156411369`17.\
-227489787641225*^-8", ",", 
-             "0.0004435887186455794279999999999999999999998665097202698102`17.\
-646980492634306", ",", 
-             RowBox[{"\[LeftSkeleton]", "9997", "\[RightSkeleton]"}], ",", 
-             "0.0001207473909304877030000000000000000000000210644293829654`17.\
-081877755434032"}], "}"}]}], "]"}],
-         Short[#, 5]& ],
-        Background->GrayLevel[1],
-        BaseStyle->{Deployed -> False},
-        Frame->True,
-        FrameStyle->GrayLevel[0, 0.2],
-        StripOnInput->False]},
-      {
-       RowBox[{
-        ButtonBox[
-         StyleBox[
-          StyleBox[
-           DynamicBox[ToBoxes[
-             FEPrivate`FrontEndResource["FEStrings", "sizeShowLess"], 
-             StandardForm],
-            ImageSizeCache->{67., {0., 11.}}],
-           StripOnInput->False,
-           DynamicUpdating->True], "Panel",
-          StripOnInput->False,
-          Background->None],
-         Appearance->Automatic,
-         ButtonFunction:>OutputSizeLimit`ButtonFunction[
-          Identity, 56, 23382301865094057124, 5/2],
-         Enabled->True,
-         Evaluator->Automatic,
-         Method->"Queued"], "\[ThinSpace]", 
-        ButtonBox[
-         StyleBox[
-          StyleBox[
-           DynamicBox[ToBoxes[
-             FEPrivate`FrontEndResource["FEStrings", "sizeShowMore"], 
-             StandardForm],
-            ImageSizeCache->{70., {0., 11.}}],
-           StripOnInput->False,
-           DynamicUpdating->True], "Panel",
-          StripOnInput->False,
-          Background->None],
-         Appearance->Automatic,
-         ButtonFunction:>OutputSizeLimit`ButtonFunction[
-          Identity, 56, 23382301865094057124, 5 2],
-         Enabled->True,
-         Evaluator->Automatic,
-         Method->"Queued"], "\[ThinSpace]", 
-        ButtonBox[
-         StyleBox[
-          StyleBox[
-           DynamicBox[ToBoxes[
-             FEPrivate`FrontEndResource["FEStrings", "sizeShowAll"], 
-             StandardForm],
-            ImageSizeCache->{107., {3., 11.}}],
-           StripOnInput->False,
-           DynamicUpdating->True], "Panel",
-          StripOnInput->False,
-          Background->None],
-         Appearance->Automatic,
-         ButtonFunction:>OutputSizeLimit`ButtonFunction[
-          Identity, 56, 23382301865094057124, Infinity],
-         Enabled->True,
-         Evaluator->Automatic,
-         Method->"Queued"], "\[ThinSpace]", 
-        ButtonBox[
-         StyleBox[
-          StyleBox[
-           DynamicBox[ToBoxes[
-             FEPrivate`FrontEndResource["FEStrings", "sizeChangeLimit"], 
-             StandardForm],
-            ImageSizeCache->{100., {0., 10.}}],
-           StripOnInput->False,
-           DynamicUpdating->True], "Panel",
-          StripOnInput->False,
-          Background->None],
-         Appearance->Automatic,
-         ButtonFunction:>FrontEndExecute[{
-            FrontEnd`SetOptions[
-            FrontEnd`$FrontEnd, 
-             FrontEnd`PreferencesSettings -> {"Page" -> "Evaluation"}], 
-            FrontEnd`FrontEndToken["PreferencesDialog"]}],
-         Evaluator->None,
-         Method->"Preemptive"]}]}
-     },
-     GridBoxAlignment->{
-      "Columns" -> {{Left}}, "ColumnsIndexed" -> {}, "Rows" -> {{Baseline}}, 
-       "RowsIndexed" -> {}},
-     GridBoxDividers->{
-      "Columns" -> {{False}}, "ColumnsIndexed" -> {}, "Rows" -> {{False}}, 
-       "RowsIndexed" -> {}},
-     GridBoxItemSize->{
-      "Columns" -> {{Automatic}}, "ColumnsIndexed" -> {}, "Rows" -> {{1.}}, 
-       "RowsIndexed" -> {}},
-     GridBoxSpacings->{"Columns" -> {
-         Offset[0.27999999999999997`], {
-          Offset[0.5599999999999999]}, 
-         Offset[0.27999999999999997`]}, "ColumnsIndexed" -> {}, "Rows" -> {
-         Offset[0.2], {
-          Offset[1.2]}, 
-         Offset[0.2]}, "RowsIndexed" -> {}}],
-    DefaultBaseStyle->{},
-    FrameMargins->5],
-   Deploy,
-   DefaultBaseStyle->"Deploy"],
-  Out[56]]], "Output",
+Cell[BoxData["0``17.854683140552286"], "Output",
  CellChangeTimes->{
   3.567877850893918*^9, {3.5678779460330477`*^9, 3.567878022021895*^9}, 
    3.5678780531846724`*^9, 3.567878108422183*^9, 3.567878150838203*^9, 
@@ -224,21 +75,14 @@ Cell[BoxData[
    3.567878714101282*^9, 3.567878737393938*^9}, 3.567879097027102*^9, {
    3.567879253142476*^9, 3.567879327101398*^9}, 3.567879590939752*^9, 
    3.567879757190165*^9, 3.567943567111615*^9, 3.567944712716621*^9, 
-   3.567944758982431*^9}]
-}, Open  ]],
-
-Cell[CellGroupData[{
-
-Cell[BoxData[
- RowBox[{"Directory", "[", "]"}]], "Input",
- CellChangeTimes->{{3.567956611946314*^9, 3.567956614310689*^9}}],
-
-Cell[BoxData["\<\"/home/carlosp/fun/Dropbox/code\"\>"], "Output",
- CellChangeTimes->{3.567956614637121*^9}]
+   3.567944758982431*^9, {3.5679566457427187`*^9, 3.567956656561777*^9}, 
+   3.567957298179089*^9, 3.567957478081833*^9, 3.567962596729141*^9, 
+   3.567962669369458*^9, 3.567963157597859*^9, {3.567974666083708*^9, 
+   3.567974673319648*^9}, 3.567974789854998*^9}]
 }, Open  ]]
 },
 WindowSize->{740, 867},
-WindowMargins->{{150, Automatic}, {Automatic, 52}},
+WindowMargins->{{Automatic, 143}, {Automatic, 48}},
 FrontEndVersion->"8.0 for Linux x86 (64-bit) (October 10, 2011)",
 StyleDefinitions->"Default.nb"
 ]
@@ -257,13 +101,8 @@ Cell[557, 20, 138, 2, 29, "Input"],
 Cell[698, 24, 436, 11, 66, "Input"],
 Cell[1137, 37, 447, 10, 48, "Input"],
 Cell[CellGroupData[{
-Cell[1609, 51, 698, 18, 102, "Input"],
-Cell[2310, 71, 839, 16, 67, "Message"],
-Cell[3152, 89, 5021, 137, 140, "Output"]
-}, Open  ]],
-Cell[CellGroupData[{
-Cell[8210, 231, 123, 2, 29, "Input"],
-Cell[8336, 235, 107, 1, 29, "Output"]
+Cell[1609, 51, 708, 16, 102, "Input"],
+Cell[2320, 69, 763, 11, 29, "Output"]
 }, Open  ]]
 }
 ]

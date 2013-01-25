@@ -8,7 +8,6 @@ subroutine wigner_from_state(phi,wigner) !{{{
   real(kind(1d0)), intent(out)     :: wigner(:,:)
   complex(kind(1d0)), allocatable  :: rho1(:,:), work1(:)
   integer n, nr
-  print*,"En la rutina, ", size(phi)
   n=size(phi)
   if ((size(wigner,1).ne.2*n).or.(size(wigner,2).ne.2*n)) then
     print*,"Tamanos no compatibles en la rutina wigner_from_state"
