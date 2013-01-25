@@ -1496,10 +1496,11 @@ double Concurrence(const itpp::Mat<std::complex<double>  > rho){ // {{{
 double ConcurrenceFromPure(const itpp::cvec psi){ // {{{
 	return 2*abs(psi(1)*psi(2)-psi(0)*psi(3));
 } // }}}
-double vonNeumann(const itpp::vec lambda){// {{{
+double vonNeumann(const itpp::vec& lambda){// {{{
 	double tmp=0;
 	for (int i=0; i<lambda.size(); i++){tmp+=cfpmath::h_function(lambda(i));}
-	return tmp/log(lambda.size());
+// 	return tmp/log(lambda.size());
+	return tmp;
 }// }}}
 double vonNeumann(const itpp::cmat rho){// {{{
   itpp::Vec<double> eigenvalues=real(eig(rho));
