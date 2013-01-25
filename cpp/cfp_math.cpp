@@ -6,19 +6,28 @@
 #include <iostream>
 #include <cmath>
 #include <cfp_math.h>
+
+#ifndef M_LOG2E
+#define M_LOG2E 1.44269504088896340736 //log2(e)
+#endif  
+
 namespace cfpmath{// {{{
 
   bool even_number_of_ones_base_2(const int );
 }// }}}
 namespace cfpmath{// {{{
-  double h_function(double x){// {{{
-    if (x<=0.) return 0. ;
-    if (x>=1.) return 0. ;
-    return -x*std::log2(x);
-  }// }}}
-  double linear_interval(int iterator, int max_iterator, double min, double max){// {{{
-    return min + iterator*(max-min)/(max_iterator-1);
-  }// }}}
+// http://stackoverflow.com/questions/3064926/how-to-write-log-base2-in-c-c
+inline long double log2(const long double x){ // {{{
+    return  log(x) * M_LOG2E;
+} //}}}
+double h_function(double x){// {{{
+  if (x<=0.) return 0. ;
+  if (x>=1.) return 0. ;
+  return -x*log2(x);
+}// }}}
+double linear_interval(int iterator, int max_iterator, double min, double max){// {{{
+  return min + iterator*(max-min)/(max_iterator-1);
+}// }}}
 double next_point_secant(double tnm1, double tnm2, double fnm1, double fnm2){// {{{
  return tnm1-fnm1*(tnm1-tnm2)/(fnm1-fnm2); 
   
