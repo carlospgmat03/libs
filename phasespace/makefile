@@ -1,3 +1,4 @@
+include ~/makefile
 fc=gfortran
 FFLAGS=-O3 -msse4  -funroll-loops --param max-unroll-times=4
 
