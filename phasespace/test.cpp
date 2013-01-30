@@ -2,8 +2,8 @@
 //  cut -f3- prueba_estado_entrada.txt| ./test --i1 50 -o test_wigner_transformation
 //
 //
-Creo que la onda para hacerlo bien es ver bien como lo hacen en it++ para llamarlas. 
-http://itpp.sourceforge.net/devel/eigen_8cpp_source.html
+// Creo que la onda para hacerlo bien es ver bien como lo hacen en it++ para llamarlas. 
+// http://itpp.sourceforge.net/devel/eigen_8cpp_source.html
 
 
 
@@ -47,8 +47,9 @@ void printarray (complex<double> arg[], int length) { //example to use simple ar
 
 
 // external Fortran function prototype
-extern "C" { int fortranfuntion_( double&, double& ); }
-subroutine wigner_from_state_tmp(phi) 
+extern "C" { 
+void wigner_from_state_tmp(std::complex<double> *vt); 
+}
 
 int main(int argc, char* argv[]) { // {{{
   // {{{ initial definitions
@@ -98,9 +99,9 @@ int main(int argc, char* argv[]) { // {{{
 
 
 
-Entonces, algunos ejemplos utiles de como llamar ritunas de fortran en c++ estan en las librerias de cpp, de ahi se llama
-desde c++ con las rutinas nativas de itpp. Los archivos utiles son 
-/home/carlosp/investigacion/nacho/itppstrip/itpp-4.2/itpp/base/algebra/eigen.cpp
-/home/carlosp/investigacion/nacho/itppstrip/itpp-4.2/itpp/base/algebra/lapack.h
+// Entonces, algunos ejemplos utiles de como llamar ritunas de fortran en c++ estan en las librerias de cpp, de ahi se llama
+// desde c++ con las rutinas nativas de itpp. Los archivos utiles son 
+// /home/carlosp/investigacion/nacho/itppstrip/itpp-4.2/itpp/base/algebra/eigen.cpp
+// /home/carlosp/investigacion/nacho/itppstrip/itpp-4.2/itpp/base/algebra/lapack.h
 
 
