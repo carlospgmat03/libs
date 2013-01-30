@@ -48,7 +48,12 @@ void printarray (complex<double> arg[], int length) { //example to use simple ar
 
 // external Fortran function prototype
 extern "C" { 
-void wigner_from_state_tmp(std::complex<double> *vt); 
+void wigner_from_state_tmp_(std::complex<double> *phi); 
+// It seems that a good deal of information can be obtained through, say 
+// nm torus_mac.o
+// 
+void __phase_space_routines_MOD_wigner_from_state_tmp(std::complex<double> *phi); 
+void phase_space_routines_wigner_from_state_tmp_(std::complex<double> *phi); 
 }
 
 int main(int argc, char* argv[]) { // {{{
@@ -90,7 +95,8 @@ int main(int argc, char* argv[]) { // {{{
 //       cout << "moco, i=" << i << endl;
       }
       cout << "moco, hecho" << endl;
- printarray (state._data(), 50);
+      __phase_space_routines_MOD_wigner_from_state_tmp(state._data());
+//  printarray (state._data(), 50);
 //       cout << eig << endl;
       return 0;
     } // }}}

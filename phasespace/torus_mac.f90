@@ -1,26 +1,12 @@
 module phase_space_routines
 implicit none
 contains
-subroutine wigner_from_state_tmp(phi,wigner) !{{{
+subroutine wigner_from_state_tmp(phi) !{{{
   implicit none
   complex(kind(1d0)), intent(in)   :: phi(0:)
-  complex(kind(1d0)), allocatable  :: wigner_tmp(:,:)
-  real(kind(1d0)), intent(out)     :: wigner
-  complex(kind(1d0)), allocatable  :: rho1(:,:), work1(:)
-  integer n, nr
-  n=size(phi)
-  allocate (rho1(n,n), work1(4*n+16), wigner_tmp(2*n,2*n))
-  wigner_tmp=0d0
-  call state2kirk(n,phi,0d0,0d0,rho1,n,work1)
-  call kirk2wig(1,n,rho1,n,nr,wigner_tmp,2*n,work1)
-  wigner_tmp=wigner_tmp/(2*n)
-  call zfft2d(1,2*n,2*n,wigner_tmp,2*n,work1)
-  call zfft2d(-1,2*n,2*n,wigner_tmp,2*n,work1)
-  wigner_tmp=wigner_tmp/(4*n*n)
-  deallocate(rho1, work1)
-  wigner=8d0
-  deallocate(wigner_tmp)
-end subroutine wigner_from_state ! }}}
+  print*, "Si buenas, ando en fortran"
+  return
+end subroutine wigner_from_state_tmp ! }}}
 subroutine wigner_from_state(phi,wigner) !{{{
   implicit none
   complex(kind(1d0)), intent(in)   :: phi(0:)
