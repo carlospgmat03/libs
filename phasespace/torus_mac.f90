@@ -1,20 +1,16 @@
 module phase_space_routines
 implicit none
 contains
-subroutine wigner_from_state_tmp(phi) !{{{
+subroutine wigner_from_state(n, phi,wigner) !{{{
   implicit none
-  complex(kind(1d0)), intent(in)   :: phi(0:)
-  print*, "Si buenas, ando en fortran"
-  return
-end subroutine wigner_from_state_tmp ! }}}
-subroutine wigner_from_state(phi,wigner) !{{{
-  implicit none
-  complex(kind(1d0)), intent(in)   :: phi(0:)
+  integer :: n
+  complex(kind(1d0)), intent(in)   :: phi(n)
   complex(kind(1d0)), allocatable  :: wigner_tmp(:,:)
-  real(kind(1d0)), intent(out)     :: wigner(:,:)
+  real(kind(1d0)), intent(out)     :: wigner(2*n,2*n)
   complex(kind(1d0)), allocatable  :: rho1(:,:), work1(:)
-  integer n, nr
+  integer nr
   n=size(phi)
+!   print*,"En la rutina de fortran wigner_from_state n=", n
   if ((size(wigner,1).ne.2*n).or.(size(wigner,2).ne.2*n)) then
     print*,"Tamanos no compatibles en la rutina wigner_from_state"
     print*,size(phi), size(wigner,1), size(wigner,2)
