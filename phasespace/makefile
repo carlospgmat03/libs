@@ -14,3 +14,11 @@ wigner: wigner.f90  torus_mac.o
 torus_mac.o: torus_mac.f90
 	$(fc) -c torus_mac.f90 $(FFLAGS) -llapack -lm -lfftw3 
 
+%.o :: %.cpp
+	$(CXX) -c -I$(MYCPP) $<  -litpp
+
+test :: test.o torus_mac.o
+	$(CXX) -I$(MYCPP) $^ -o $@ -litpp  -llapack -lm -lfftw3
+
+
+
