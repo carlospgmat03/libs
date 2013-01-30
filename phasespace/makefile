@@ -17,6 +17,9 @@ torus_mac.o: torus_mac.f90
 %.o :: %.cpp
 	$(CXX) -c -I$(MYCPP) $<  -litpp
 
+test.o :: test.cpp 
+	$(CXX) -c -I$(MYCPP)  -I$(PHASESPACE) $<  -litpp
+
 test :: test.o torus_mac.o
 	$(CXX) -I$(MYCPP) $^ -o $@ -litpp  -llapack -lm -lfftw3
 
