@@ -9,7 +9,9 @@ subroutine wigner_from_state(n, phi,wigner) !{{{
   real(kind(1d0)), intent(out)     :: wigner(2*n,2*n)
   complex(kind(1d0)), allocatable  :: rho1(:,:), work1(:)
   integer nr
-  n=size(phi)
+!   print*,n
+!   print*,phi(1)
+!   n=size(phi)
 !   print*,"En la rutina de fortran wigner_from_state n=", n
   if ((size(wigner,1).ne.2*n).or.(size(wigner,2).ne.2*n)) then
     print*,"Tamanos no compatibles en la rutina wigner_from_state"

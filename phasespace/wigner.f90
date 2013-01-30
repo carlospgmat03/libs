@@ -5,6 +5,7 @@ use phase_space_routines
   complex(kind(1d0)) ::  phi(0:nmax-1)
   complex(kind(1d0)), allocatable ::  phi_a(:)
   real(kind(1d0)), allocatable :: wigner(:,:)
+  real(kind(1d0))  :: ra, rr, xr,xi
   ! }}}
 ! Read the state {{{
   n=0
@@ -18,7 +19,8 @@ use phase_space_routines
 ! }}}
  allocate(phi_a(n), wigner(2*n,2*n))
  phi_a=phi(0:n-1)
- call wigner_from_state(phi_a,wigner)
+ call wigner_from_state(n, phi_a,wigner)
+! print*, wigner(1,1), wigner(1,2), wigner(2,1)
 ! test {{{
     do i=1,2*n
       do j=1,2*n

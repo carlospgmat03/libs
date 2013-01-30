@@ -33,6 +33,7 @@ TCLAP::SwitchArg no_general_report("","no_general_report",
 std::complex<double>     Im=std::complex<double>(0,1);
 
 int main(int argc, char* argv[]) { // {{{
+  cout.precision(17); cerr.precision(17);
   // {{{ initial definitions
   cmd.parse( argc, argv );
   int error=0;
@@ -70,10 +71,10 @@ int main(int argc, char* argv[]) { // {{{
         //         cout << rho(i,j) << endl;
         //       cout << "moco, i=" << i << endl;
       }
-      cout << "moco, hecho" << endl;
       mat w=phasespace::wigner(state);
-      for (int i=0; i<d; i++){
-        for (int j=0; j<d; j++){
+//       cout << w(0,0) << " " << w(0,1) << endl;
+      for (int i=0; i<2*d; i++){
+        for (int j=0; j<2*d; j++){
           cout << w(i,j) << endl;
         }
       }
