@@ -83,10 +83,3 @@ int main(int argc, char* argv[]) { // {{{
 } // }}}
 
 
-Cambios en test.cpp
-Cleaned and uses the c++ namespace
-
-
-
-
-
