@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       157,          7]
-NotebookDataLength[      3518,        102]
-NotebookOptionsPosition[      3099,         83]
-NotebookOutlinePosition[      3436,         98]
-CellTagsIndexPosition[      3393,         95]
+NotebookDataLength[      3063,         88]
+NotebookOptionsPosition[      2682,         70]
+NotebookOutlinePosition[      3019,         85]
+CellTagsIndexPosition[      2976,         82]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -21,19 +21,6 @@ Notebook[{
 Cell[BoxData[
  RowBox[{"Needs", "[", "\"\<Carlos`\>\"", "]"}]], "Input",
  CellChangeTimes->{{3.567877726567137*^9, 3.567877726572508*^9}}],
-
-Cell[BoxData[
- RowBox[{
-  RowBox[{"TestMyWignerFunction", "=", 
-   RowBox[{
-    RowBox[{"ReadList", "[", 
-     RowBox[{
-     "\"\<!cat prueba_estado_entrada.txt|./wigner\>\"", ",", "Number", ",", 
-      RowBox[{"RecordLists", "\[Rule]", "True"}]}], "]"}], "[", 
-    RowBox[{"[", 
-     RowBox[{"All", ",", "3"}], "]"}], "]"}]}], ";"}]], "Input",
- CellChangeTimes->{{3.567877739835011*^9, 3.567877821139062*^9}, 
-   3.567877941189378*^9}],
 
 Cell[BoxData[
  RowBox[{
@@ -78,11 +65,11 @@ Cell[BoxData["0``17.854683140552286"], "Output",
    3.567944758982431*^9, {3.5679566457427187`*^9, 3.567956656561777*^9}, 
    3.567957298179089*^9, 3.567957478081833*^9, 3.567962596729141*^9, 
    3.567962669369458*^9, 3.567963157597859*^9, {3.567974666083708*^9, 
-   3.567974673319648*^9}, 3.567974789854998*^9}]
+   3.567974673319648*^9}, 3.567974789854998*^9, 3.568468326203434*^9}]
 }, Open  ]]
 },
 WindowSize->{740, 867},
-WindowMargins->{{Automatic, 143}, {Automatic, 48}},
+WindowMargins->{{203, Automatic}, {Automatic, 82}},
 FrontEndVersion->"8.0 for Linux x86 (64-bit) (October 10, 2011)",
 StyleDefinitions->"Default.nb"
 ]
@@ -98,11 +85,10 @@ CellTagsIndex->{}
 (*NotebookFileOutline
 Notebook[{
 Cell[557, 20, 138, 2, 29, "Input"],
-Cell[698, 24, 436, 11, 66, "Input"],
-Cell[1137, 37, 447, 10, 48, "Input"],
+Cell[698, 24, 447, 10, 48, "Input"],
 Cell[CellGroupData[{
-Cell[1609, 51, 708, 16, 102, "Input"],
-Cell[2320, 69, 763, 11, 29, "Output"]
+Cell[1170, 38, 708, 16, 102, "Input"],
+Cell[1881, 56, 785, 11, 29, "Output"]
 }, Open  ]]
 }
 ]
