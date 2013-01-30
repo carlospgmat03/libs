@@ -1,18 +1,13 @@
-//  PAra meter el estado en cuestion usamos
+//  Para meter el estado en cuestion usamos
 //  cut -f3- prueba_estado_entrada.txt| ./test --i1 50 -o test_wigner_transformation
 //
-//
-// Creo que la onda para hacerlo bien es ver bien como lo hacen en it++ para llamarlas. 
-// http://itpp.sourceforge.net/devel/eigen_8cpp_source.html
-
-
-
 // {{{ Include and TCLAP
 #include <iostream>
 #include <tclap/CmdLine.h>
 #include <itpp/itbase.h>
 // #include <RMT.cpp>
 // #include <purity_RMT.cpp>
+#include <phasespace.cpp>
 using namespace std;
 using namespace itpp;
 // using namespace RMT;
@@ -35,26 +30,7 @@ TCLAP::SwitchArg no_general_report("","no_general_report",
     "Print the general report", cmd);
   TCLAP::ValueArg<int> i1("","i1", "First integer argument",false, 1,"int",cmd);
 // }}}
-//
-//
 std::complex<double>     Im=std::complex<double>(0,1);
-void printarray (complex<double> arg[], int length) { //example to use simple arrays {{{
-  for (int n=0; n<length; n++)
-    cout << real(arg[n]) << " "<< real(-Im*arg[n]) << endl;
-  cout << "\n";
-} //}}}
-
-
-
-// external Fortran function prototype
-extern "C" { 
-void wigner_from_state_tmp_(std::complex<double> *phi); 
-// It seems that a good deal of information can be obtained through, say 
-// nm torus_mac.o
-// 
-void __phase_space_routines_MOD_wigner_from_state_tmp(std::complex<double> *phi); 
-void phase_space_routines_wigner_from_state_tmp_(std::complex<double> *phi); 
-}
 
 int main(int argc, char* argv[]) { // {{{
   // {{{ initial definitions
@@ -87,27 +63,30 @@ int main(int argc, char* argv[]) { // {{{
     (option == "test_wigner_transformation"){ // {{{
       int d=i1.getValue();
       cvec state(d);
-    double x,y;
+      double x,y;
       for (int i=0; i<d; i++){
         cin >> x  >> y ;
         state(i)=x+std::complex<double>(0,1)*y;
-//         cout << rho(i,j) << endl;
-//       cout << "moco, i=" << i << endl;
+        //         cout << rho(i,j) << endl;
+        //       cout << "moco, i=" << i << endl;
       }
       cout << "moco, hecho" << endl;
-      __phase_space_routines_MOD_wigner_from_state_tmp(state._data());
-//  printarray (state._data(), 50);
-//       cout << eig << endl;
+      mat w=phasespace::wigner(state);
+      for (int i=0; i<d; i++){
+        for (int j=0; j<d; j++){
+          cout << w(i,j) << endl;
+        }
+      }
       return 0;
     } // }}}
   //}}}
 } // }}}
 
 
+Cambios en test.cpp
+Cleaned and uses the c++ namespace
 
-// Entonces, algunos ejemplos utiles de como llamar ritunas de fortran en c++ estan en las librerias de cpp, de ahi se llama
-// desde c++ con las rutinas nativas de itpp. Los archivos utiles son 
-// /home/carlosp/investigacion/nacho/itppstrip/itpp-4.2/itpp/base/algebra/eigen.cpp
-// /home/carlosp/investigacion/nacho/itppstrip/itpp-4.2/itpp/base/algebra/lapack.h
+
+
 
 
