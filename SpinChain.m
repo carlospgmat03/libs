@@ -6,6 +6,7 @@ ApplyIsing::usage = "ApplyIsing[state_, J_, Position1_, Position2_]"
 (* {{{ Full topologies*)
 ApplyIsingChain::usage="Se hace la topologia de una cadena. Solo la parte de Ising"
 ApplyChain::usage="Se hace la topologia de una cadena."
+ApplyInverseChain::usage="Se hace la topologia de una cadena pero hacia atras en el tiempo."
 ApplyCommonEnvironment::usage="Se refiere a la topologia (a) del PRL de n-body Bell en PRA."
 (* }}} *)
 Begin["`Private`"] 
@@ -49,6 +50,12 @@ Begin["`Private`"]
   ];
   statenew = ApplyIsing[statenew, J, 0 , Qubits-1];
   statenew]
+(* }}} *)
+(* {{{ *) ApplyInverseChain[state_?VectorQ, J_, b_] := Module[{statenew},
+ statenew = state;
+ statenew = ApplyMagnetickKick[statenew, -b];
+ statenew = ApplyIsingChain[statenew, -J];
+ statenew ]
 (* }}} *)
 (* {{{ *) ApplyChain[state_?VectorQ, J_, b_] := Module[{statenew},
  statenew = state;
