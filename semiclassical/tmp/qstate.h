@@ -23,7 +23,9 @@
 
 #define QUANTUM
 
-#include "complex.h"
+// #include "complex.h"
+
+#include <complex>
 
 #define EXP2(x) (1<<(x))
 #define DEFAULT_NBQUBITS 10 
@@ -45,7 +47,7 @@ class q_state{
     int nbqubits;  // number of qubits
     int nbstates;  // number of states = 2^nbqubits
     int nbpbits;   // number of qubits used for p values in classical case
-    complex *coeffs; // complex coefficients for each state
+    std::complex<double> *coeffs; // complex coefficients for each state
 
     // initializes the global variables
     void global_initialize();
@@ -53,7 +55,7 @@ class q_state{
     void initialize(int nbq);
 
  public:
-complex& operator()(int i){
+std::complex<double>& operator()(int i){
 #ifdef RANGE_CHECK
     if ((i<0) || (i>=nbstates)){
       printf("Indizies: %5d  %5d\n",i);
@@ -68,7 +70,7 @@ complex& operator()(int i){
     // default constructor, all qubits put to 0
     q_state(int nbq=DEFAULT_NBQUBITS);
     // constructor, with "coeffs" given by the vector "vec"
-    q_state(int nbq,const complex *vec);
+    q_state(int nbq,const std::complex<double> *vec);
     // constructor, with coeffs[pos]=1 and coeffs[i]=0 if i!=pos
     q_state(int nbq,int pos);
     // copy construcor
@@ -80,7 +82,7 @@ complex& operator()(int i){
     // assignment operator
     q_state& operator+(q_state &a);
     // assignment operator
-    void const_mult(complex phi);
+    void const_mult(std::complex<double> phi);
 
     // --> diverse quantum-gate operations
     // reverse qubit order
@@ -91,14 +93,14 @@ complex& operator()(int i){
     // binary reverse of first and second half of the qubits
     void bin_reverse_state();
        // put coeffs to a complex vector
-    void put(complex *a);
+    void put(std::complex<double> *a);
     // get coeffs from a complex vector
-    void get(complex *a);
+    void get(std::complex<double> *a);
     // set value of "nbpbits"
     void put_pbits(int p);
     // diverse administrative or other tools
     // multiplication with arbitrary phase-vector
-    void phase_mult(complex *phases);
+    void phase_mult(std::complex<double> *phases);
     // effective difference between two qubit-states
     double max_diff(const q_state &a);
     // norm of difference of two qubit-states
@@ -158,19 +160,19 @@ complex& operator()(int i){
     // fidelity
     double fidelity(const q_state &a);
     // fidelity ampliytude
-    complex fid_amp(const q_state &a);
+    std::complex<double> fid_amp(const q_state &a);
     
 //Pauli ops
     //global phase
-    void global_phase(complex phase);
+    void global_phase(std::complex<double> phase);
     //Pauli Z operator on qubit m  OLD 
    
 };
 
-extern void print(complex);
+extern void print(std::complex<double>);
 extern double random_rectangular_old(double w);
 // provides a random phase e^{ix} with -eps/2 <= x < eps/2
-complex rand_phase(double eps); 
+std::complex<double> rand_phase(double eps); 
 extern unsigned int seed_wert_1;
 extern unsigned int seed_wert_2;
 

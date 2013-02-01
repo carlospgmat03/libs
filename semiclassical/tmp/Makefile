@@ -36,8 +36,8 @@ qstate.o : qstate.cc qstate.h
 # qstate.o : qstate.cc qstate.h gcd.h
 	$(GCC) $(LIBCFLAGS) qstate.cc
 	
-onestateeco.out : onestateeco.cc qstate.o random.o 
-	$(GCC) onestateeco.cc qstate.o random.o -o onestateeco.out $(CFLAGS) 
+onestateeco.out : onestateeco.cc qstate.o 
+	$(GCC) onestateeco.cc qstate.o -o onestateeco.out $(CFLAGS)  -litpp
 
 # eco2.out : eco2.cc quantum.o complex.o random.o 
 # 	$(GCC) eco2.cc quantum.o complex.o random.o -o eco2.out $(CFLAGS)
