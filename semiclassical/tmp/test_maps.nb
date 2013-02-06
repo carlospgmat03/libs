@@ -1,0 +1,125 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 8.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       157,          7]
+NotebookDataLength[      4129,        115]
+NotebookOptionsPosition[      3715,         95]
+NotebookOutlinePosition[      4052,        110]
+CellTagsIndexPosition[      4009,        107]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+
+Cell[CellGroupData[{
+Cell[BoxData[
+ RowBox[{"SetDirectory", "[", 
+  "\"\<~/investigacion/libs/semiclassical/tmp\>\"", "]"}]], "Input",
+ CellChangeTimes->{{3.568662059995803*^9, 3.568662083393968*^9}}],
+
+Cell[BoxData["\<\"/home/carlosp/investigacion/libs/semiclassical/tmp\"\>"], \
+"Output",
+ CellChangeTimes->{{3.568662062300088*^9, 3.56866208409448*^9}}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"Chop", "[", 
+  RowBox[{"{", 
+   RowBox[{
+    RowBox[{"Run", "[", "\"\<make onestateeco.out\>\"", "]"}], ",", 
+    RowBox[{
+    "Run", "[", "\"\< ./onestateeco.out 4. 2.4048 10 50 0.3 0.4 1 3 40.\>\"", 
+     "]"}], ",", "\[IndentingNewLine]", 
+    RowBox[{"Norm", "[", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"Norm", "[", 
+        RowBox[{
+         RowBox[{"ReadList", "[", 
+          RowBox[{"\"\<state_a.txt\>\"", ",", "Number", ",", 
+           RowBox[{"RecordLists", "\[Rule]", "True"}]}], "]"}], "-", 
+         RowBox[{"ReadList", "[", 
+          RowBox[{"\"\<state_aINI.txt\>\"", ",", "Number", ",", 
+           RowBox[{"RecordLists", "\[Rule]", "True"}]}], "]"}]}], "]"}], ",", 
+       
+       RowBox[{"Norm", "[", 
+        RowBox[{
+         RowBox[{"ReadList", "[", 
+          RowBox[{"\"\<state_b.txt\>\"", ",", "Number", ",", 
+           RowBox[{"RecordLists", "\[Rule]", "True"}]}], "]"}], "-", 
+         RowBox[{"ReadList", "[", 
+          RowBox[{"\"\<state_bINI.txt\>\"", ",", "Number", ",", 
+           RowBox[{"RecordLists", "\[Rule]", "True"}]}], "]"}]}], "]"}], ",", 
+       
+       RowBox[{"Norm", "[", 
+        RowBox[{
+         RowBox[{"ReadList", "[", 
+          RowBox[{"\"\<state_ini.txt\>\"", ",", "Number", ",", 
+           RowBox[{"RecordLists", "\[Rule]", "True"}]}], "]"}], "-", 
+         "\[IndentingNewLine]", 
+         RowBox[{"ReadList", "[", 
+          RowBox[{"\"\<state_iniINI.txt\>\"", ",", "Number", ",", 
+           RowBox[{"RecordLists", "\[Rule]", "True"}]}], "]"}]}], "]"}]}], 
+      "}"}], "]"}]}], "}"}], "]"}]], "Input",
+ CellChangeTimes->{{3.568662093294004*^9, 3.56866210865972*^9}, {
+   3.568662253725415*^9, 3.5686622831365957`*^9}, {3.5686667504659243`*^9, 
+   3.568666754270603*^9}, {3.5686668060435658`*^9, 3.5686668101315203`*^9}, 
+   3.5686672309936647`*^9}],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{"0", ",", "0", ",", "0"}], "}"}]], "Output",
+ CellChangeTimes->{{3.568665288131872*^9, 3.568665292425496*^9}, 
+   3.56866653515631*^9, 3.568666755250746*^9, {3.5686667980431433`*^9, 
+   3.5686668104193153`*^9}, 3.568666852035469*^9, {3.568666921949106*^9, 
+   3.568666928421219*^9}, 3.568666988841042*^9, {3.5686670190372353`*^9, 
+   3.568667060942995*^9}, {3.56866709629146*^9, 3.568667199614736*^9}, {
+   3.568667231933115*^9, 3.568667416216997*^9}, 3.568667509495719*^9, 
+   3.5686675535000772`*^9, 3.568667598420189*^9, 3.568667646056869*^9, 
+   3.568667705205883*^9, {3.568667824233491*^9, 3.568667871991109*^9}, {
+   3.568667937765134*^9, 3.568667957296893*^9}, 3.56866806512712*^9, {
+   3.5686683930450687`*^9, 3.56866840743121*^9}, {3.568669485141445*^9, 
+   3.568669496352219*^9}, 3.568669556497951*^9, 3.5686695925093603`*^9, 
+   3.568672702318617*^9}]
+}, Open  ]]
+},
+WindowSize->{740, 867},
+WindowMargins->{{150, Automatic}, {Automatic, 52}},
+FrontEndVersion->"8.0 for Linux x86 (64-bit) (October 10, 2011)",
+StyleDefinitions->"Default.nb"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[CellGroupData[{
+Cell[579, 22, 179, 3, 29, "Input"],
+Cell[761, 27, 152, 2, 29, "Output"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[950, 34, 1845, 42, 174, "Input"],
+Cell[2798, 78, 901, 14, 29, "Output"]
+}, Open  ]]
+}
+]
+*)
+
+(* End of internal cache information *)
+
