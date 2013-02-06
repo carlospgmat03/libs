@@ -24,4 +24,8 @@ test :: test.o torus_mac.o
 	$(CXX) -I$(MYCPP) $^ -o $@ -litpp  -llapack -lm -lfftw3
 
 
+CFLAGS=-O3 -lm -lfftw3
+onestateeco.out : onestateeco.cc semiclassical.cpp
+	$(CXX) -I . onestateeco.cc -o onestateeco.out $(CFLAGS)  -litpp
+
 

@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       157,          7]
-NotebookDataLength[      4129,        115]
-NotebookOptionsPosition[      3715,         95]
-NotebookOutlinePosition[      4052,        110]
-CellTagsIndexPosition[      4009,        107]
+NotebookDataLength[      5037,        144]
+NotebookOptionsPosition[      4545,        123]
+NotebookOutlinePosition[      4960,        139]
+CellTagsIndexPosition[      4917,        136]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -27,7 +27,8 @@ Cell[BoxData[
 
 Cell[BoxData["\<\"/home/carlosp/investigacion/libs/semiclassical/tmp\"\>"], \
 "Output",
- CellChangeTimes->{{3.568662062300088*^9, 3.56866208409448*^9}}]
+ CellChangeTimes->{{3.568662062300088*^9, 3.56866208409448*^9}, 
+   3.569166508678405*^9}]
 }, Open  ]],
 
 Cell[CellGroupData[{
@@ -70,32 +71,60 @@ Cell[BoxData[
          RowBox[{"ReadList", "[", 
           RowBox[{"\"\<state_iniINI.txt\>\"", ",", "Number", ",", 
            RowBox[{"RecordLists", "\[Rule]", "True"}]}], "]"}]}], "]"}]}], 
-      "}"}], "]"}]}], "}"}], "]"}]], "Input",
+      "}"}], "]"}], ",", "\[IndentingNewLine]", 
+    RowBox[{"Chop", "[", 
+     RowBox[{
+      RowBox[{"psif1", "=", 
+       RowBox[{
+        RowBox[{
+         RowBox[{
+          RowBox[{"#", "[", 
+           RowBox[{"[", "1", "]"}], "]"}], "+", 
+          RowBox[{"\[ImaginaryI]", 
+           RowBox[{"#", "[", 
+            RowBox[{"[", "2", "]"}], "]"}]}]}], "&"}], "/@", 
+        RowBox[{"ReadList", "[", 
+         RowBox[{
+         "\"\<!./onestateeco.out 4. 2.4048 10 50 0.3 0.4 1 3 40.\>\"", ",", 
+          "Number", ",", 
+          RowBox[{"RecordLists", "\[Rule]", "True"}]}], "]"}]}]}], ";", "\n", 
+      
+      RowBox[{"psif2", "=", 
+       RowBox[{
+        RowBox[{
+         RowBox[{
+          RowBox[{"#", "[", 
+           RowBox[{"[", "3", "]"}], "]"}], "+", 
+          RowBox[{"\[ImaginaryI]", 
+           RowBox[{"#", "[", 
+            RowBox[{"[", "4", "]"}], "]"}]}]}], "&"}], "/@", 
+        RowBox[{"ReadList", "[", 
+         RowBox[{"\"\<state_aINI.txt\>\"", ",", "Number", ",", 
+          RowBox[{"RecordLists", "\[Rule]", "True"}]}], "]"}]}]}], ";", "\n", 
+      
+      RowBox[{"Norm", "[", 
+       RowBox[{"psif1", "-", "psif2"}], "]"}]}], "]"}]}], 
+   "\[IndentingNewLine]", "}"}], "]"}]], "Input",
  CellChangeTimes->{{3.568662093294004*^9, 3.56866210865972*^9}, {
    3.568662253725415*^9, 3.5686622831365957`*^9}, {3.5686667504659243`*^9, 
    3.568666754270603*^9}, {3.5686668060435658`*^9, 3.5686668101315203`*^9}, 
-   3.5686672309936647`*^9}],
+   3.5686672309936647`*^9, {3.569168906345537*^9, 3.569168920187078*^9}}],
 
 Cell[BoxData[
  RowBox[{"{", 
-  RowBox[{"0", ",", "0", ",", "0"}], "}"}]], "Output",
- CellChangeTimes->{{3.568665288131872*^9, 3.568665292425496*^9}, 
-   3.56866653515631*^9, 3.568666755250746*^9, {3.5686667980431433`*^9, 
-   3.5686668104193153`*^9}, 3.568666852035469*^9, {3.568666921949106*^9, 
-   3.568666928421219*^9}, 3.568666988841042*^9, {3.5686670190372353`*^9, 
-   3.568667060942995*^9}, {3.56866709629146*^9, 3.568667199614736*^9}, {
-   3.568667231933115*^9, 3.568667416216997*^9}, 3.568667509495719*^9, 
-   3.5686675535000772`*^9, 3.568667598420189*^9, 3.568667646056869*^9, 
-   3.568667705205883*^9, {3.568667824233491*^9, 3.568667871991109*^9}, {
-   3.568667937765134*^9, 3.568667957296893*^9}, 3.56866806512712*^9, {
-   3.5686683930450687`*^9, 3.56866840743121*^9}, {3.568669485141445*^9, 
-   3.568669496352219*^9}, 3.568669556497951*^9, 3.5686695925093603`*^9, 
-   3.568672702318617*^9}]
+  RowBox[{"0", ",", "0", ",", "0", ",", "0"}], "}"}]], "Output",
+ CellChangeTimes->{
+  3.5691665171155567`*^9, 3.569166559309732*^9, {3.569166597200136*^9, 
+   3.569166634356283*^9}, 3.5691668243892937`*^9, {3.5691669239351187`*^9, 
+   3.5691669656886053`*^9}, {3.5691670672627153`*^9, 3.569167088233274*^9}, 
+   3.569167496600428*^9, 3.569167714177328*^9, 3.5691689212137747`*^9, 
+   3.569169163851614*^9, 3.569169206212188*^9, 3.5691692448812933`*^9}]
 }, Open  ]]
 },
 WindowSize->{740, 867},
-WindowMargins->{{150, Automatic}, {Automatic, 52}},
-FrontEndVersion->"8.0 for Linux x86 (64-bit) (October 10, 2011)",
+WindowMargins->{{Automatic, 305}, {Automatic, 88}},
+PrivateNotebookOptions->{"VersionedStylesheet"->{"Default.nb"[8.] -> False}},
+FrontEndVersion->"9.0 for Linux x86 (64-bit) (January 25, 2013)",
 StyleDefinitions->"Default.nb"
 ]
 (* End of Notebook Content *)
@@ -110,16 +139,15 @@ CellTagsIndex->{}
 (*NotebookFileOutline
 Notebook[{
 Cell[CellGroupData[{
-Cell[579, 22, 179, 3, 29, "Input"],
-Cell[761, 27, 152, 2, 29, "Output"]
+Cell[579, 22, 179, 3, 32, "Input"],
+Cell[761, 27, 178, 3, 31, "Output"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[950, 34, 1845, 42, 174, "Input"],
-Cell[2798, 78, 901, 14, 29, "Output"]
+Cell[976, 35, 3068, 75, 385, "Input"],
+Cell[4047, 112, 482, 8, 63, "Output"]
 }, Open  ]]
 }
 ]
 *)
 
 (* End of internal cache information *)
-
