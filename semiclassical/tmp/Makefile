@@ -20,8 +20,8 @@ ejemplo ::
 ##los programas que usan qstate en lugar de quantum, no estan limitados por
 ##la dimension, i.e. no son "estados de qubits"
 
-onestateeco.out : onestateeco.cc 
-	$(GCC) onestateeco.cc -o onestateeco.out $(CFLAGS)  -litpp
+onestateeco.out : onestateeco.cc semiclassical.cpp
+	$(GCC) -I . onestateeco.cc -o onestateeco.out $(CFLAGS)  -litpp
 
 clean: 
 	rm -f *.o 
