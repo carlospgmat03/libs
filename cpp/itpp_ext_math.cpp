@@ -7,13 +7,6 @@
 #include <itpp/itbase.h>
 #include <itpp/stat/misc_stat.h>
 // }}}
-namespace itppextmath{ // {{{ .h
-template <class Num_T>  double test_symmetry(const itpp::Mat<Num_T >);
-double test_real_symmetric(const itpp::cmat);
-itpp::cmat sigma(int );
-itpp::cvec OperatorToVectorPauliBasis(itpp::cmat );
-itpp::cmat multiply_by_sigma_leftmost_qubit(const itpp::cmat& A, int sigma_label);
-} // }}}
 namespace itppextmath{ // {{{
   itpp::mat rotation_matrix(double theta){
     itpp::mat R(2,2);
