@@ -1,0 +1,157 @@
+#include <itpp/itbase.h>
+#include <itpp/stat/misc_stat.h>
+#include <fftw3.h>
+namespace semiclassical{ // {{{
+
+//********************************************//
+  fftw_complex *in;
+  fftw_complex *out;
+  fftw_plan planb;
+  fftw_plan planf;
+  //
+//********************************************//
+void initialize_fftplans(int dim){
+	in  = (fftw_complex*) fftw_malloc(sizeof(fftw_complex)*dim);
+	out = (fftw_complex*) fftw_malloc(sizeof(fftw_complex)*dim);
+	planf=fftw_plan_dft_1d(dim,in,in,FFTW_FORWARD,FFTW_ESTIMATE);
+	planb=fftw_plan_dft_1d(dim,out,out,FFTW_BACKWARD,FFTW_ESTIMATE);
+        return;
+}
+void copyF(itpp::cvec &a,fftw_complex *in){ // {{{
+  int nx=size(a);
+int i,j;
+double xi,xj;
+for(i=0;i<nx;i++)
+   {
+	   xi=std::real(a(i));
+	   xj=std::imag(a(i));
+	   in[i][0]=xi;
+	   in[i][1]=xj;
+   }	
+return;
+} // }}}
+void copyB(itpp::cvec &a,fftw_complex *out){ // {{{
+  int nx=a.size();
+int i,j;
+double xi,xj;
+for(i=0;i<nx;i++)
+     {
+	   xi=out[i][0];
+	   xj=out[i][1];
+	   a(i)=std::complex<double>(xi,xj);
+     }
+return;
+} // }}}
+void FFT(itpp::cvec &a,int dir){ // {{{
+int nq_tot,nq2,N,nx,ny;
+nq_tot=log2(a.size());
+nq2=nq_tot/2;
+N=1<<(nq_tot);
+nx=ny=1<<(nq2);
+double norma=norm(a);
+if(dir==0)
+  {
+    copyF(a,in);
+    fftw_execute(planf);
+    copyB(a,in);
+  }
+if(dir==1)
+  {
+    copyF(a,out);
+    fftw_execute(planb);
+    copyB(a,out);
+  }
+
+a=a/norm(a);
+return;
+} //}}}
+void put_coh(itpp::cvec& a,double p0,double q0, double sigma, int N){ // {{{
+//  int 
+  a.set_size(N);
+ a(0)=1.;
+//  int N=a.size();
+	int jmax=8;
+	double arg=2*M_PI*N;
+	std::complex<double> sumc;
+// 	double sigma=coefsigma;
+	double tip,tiq;
+	tip=tiq=0.;
+	for(int i=0;i<N;i++){
+				sumc=std::complex<double>(0.,0.);
+				for(int jj=-jmax;jj<=jmax;jj++){
+					double dx=jj+q0-((double)i+tiq)/((double)N);
+				//	double ex=arg*(-0.5*pow(dx/sigma,2.)-complex(0.,p0*dx-jj*tip/((double)N)));
+				double ex=arg*-0.5*pow(dx/sigma,2.);
+				double ex1=arg*p0*dx-jj*tip/((double)N);
+					sumc+=exp(ex)*std::complex<double>(cos(ex1),sin(ex1));		
+				}
+ 				a(i)=sumc;
+// 				a(i)=1.;
+	}
+// 	a=a/itpp::norm(a);
+	a=a/itpp::norm(a);
+    return;
+} // }}}
+// standard map
+// p'=p+k sin(q) mod(2 pi) transicion en k~0.96
+// q'=q+p'
+void U_p_std(double T,itpp::cvec &a){ // {{{
+    int l,N;
+    double x;double T1=2.0; // de acuerdo a valores tipicos usados con dima
+    N=a.size();
+    itpp::cvec phases(N);
+    for(l=0;l<N;l++){
+	x=-M_PI*(double)l*(double)l/((double)N);
+	if(T>=0.){
+		phases[l]=std::complex<double>(cos(x),sin(x));
+	}else{
+		phases[l]=std::complex<double>(cos(x),-sin(x));
+	}
+    }
+    a=elem_mult(a,phases);
+} // }}}
+void U_x_std(double k, itpp::cvec &a){ //{{{
+int l,N;
+double x,k1;
+double theta;
+// std::complex<double> *phases;
+k1=1.1;
+double alpha2=0.;
+    N=size(a);
+    itpp::cvec phases(N);
+    for(l=0;l<N;l++){
+	theta=2*M_PI*l/((double)N);
+	x=(-2*M_PI*N*k*cos(theta));
+	phases(l)=std::complex<double>(cos(x),sin(x));
+    }
+    a=elem_mult(a,phases);
+return ;
+} // }}}
+void kick_std(double T,itpp::cvec &a){ // {{{
+	U_x_std(T,a);
+// 	cout << "En kick_std, a(0)=" << a(0) << endl;
+	FFT(a,1);
+	U_p_std(2.0,a);
+	FFT(a,0);
+} // }}}
+void print_state_p(itpp::cvec &a,char *filename){ // {{{
+FILE *fp;
+double pp;
+
+
+fp=fopen(filename,"w");
+for(int i=0;i<a.size();i++){
+    pp=(double)i;
+	fprintf(fp,"%lf\t %.14e\t %.14e\t %.14e\n",pp,abs(a(i))*abs(a(i)),real(a(i)),imag(a(i)));
+   }	
+ //fprintf(fp,"%lf\t %20.18lf \n",(double)NN,absquad(a(0))); //real_teil(a(0)),imag_teil(a(0)));
+fprintf(fp,"\n");
+fclose(fp);
+return;
+} // }}}
+void inicio_estado(itpp::cvec &a, double q0, double p0, double sigma, int dimension){ // {{{
+	put_coh(a,p0,q0, sigma, dimension);
+	a=a/itpp::norm(a);
+	return;
+} // }}}
+} // }}}
