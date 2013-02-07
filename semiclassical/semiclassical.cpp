@@ -105,7 +105,9 @@ void U_p_std(double T,itpp::cvec &a){ // {{{
     N=a.size();
     itpp::cvec phases(N);
     for(l=0;l<N;l++){
-	x=-M_PI*(double)l*(double)l/((double)N);
+	// Correccion de nacho, el menos no va!!!
+        // x=-M_PI*(double)l*(double)l/((double)N);
+	x=M_PI*(double)l*(double)l/((double)N);
 	if(T>=0.){
 		phases[l]=std::complex<double>(cos(x),sin(x));
 	}else{
@@ -125,7 +127,9 @@ double alpha2=0.;
     itpp::cvec phases(N);
     for(l=0;l<N;l++){
 	theta=2*M_PI*l/((double)N);
-	x=(-2*M_PI*N*k*cos(theta));
+	// Correccion de nacho, el menos no va!!!
+// 	x=(-2*M_PI*N*k*cos(theta));
+	x=(2*M_PI*N*k*cos(theta));
 	phases(l)=std::complex<double>(cos(x),sin(x));
     }
     a=elem_mult(a,phases);
