@@ -65,7 +65,7 @@ if(dir==1)
 a=a/norm(a);
 return;
 } //}}}
-void put_coh(itpp::cvec& a,double p0,double q0, double sigma, int N){ // {{{
+void put_coh(itpp::cvec& a,double q0,double p0, double sigma, int N){ // {{{
 //  int 
   a.set_size(N);
  a(0)=1.;
@@ -92,6 +92,37 @@ void put_coh(itpp::cvec& a,double p0,double q0, double sigma, int N){ // {{{
 	a=a/itpp::norm(a);
     return;
 } // }}}
+itpp::cvec coherent_state(double q0,double p0, double sigma, int N){ // {{{
+//  int 
+  itpp::cvec a;
+  a.set_size(N);
+ a(0)=1.;
+//  int N=a.size();
+	int jmax=8;
+	double arg=2*M_PI*N;
+	std::complex<double> sumc;
+// 	double sigma=coefsigma;
+	double tip,tiq;
+	tip=tiq=0.;
+	for(int i=0;i<N;i++){
+				sumc=std::complex<double>(0.,0.);
+				for(int jj=-jmax;jj<=jmax;jj++){
+					double dx=jj+q0-((double)i+tiq)/((double)N);
+				//	double ex=arg*(-0.5*pow(dx/sigma,2.)-complex(0.,p0*dx-jj*tip/((double)N)));
+				double ex=arg*-0.5*pow(dx/sigma,2.);
+				double ex1=arg*p0*dx-jj*tip/((double)N);
+					sumc+=exp(ex)*std::complex<double>(cos(ex1),sin(ex1));		
+				}
+ 				a(i)=sumc;
+// 				a(i)=1.;
+	}
+// 	a=a/itpp::norm(a);
+	a=a/itpp::norm(a);
+    return a;
+} // }}}
+itpp::cvec coherent_state(double q0,double p0, int N){ // {{{
+  return coherent_state(q0, p0, 1., N);
+} //}}}
 // standard map
 // p'=p+k sin(q) mod(2 pi) transicion en k~0.96
 // q'=q+p'
@@ -128,8 +159,9 @@ double alpha2=0.;
 return ;
 } // }}}
 void kick_std(double T,itpp::cvec &a){ // {{{
+//         std::cout << "En kick_std, 1 a(0)=" << a(0) << std::endl;
 	U_x_std(T,a);
-// 	cout << "En kick_std, a(0)=" << a(0) << endl;
+//         std::cout << "En kick_std, 2 a(0)=" << a(0) << std::endl;
 	FFT(a,1);
 	U_p_std(2.0,a);
 	FFT(a,0);
@@ -148,10 +180,5 @@ for(int i=0;i<a.size();i++){
 fprintf(fp,"\n");
 fclose(fp);
 return;
-} // }}}
-void inicio_estado(itpp::cvec &a, double q0, double p0, double sigma, int dimension){ // {{{
-	put_coh(a,p0,q0, sigma, dimension);
-	a=a/itpp::norm(a);
-	return;
 } // }}}
 } // }}}
