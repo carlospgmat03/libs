@@ -1509,12 +1509,12 @@ double vonNeumann(const itpp::cmat rho){// {{{
 double Purity(const itpp::Mat<std::complex<double> >& rho){// {{{
 	double P=0;
 	for (int i =0; i< rho.rows(); i++){
-		P += abs(dot (rho.get_col(i),rho.get_row(i)));
+		P += abs(itpp::dot (rho.get_col(i),rho.get_row(i)));
 	}
 	return P;
 }// }}}
 double Purity(const itpp::vec& eigenvalues){// {{{
-        return dot(eigenvalues,eigenvalues);
+        return itpp::dot(eigenvalues,eigenvalues);
 }// }}}
 // Others
 itpp::mat LambdaMatrixQubitRight(itpp::cmat U){ // {{{ Quantum channel for a single qubit, slow
@@ -1610,7 +1610,7 @@ itpp::cvec OperatorToVectorPauliBasis(itpp::cmat rho){ // {{{
 itpp::cvec GetState(itpp::cmat& U, itpp::vec& eigenvalues, itpp::cvec& psi_0, double t){ // {{{
   itpp::cmat U_dagger = itpp::hermitian_transpose(U);
   itpp::cvec psi_0_prime = U_dagger*psi_0;
-  itpp::cvec psi_t_prime = elem_mult(exp(-eigenvalues * t * std::complex<double>(0.,1.)),psi_0_prime);
+  itpp::cvec psi_t_prime = itpp::elem_mult(exp(-eigenvalues * t * std::complex<double>(0.,1.)),psi_0_prime);
   itpp::cvec psi_t = U* psi_t_prime;
 
   //   cout << "In GetState, test_unitarity(U)=" <<  test_unitarity(U) << endl;
@@ -1666,7 +1666,7 @@ void test_GetState_pure(){ // {{{
   eig_sym(H,lambda, eigenvectors);
   psi_fast = GetState(eigenvectors, lambda, psi_0, t);
   std::cout << "1-Producto interior=" 
-    << 1.-dot(conj(psi_fast), psi_fast) << std::endl;
+    << 1.-itpp::dot(conj(psi_fast), psi_fast) << std::endl;
 //   std::cout << psi_slow << std::endl<< psi_fast << std::endl;
 
   abort();
