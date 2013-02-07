@@ -65,33 +65,6 @@ if(dir==1)
 a=a/norm(a);
 return;
 } //}}}
-void put_coh(itpp::cvec& a,double q0,double p0, double sigma, int N){ // {{{
-//  int 
-  a.set_size(N);
- a(0)=1.;
-//  int N=a.size();
-	int jmax=8;
-	double arg=2*M_PI*N;
-	std::complex<double> sumc;
-// 	double sigma=coefsigma;
-	double tip,tiq;
-	tip=tiq=0.;
-	for(int i=0;i<N;i++){
-				sumc=std::complex<double>(0.,0.);
-				for(int jj=-jmax;jj<=jmax;jj++){
-					double dx=jj+q0-((double)i+tiq)/((double)N);
-				//	double ex=arg*(-0.5*pow(dx/sigma,2.)-complex(0.,p0*dx-jj*tip/((double)N)));
-				double ex=arg*-0.5*pow(dx/sigma,2.);
-				double ex1=arg*p0*dx-jj*tip/((double)N);
-					sumc+=exp(ex)*std::complex<double>(cos(ex1),sin(ex1));		
-				}
- 				a(i)=sumc;
-// 				a(i)=1.;
-	}
-// 	a=a/itpp::norm(a);
-	a=a/itpp::norm(a);
-    return;
-} // }}}
 itpp::cvec coherent_state(double q0,double p0, double sigma, int N){ // {{{
 //  int 
   itpp::cvec a;
