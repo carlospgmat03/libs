@@ -100,40 +100,49 @@ itpp::cvec coherent_state(double q0,double p0, int N){ // {{{
 // p'=p+k sin(q) mod(2 pi) transicion en k~0.96
 // q'=q+p'
 void U_p_std(double T,itpp::cvec &a){ // {{{
-    int l,N;
-    double x;double T1=2.0; // de acuerdo a valores tipicos usados con dima
-    N=a.size();
-    itpp::cvec phases(N);
-    for(l=0;l<N;l++){
-	// Correccion de nacho, el menos no va!!!
-        // x=-M_PI*(double)l*(double)l/((double)N);
-	x=M_PI*(double)l*(double)l/((double)N);
-	if(T>=0.){
-		phases[l]=std::complex<double>(cos(x),sin(x));
-	}else{
-		phases[l]=std::complex<double>(cos(x),-sin(x));
-	}
+  int l,N;
+  double x;double T1=2.0; // de acuerdo a valores tipicos usados con dima
+  N=a.size();
+  if (N%2 != 0){
+    std::cerr << "The dimension must be even. In this case, dimension=" << N 
+      << std::endl<<"Aborting @U_p_std " << endl;
+    abort();
+  }
+  itpp::cvec phases(N);
+  for(l=0;l<N;l++){
+    // Correccion de nacho, el menos no va!!!
+    // x=-M_PI*(double)l*(double)l/((double)N);
+    x=M_PI*(double)l*(double)l/((double)N);
+    if(T>=0.){
+      phases[l]=std::complex<double>(cos(x),sin(x));
+    }else{
+      phases[l]=std::complex<double>(cos(x),-sin(x));
     }
-    a=elem_mult(a,phases);
+  }
+  a=elem_mult(a,phases);
 } // }}}
 void U_x_std(double k, itpp::cvec &a){ //{{{
-int l,N;
-double x,k1;
-double theta;
-// std::complex<double> *phases;
-k1=1.1;
-double alpha2=0.;
-    N=size(a);
-    itpp::cvec phases(N);
-    for(l=0;l<N;l++){
-	theta=2*M_PI*l/((double)N);
-	// Correccion de nacho, el menos no va!!!
-// 	x=(-2*M_PI*N*k*cos(theta));
-	x=(2*M_PI*N*k*cos(theta));
-	phases(l)=std::complex<double>(cos(x),sin(x));
-    }
-    a=elem_mult(a,phases);
-return ;
+  int l,N;
+  double x;
+  double theta;
+  // std::complex<double> *phases;
+  double alpha2=0.;
+  N=size(a);
+  if (N%2 != 0){
+    std::cerr << "The dimension must be even. In this case, dimension=" << N 
+      << std::endl<<"Aborting @U_x_std " << endl;
+    abort();
+  }
+  itpp::cvec phases(N);
+  for(l=0;l<N;l++){
+    theta=2*M_PI*l/((double)N);
+    // Correccion de nacho, el menos no va!!!
+    // 	x=(-2*M_PI*N*k*cos(theta));
+    x=(2*M_PI*N*k*cos(theta));
+    phases(l)=std::complex<double>(cos(x),sin(x));
+  }
+  a=elem_mult(a,phases);
+  return ;
 } // }}}
 void kick_std(double T,itpp::cvec &a){ // {{{
 //         std::cout << "En kick_std, 1 a(0)=" << a(0) << std::endl;
