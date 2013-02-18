@@ -100,29 +100,27 @@ itpp::cvec coherent_state(double q0,double p0, int N){ // {{{
 //  q'=q+p'
 //  p'=p+K(q mod 1 -0.5)
 void U_p_saw(double T,itpp::cvec &a){ // {{{
-  int l;
   double x;
-  int N=a.size();
+  int l, N=a.size();
   itpp::cvec phases(N);
   for(l=0;l<N;l++){
     x=(-2*M_PI*(0.5*l*l/((double)N)));
-    phases[l]=complex(cos(x),sin(x));
+    phases[l]=std::complex<double>(cos(x),sin(x));
   }
   a=elem_mult(a,phases);
 } // }}}
-void U_x_saw(double T, q_state &a){ // {{{
-  int l,N;
+void U_x_saw(double T, itpp::cvec &a){ // {{{
+  int l,N=a.size();
   double x;
-  N=a.N();
   itpp::cvec phases(N);
   if (N%2 != 0){
     std::cerr << "The dimension must be even. In this case, dimension=" 
-      << N << std::endl<<"Aborting @U_x_std " << endl;
+      << N << std::endl<<"Aborting @U_x_std " << std::endl;
     abort();
   }
   for(l=0;l<N;l++){
     x=2*M_PI*(T)*(0.5*(l-N/2)*(l-N/2)/((double)N)); 
-    phases[l]=complex(cos(x),sin(x));
+    phases[l]=std::complex<double>(cos(x),sin(x));
   }
   a=elem_mult(a,phases);
   return ;
@@ -142,7 +140,7 @@ void U_p_std(double T,itpp::cvec &a){ // {{{
   N=a.size();
   if (N%2 != 0){
     std::cerr << "The dimension must be even. In this case, dimension=" << N 
-      << std::endl<<"Aborting @U_p_std " << endl;
+      << std::endl<<"Aborting @U_p_std " << std::endl;
     abort();
   }
   itpp::cvec phases(N);
@@ -167,7 +165,7 @@ void U_x_std(double k, itpp::cvec &a){ //{{{
   N=size(a);
   if (N%2 != 0){
     std::cerr << "The dimension must be even. In this case, dimension=" << N 
-      << std::endl<<"Aborting @U_x_std " << endl;
+      << std::endl<<"Aborting @U_x_std " << std::endl;
     abort();
   }
   itpp::cvec phases(N);
