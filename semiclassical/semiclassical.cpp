@@ -126,10 +126,22 @@ void U_x_saw(double T, itpp::cvec &a){ // {{{
   return ;
 } // }}}
 void kick_saw(double T,itpp::cvec &a){ // {{{
+//   std::cout << "En el saw, T=" << T << std::endl; 
+//   std::cout << "En el saw, 1 psi(0)=" << a(0) << std::endl; 
+//   U_x_saw(T,a);
+//   FFT(a,1);
+//   U_p_saw(0.,a);
+//   FFT(a,0); 
+//   std::cout << "En el saw, T=" << T << std::endl; 
+//   std::cout << "En el saw, 1 psi(0)=" << a(0) << std::endl; 
   U_x_saw(T,a);
+//   std::cout << "En el saw, 2 psi(0)=" << a(0) << std::endl; 
   FFT(a,1);
+//   std::cout << "En el saw, 3 psi(0)=" << a(0) << std::endl; 
   U_p_saw(0.,a);
+//   std::cout << "En el saw, 4 psi(0)=" << a(0) << std::endl; 
   FFT(a,0); 
+//   std::cout << "En el saw, 5 psi(0)=" << a(0) << std::endl; 
 } // }}}
 // standard map
 // p'=p+k sin(q) mod(2 pi) transicion en k~0.96
