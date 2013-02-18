@@ -96,6 +96,43 @@ itpp::cvec coherent_state(double q0,double p0, double sigma, int N){ // {{{
 itpp::cvec coherent_state(double q0,double p0, int N){ // {{{
   return coherent_state(q0, p0, 1., N);
 } //}}}
+// Sawtooth
+//  q'=q+p'
+//  p'=p+K(q mod 1 -0.5)
+void U_p_saw(double T,itpp::cvec &a){ // {{{
+  int l;
+  double x;
+  int N=a.size();
+  itpp::cvec phases(N);
+  for(l=0;l<N;l++){
+    x=(-2*M_PI*(0.5*l*l/((double)N)));
+    phases[l]=complex(cos(x),sin(x));
+  }
+  a=elem_mult(a,phases);
+} // }}}
+void U_x_saw(double T, q_state &a){ // {{{
+  int l,N;
+  double x;
+  N=a.N();
+  itpp::cvec phases(N);
+  if (N%2 != 0){
+    std::cerr << "The dimension must be even. In this case, dimension=" 
+      << N << std::endl<<"Aborting @U_x_std " << endl;
+    abort();
+  }
+  for(l=0;l<N;l++){
+    x=2*M_PI*(T)*(0.5*(l-N/2)*(l-N/2)/((double)N)); 
+    phases[l]=complex(cos(x),sin(x));
+  }
+  a=elem_mult(a,phases);
+  return ;
+} // }}}
+void kick_saw(double T,itpp::cvec &a){ // {{{
+  U_x_saw(T,a);
+  FFT(a,1);
+  U_p_saw(0.,a);
+  FFT(a,0); 
+} // }}}
 // standard map
 // p'=p+k sin(q) mod(2 pi) transicion en k~0.96
 // q'=q+p'
