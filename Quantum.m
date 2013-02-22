@@ -52,9 +52,9 @@ PartialTranspose::usage = "Takes the partial transpososition with  respect
 PartialTransposeFirst::usage = "Transpose the first part of a bipartite system with equal dimensions"
 PartialTransposeSecond::usage = "Transpose the Second part of a bipartite system with equal dimensions"
 DirectSum::usage = "DirectSum[A1, A2] A1 \[CirclePlus] A2 or DirectSum[{A1, A2, ..., An}] = A1 \[CirclePlus] A2\[CirclePlus] ... \[CirclePlus] An"
-TensorProduct::usage = "Creates the tensor product for qubits, like TensorProduct_real_routine in linear.f90
+tensorProduct::usage = "Creates the tensor product for qubits, like TensorProduct_real_routine in linear.f90
       I think that the inidices in the number refer to where to place the second matrix."
-TensorPower::usage = "Creates the tensor product of n matrices"
+tensorPower::usage = "Creates the tensor product of n matrices"
 OrthonormalBasisContaningVector::usage=" OrthonormalBasisContaningVector[psi_?VectorQ] will create an orthonorlam basis that contains the given vector"
 GetMatrixForm[Gate_, Qubits_] := Gate /@ IdentityMatrix[Power[2, Qubits]]
 (* }}} *)
@@ -257,9 +257,9 @@ Triangular[n_] := n (n + 1)/2
   ArrayFlatten[{{A1, Table[0, {dims[[1, 1]]}, {dims[[2, 2]]}]},
     {Table[0, {dims[[2, 1]]}, {dims[[1, 2]]}], A2}}]]
 (* }}} *)
-(* {{{ *) TensorProduct[Matrix1_?MatrixQ, Matrix2_?MatrixQ] := KroneckerProduct[Matrix1, Matrix2]
+(* {{{ *) tensorProduct[Matrix1_?MatrixQ, Matrix2_?MatrixQ] := KroneckerProduct[Matrix1, Matrix2]
 (* }}} *)
-(* {{{ *) TensorProduct[LocationDigits_Integer, Matrix1_?MatrixQ, Matrix2_?MatrixQ] := 
+(* {{{ *) tensorProduct[LocationDigits_Integer, Matrix1_?MatrixQ, Matrix2_?MatrixQ] := 
 	Module[{Indices, iRow, iCol, L1, L2}, 
 		{L1,L2}=Length/@{Matrix1,Matrix2};
 		Normal[SparseArray[Flatten[Table[
@@ -268,15 +268,15 @@ Triangular[n_] := n (n + 1)/2
 			{iRow, iCol} -> Part @@ Join[{Matrix1}, Indices[[All, 1]]] Part @@ Join[{Matrix2}, 
 			Indices[[All, 2]]], {iRow, L1 L2}, {iCol, L1 L2}]]]]];
 (* }}} *)
-(* {{{ *) TensorProduct[LocationDigits_, State1_?VectorQ, State2_?VectorQ] := 
+(* {{{ *) tensorProduct[LocationDigits_, State1_?VectorQ, State2_?VectorQ] := 
 	Module[{Index, i, L1, L2}, 
 		{L1, L2} = Length /@ {State1, State2};
 		Normal[SparseArray[Table[Index = 1 + ExtractDigits[i - 1, LocationDigits]; 
 		i -> State1[[Index[[1]]]] State2[[Index[[2]]]], {i, L1 L2}]]]];
 (* }}} *)
-(* {{{ *) TensorProduct[State1_?VectorQ, State2_?VectorQ] := Flatten[KroneckerProduct[State1, State2]]
+(* {{{ *) tensorProduct[State1_?VectorQ, State2_?VectorQ] := Flatten[KroneckerProduct[State1, State2]]
 (* }}} *)
-(* {{{ *) TensorPower[A_, n_] := Nest[KroneckerProduct[A, #] &, A, n - 1]
+(* {{{ *) tensorPower[A_, n_] := Nest[KroneckerProduct[A, #] &, A, n - 1]
 (* }}} *)
 (* {{{ *) OrthonormalBasisContaningVector[psi_?VectorQ] := 
 (*El Ri generado es orthogonal a psi y tiene norma menor que uno*)
@@ -511,7 +511,7 @@ Reshuffle[Phi_?MatrixQ] := Module[{Dim, mn, MuNu, m, Mu, n, Nu},
 RandomTracePreservingMapChoiBasis[] := Module[{psi},
   psi = Total[
      MapThread[
-      TensorProduct, {TwoRandomOrhtogonalStates[8], 
+      tensorProduct, {TwoRandomOrhtogonalStates[8], 
        TwoRandomOrhtogonalStates[2]}]]/Sqrt[2];
   Reshuffle[2 PartialTrace[Proyector[psi], 3]]
   ]
