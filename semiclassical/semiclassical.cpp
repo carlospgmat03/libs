@@ -2,7 +2,7 @@
 #include <itpp/stat/misc_stat.h>
 #include <fftw3.h>
 namespace semiclassical{ // {{{
-// FFT initialize  {{{
+// FFT initialize and related  {{{
 //********************************************//
   fftw_complex *in;
   fftw_complex *out;
@@ -10,7 +10,7 @@ namespace semiclassical{ // {{{
   fftw_plan planf;
   //
 //********************************************//
-void initialize_fftplans(int dim){ 
+void initialize_fftplans(int dim){  // {{{
 	in  = (fftw_complex*) fftw_malloc(sizeof(fftw_complex)*dim);
 	out = (fftw_complex*) fftw_malloc(sizeof(fftw_complex)*dim);
 	planf=fftw_plan_dft_1d(dim,in,in,FFTW_FORWARD,FFTW_ESTIMATE);
@@ -65,6 +65,8 @@ if(dir==1)
 a=a/norm(a);
 return;
 } //}}}
+// }}}
+// States prepare, and print {{{
 itpp::cvec coherent_state(double q0,double p0, double sigma, int N){ // {{{
 //  int 
   itpp::cvec a;
@@ -96,6 +98,23 @@ itpp::cvec coherent_state(double q0,double p0, double sigma, int N){ // {{{
 itpp::cvec coherent_state(double q0,double p0, int N){ // {{{
   return coherent_state(q0, p0, 1., N);
 } //}}}
+void print_state_p(itpp::cvec &a,char *filename){ // {{{
+FILE *fp;
+double pp;
+
+
+fp=fopen(filename,"w");
+for(int i=0;i<a.size();i++){
+    pp=(double)i;
+	fprintf(fp,"%lf\t %.14e\t %.14e\t %.14e\n",pp,abs(a(i))*abs(a(i)),real(a(i)),imag(a(i)));
+   }	
+ //fprintf(fp,"%lf\t %20.18lf \n",(double)NN,absquad(a(0))); //real_teil(a(0)),imag_teil(a(0)));
+fprintf(fp,"\n");
+fclose(fp);
+return;
+} // }}}
+// }}}
+// Maps {{{
 // Harper map {{{
 /***********************************/
 void U_x_har(double k,itpp::cvec &a){ // {{{
@@ -236,19 +255,5 @@ void kick_std(double T,itpp::cvec &a){ // {{{
 	FFT(a,0);
 } // }}}
 // }}}
-void print_state_p(itpp::cvec &a,char *filename){ // {{{
-FILE *fp;
-double pp;
-
-
-fp=fopen(filename,"w");
-for(int i=0;i<a.size();i++){
-    pp=(double)i;
-	fprintf(fp,"%lf\t %.14e\t %.14e\t %.14e\n",pp,abs(a(i))*abs(a(i)),real(a(i)),imag(a(i)));
-   }	
- //fprintf(fp,"%lf\t %20.18lf \n",(double)NN,absquad(a(0))); //real_teil(a(0)),imag_teil(a(0)));
-fprintf(fp,"\n");
-fclose(fp);
-return;
-} // }}}
+// }}}
 } // }}}
