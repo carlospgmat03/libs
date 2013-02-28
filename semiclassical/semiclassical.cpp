@@ -2,7 +2,7 @@
 #include <itpp/stat/misc_stat.h>
 #include <fftw3.h>
 namespace semiclassical{ // {{{
-
+// FFT initialize  {{{
 //********************************************//
   fftw_complex *in;
   fftw_complex *out;
@@ -10,13 +10,13 @@ namespace semiclassical{ // {{{
   fftw_plan planf;
   //
 //********************************************//
-void initialize_fftplans(int dim){
+void initialize_fftplans(int dim){ 
 	in  = (fftw_complex*) fftw_malloc(sizeof(fftw_complex)*dim);
 	out = (fftw_complex*) fftw_malloc(sizeof(fftw_complex)*dim);
 	planf=fftw_plan_dft_1d(dim,in,in,FFTW_FORWARD,FFTW_ESTIMATE);
 	planb=fftw_plan_dft_1d(dim,out,out,FFTW_BACKWARD,FFTW_ESTIMATE);
         return;
-}
+} // }}}
 void copyF(itpp::cvec &a,fftw_complex *in){ // {{{
   int nx=size(a);
 int i,j;
@@ -126,6 +126,7 @@ void U_x_saw(double T, itpp::cvec &a){ // {{{
   return ;
 } // }}}
 void kick_saw(double T,itpp::cvec &a){ // {{{
+  double tn=2*itpp::pi*T;
 //   std::cout << "En el saw, T=" << T << std::endl; 
 //   std::cout << "En el saw, 1 psi(0)=" << a(0) << std::endl; 
 //   U_x_saw(T,a);
@@ -134,7 +135,7 @@ void kick_saw(double T,itpp::cvec &a){ // {{{
 //   FFT(a,0); 
 //   std::cout << "En el saw, T=" << T << std::endl; 
 //   std::cout << "En el saw, 1 psi(0)=" << a(0) << std::endl; 
-  U_x_saw(T,a);
+  U_x_saw(tn,a);
 //   std::cout << "En el saw, 2 psi(0)=" << a(0) << std::endl; 
   FFT(a,1);
 //   std::cout << "En el saw, 3 psi(0)=" << a(0) << std::endl; 
