@@ -96,7 +96,41 @@ itpp::cvec coherent_state(double q0,double p0, double sigma, int N){ // {{{
 itpp::cvec coherent_state(double q0,double p0, int N){ // {{{
   return coherent_state(q0, p0, 1., N);
 } //}}}
-// Sawtooth
+// Harper map {{{
+/***********************************/
+void U_x_har(double k,itpp::cvec &a){ // {{{
+  int l,N=a.size();
+  double x;
+  double theta;
+  itpp::cvec phases(N);
+  for(l=0;l<N;l++){
+    theta=2*M_PI*l/((double)N);
+    x=2*M_PI*N*k*cos(theta);
+    phases[l]=std::complex<double>(cos(x),sin(x));
+  }
+  a=elem_mult(a,phases);
+  return ;
+} // }}}
+void U_p_har(double k, itpp::cvec &a){ // {{{
+  int l,N=a.size();
+  double x,theta;
+  itpp::cvec phases(N);
+  for(l=0;l<N;l++){
+    theta=2*M_PI*l/((double)N);
+    x=2*M_PI*N*k*cos(theta);
+    phases[l]=std::complex<double>(cos(x),sin(x));
+  }
+  a=elem_mult(a,phases);
+  return ;
+} // }}}
+void kick_har(double kx, double kp, itpp::cvec &a){ // {{{
+  U_x_har(kx,a);
+  FFT(a,1);
+  U_p_har(kp,a);
+  FFT(a,0); 
+} // }}}
+// }}}
+// Sawtooth map {{{
 //  q'=q+p'
 //  p'=p+K(q mod 1 -0.5)
 void U_p_saw(double T,itpp::cvec &a){ // {{{
@@ -144,7 +178,8 @@ void kick_saw(double T,itpp::cvec &a){ // {{{
   FFT(a,0); 
 //   std::cout << "En el saw, 5 psi(0)=" << a(0) << std::endl; 
 } // }}}
-// standard map
+// }}}
+// standard map {{{
 // p'=p+k sin(q) mod(2 pi) transicion en k~0.96
 // q'=q+p'
 void U_p_std(double T,itpp::cvec &a){ // {{{
@@ -200,6 +235,7 @@ void kick_std(double T,itpp::cvec &a){ // {{{
 	U_p_std(2.0,a);
 	FFT(a,0);
 } // }}}
+// }}}
 void print_state_p(itpp::cvec &a,char *filename){ // {{{
 FILE *fp;
 double pp;
