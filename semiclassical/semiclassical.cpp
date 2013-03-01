@@ -124,7 +124,7 @@ void U_x_har(double k,itpp::cvec &a){ // {{{
   itpp::cvec phases(N);
   for(l=0;l<N;l++){
     theta=2*M_PI*l/((double)N);
-    x=2*M_PI*N*k*cos(theta);
+    x=-2*M_PI*N*k*cos(theta);
     phases[l]=std::complex<double>(cos(x),sin(x));
   }
   a=elem_mult(a,phases);
@@ -136,13 +136,13 @@ void U_p_har(double k, itpp::cvec &a){ // {{{
   itpp::cvec phases(N);
   for(l=0;l<N;l++){
     theta=2*M_PI*l/((double)N);
-    x=2*M_PI*N*k*cos(theta);
+    x=-2*M_PI*N*k*cos(theta);
     phases[l]=std::complex<double>(cos(x),sin(x));
   }
   a=elem_mult(a,phases);
   return ;
 } // }}}
-void kick_har(double kx, double kp, itpp::cvec &a){ // {{{
+void kick_harper(double kx, double kp, itpp::cvec &a){ // {{{
   U_x_har(kx,a);
   FFT(a,1);
   U_p_har(kp,a);
