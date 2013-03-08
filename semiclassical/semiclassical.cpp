@@ -115,34 +115,6 @@ return;
 } // }}}
 // }}}
 // Maps {{{
-void quantum_map(itpp::vec parameters, itpp::cvec &psi, std::string map){ // {{{
-  if (map=="sawtooth"){
-    kick_saw(parameters(0)/(2*pi),psi);
-  } else if (map=="standard"){
-    kick_std(parameters(0)/(4*pi*pi),psi);
-  } else if (map=="harper"){
-    kick_harper(parameters(0)/(2*pi), parameters(0)/(2*pi), psi);
-  } else {
-    std::cerr << "quantum_map not found, aborting" << endl;
-    abort();
-  }
-
-} //
-// }}}
-void quantum_map(itpp::vec parameters, itpp::cvec &psi, std::string map, double delta){ // {{{
-  if (map=="sawtooth"){
-    kick_saw((parameters(0)+delta)/(2*pi),psi);
-  } else if (map=="standard"){
-    kick_std((parameters(0)+delta)/(4*pi*pi),psi);
-  } else if (map=="harper"){
-    kick_harper((parameters(0)+delta)/(2*pi), parameters(0)/(2*pi), psi);
-  } else {
-    std::cerr << "quantum_map not found, aborting" << endl;
-    abort();
-  }
-
-} //
-// }}}
 // Harper map {{{
 /***********************************/
 void U_x_har(double k,itpp::cvec &a){ // {{{
@@ -282,6 +254,34 @@ void kick_std(double T,itpp::cvec &a){ // {{{
 	U_p_std(2.0,a);
 	FFT(a,0);
 } // }}}
+// }}}
+void quantum_map(itpp::vec parameters, itpp::cvec &psi, std::string map){ // {{{
+  if (map=="sawtooth"){
+    kick_saw(parameters(0)/(2*itpp::pi),psi);
+  } else if (map=="standard"){
+    kick_std(parameters(0)/(4*itpp::pi*itpp::pi),psi);
+  } else if (map=="harper"){
+    kick_harper(parameters(0)/(2*itpp::pi), parameters(0)/(2*itpp::pi), psi);
+  } else {
+    std::cerr << "quantum_map not found, aborting" << std::endl;
+    abort();
+  }
+
+} //
+// }}}
+void quantum_map(itpp::vec parameters, itpp::cvec &psi, std::string map, double delta){ // {{{
+  if (map=="sawtooth"){
+    kick_saw((parameters(0)+delta)/(2*itpp::pi),psi);
+  } else if (map=="standard"){
+    kick_std((parameters(0)+delta)/(4*itpp::pi*itpp::pi),psi);
+  } else if (map=="harper"){
+    kick_harper((parameters(0)+delta)/(2*itpp::pi), parameters(0)/(2*itpp::pi), psi);
+  } else {
+    std::cerr << "quantum_map not found, aborting" << std::endl;
+    abort();
+  }
+
+} //
 // }}}
 // }}}
 } // }}}
