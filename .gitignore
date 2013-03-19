@@ -3,6 +3,8 @@
 *.swp
 modules/*.o 
 
+cuda
+
 cpp/testing
 cpp/test_rmt
 cpp/test_spins
