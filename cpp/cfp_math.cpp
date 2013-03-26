@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <iostream>
 #include <cmath>
-#include <cfp_math.h>
+#include <cpp/cfp_math.h>
 
 #ifndef M_LOG2E
 #define M_LOG2E 1.44269504088896340736 //log2(e)
