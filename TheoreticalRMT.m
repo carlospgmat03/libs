@@ -1,4 +1,3 @@
-
 BeginPackage["TheoreticalRMT`"] ;
 
 ExactPs::usage =
@@ -44,6 +43,8 @@ X2::usage = "X2[4,r_] calculates the level density correlations";
 EigenvalueDensity::usage = "EigenvalueDensity[x_, n_] displays the exact eigenvalue
 density for different values of the dimension n. Example:
 Plot[EigenvalueDensity[x, 4], {x, -5, 5}]"
+
+phiMehta::usage = "Phi required for many functions of the GUE. Defined as equation 6.2.2 of Mehta (Chapter 6)"
 
 Begin["`private`"];
 
