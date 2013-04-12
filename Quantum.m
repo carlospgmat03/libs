@@ -36,6 +36,7 @@ RandomGaussianComplex::usage = "RandomGaussianComplex[] gives a complex random n
 RandomGaussian::usage = "RandomGaussian[] gives a random number with Gaussian distribution
    centered at 0 and with width 1"
 RandomHermitianMatrix::usage = "RandomHermitianMatrix[ ] To generate a GUE Random Hermitian Matrix, various normalizatios are possible"
+PUEMember::usage = "PUEMember[n_] To generate a PUE Random Hermitian Matrix, with spectral span from -1/2 to 1/2. n is the dimension"
 GUEMember::usage = "GUEMember[n_] To generate a GUE Random Hermitian Matrix, various normalizatios are possible. n is the dimension"
 GOEMember::usage = "GOEMember[n_] To generate a GOE Random Hermitian Matrix, various normalizatios are possible. n is the dimension"
 CUEMember::usage = "To generate a CUE Random Unitary Matrix: CUEMember[n_]. n is the dimension"
@@ -157,6 +158,10 @@ Begin["`Private`"]
 	{Table[ RandomGaussianComplex[], {i, Power[2, qubits]}, {j, Power[2, qubits]}]};
 Options[RandomHermitianMatrix] = {Normalization -> "Default"};
 
+(* }}} *)
+(* {{{ *) PUEMember[n_Integer] := Module[{U},
+	U = CUEMember[n];
+	Chop[U.DiagonalMatrix[Table[Random[], {n}]-0.5].Dagger[U]]]
 (* }}} *)
 (* {{{ *) GUEMember[n_Integer,   OptionsPattern[]] :=
 	Times[Switch[OptionValue[Normalization],"Default",1,"SizeIndependent",0.5, "Kohler", (n/2)/Power[Pi,2]], 
