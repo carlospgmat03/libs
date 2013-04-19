@@ -4,13 +4,14 @@
 
 #include <itpp/itbase.h>
 #include <itpp/stat/misc_stat.h>
-#include <RMT.h>
+#include <cpp/RMT.h>
 namespace RMT{ // {{{ Headers
   itpp::mat RandomGOEDeltaOne(int const );
+  itpp::Mat<std::complex<double> > RandomCUE(int const );
   void FlatSpectrumGSE(itpp::Mat<std::complex<double> >&, itpp::Vec<double>& );
 } // }}}
 namespace RMT{ // {{{ Implementation
-  // unfolding things {{{
+// unfolding things {{{
   double unfolding_function(double const e){ //{{{
     return (asin(e)+e*sqrt(1-pow(e,2)))/itpp::pi;
 
@@ -37,7 +38,7 @@ namespace RMT{ // {{{ Implementation
   }
   // }}}
 // }}}
-  // Others (e.g. antisymmetric, isometries) {{{
+// Others (e.g. antisymmetric, isometries) {{{
   itpp::mat RandomAntisymmetricDeltaOne(int const dim){ //{{{
     itpp::mat temp(dim, dim);
     temp=itpp::randn(dim,dim);
@@ -51,7 +52,7 @@ namespace RMT{ // {{{ Implementation
   };
   // }}}
 // }}}
-  // GSE Collection {{{
+// GSE Collection {{{
   itpp::cmat RandomGSEDeltaOne(int const dim){ //{{{
     // Los eigenvalores de esta matriz estan entre +- Sqrt[8 * nsize]
     if (dim %2 != 0){
@@ -138,6 +139,22 @@ namespace RMT{ // {{{ Implementation
       std::cerr  << "Illegal normalization RandomGOE" << percentage_away;
       exit(1);
     }	
+  }
+  // }}}
+  // }}}
+// PUE Collection {{{
+  itpp::vec RandomPUEspectrum(int const dim){ //{{{
+    itpp::vec temp(dim);
+    temp=itpp::randu(dim)-0.5;
+    return temp;
+  }
+  // }}}
+  itpp::cmat RandomPUE(int const dim){ //{{{
+    itpp::vec lambda=RandomPUEspectrum(dim);
+    itpp::cmat U=RandomCUE(dim);
+    return itppextmath::UDiagUdagger(U, lambda);
+//     temp=itpp::randu(dim)-0.5;
+//     return temp;
   }
   // }}}
   // }}}
