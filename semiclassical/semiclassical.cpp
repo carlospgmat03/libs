@@ -143,6 +143,7 @@ void U_p_har(double k, itpp::cvec &a){ // {{{
   return ;
 } // }}}
 void kick_harper(double kx, double kp, itpp::cvec &a){ // {{{
+//   std::cout <<"Entro al mapa con kx=" << kx <<", kp=" << kp << std::endl;
   U_x_har(kx,a);
   FFT(a,1);
   U_p_har(kp,a);
@@ -255,6 +256,17 @@ void kick_std(double T,itpp::cvec &a){ // {{{
 	FFT(a,0);
 } // }}}
 // }}}
+double absolute_perturbation(double delta_scaled, int dimension, std::string map){ // {{{
+  if (map=="sawtooth"){
+  } else if (map=="standard"){
+    return 2*itpp::pi*delta_scaled/dimension;
+  } else if (map=="harper"){
+    return delta_scaled/dimension;
+  } else {
+    std::cerr << "quantum_map not found, aborting" << std::endl;
+    abort();
+  }
+} // }}}
 void quantum_map(itpp::vec parameters, itpp::cvec &psi, std::string map){ // {{{
   if (map=="sawtooth"){
     kick_saw(parameters(0)/(2*itpp::pi),psi);
@@ -270,6 +282,7 @@ void quantum_map(itpp::vec parameters, itpp::cvec &psi, std::string map){ // {{{
 } //
 // }}}
 void quantum_map(itpp::vec parameters, itpp::cvec &psi, std::string map, double delta){ // {{{
+//   std::cout << "En el mapa perturbado, la delta que entra es " << parameters(0)+delta << std::endl;
   if (map=="sawtooth"){
     kick_saw((parameters(0)+delta)/(2*itpp::pi),psi);
   } else if (map=="standard"){
@@ -283,5 +296,24 @@ void quantum_map(itpp::vec parameters, itpp::cvec &psi, std::string map, double 
 
 } //
 // }}}
+void quantum_map(itpp::vec parameters, itpp::cvec &psi, std::string map, double scaled_delta, bool scaled_delta_set, double absolute_delta, bool absolute_delta_set){ // {{{
+      int dim=psi.size();
+ if (scaled_delta_set && absolute_delta_set){
+   int errorcode=209234230;
+   std::cerr << "Both types of perturbation set. Error, exiting. Error code " << errorcode << std::endl;
+   abort();
+ } else if (scaled_delta_set || absolute_delta_set){
+   double delta;
+   if (scaled_delta_set){
+     delta=absolute_perturbation( scaled_delta, dim, map); 
+   } else {
+     delta=absolute_delta;
+   }
+   quantum_map(parameters,psi,map, delta);
+ } else {
+   quantum_map(parameters,psi,map);
+ }
+ return;
+} // }}}
 // }}}
 } // }}}
