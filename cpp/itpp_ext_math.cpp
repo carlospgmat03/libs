@@ -8,14 +8,14 @@
 #include <itpp/stat/misc_stat.h>
 // }}}
 namespace itppextmath{ // {{{
-  itpp::mat rotation_matrix(double theta){
+  itpp::mat rotation_matrix(double theta){ // {{{
     itpp::mat R(2,2);
     R(0,0)=cos(theta);
     R(1,1)=R(0,0);
     R(1,0)=sin(theta);
     R(0,1)=-R(1,0);
     return R;
-  }
+  } //}}}
 // Inquiry {{{
 double compare(const itpp::cmat& A, const itpp::cmat& B){ // {{{
   return itpp::norm(A - B);
@@ -513,6 +513,24 @@ itpp::cmat UDiagUdagger(const itpp::cmat& U, const itpp::cvec& E){ // {{{
     }
   }
   return Result;
+} // }}}
+itpp::cmat UDiagUdagger(const itpp::cmat& U, const itpp::vec& E){ // {{{
+return UDiagUdagger(U, to_cvec(E));
+} // }}}
+itpp::cmat InteractionPicture(const itpp::cmat& H0, const itpp::cmat& As, double t){ // {{{
+  std::cout << "Warning, using a slow routine" << std::endl;
+  // Returns exp[i t H0] As exp[-i t H0]
+  // acording to wikipedia, this is the standard sign
+  // http://en.wikipedia.org/wiki/Interaction_picture
+  itpp::cmat U;
+  std::complex<double> I(0.,1.);
+  U = exponentiate(-I*t*H0);
+  itpp::cmat tmp;
+  tmp = itpp::hermitian_transpose(U);
+  tmp = itpp::hermitian_transpose(U)*As;
+  tmp = itpp::hermitian_transpose(U)*As*U;
+  return itpp::hermitian_transpose(U)*As*U;
+//   return itpp::hermitian_transpose(U)*As*U;
 } // }}}
 template <class Num_T> itpp::Mat<Num_T> Proyector(const itpp::Vec<Num_T>& psi){ // {{{
   int n=psi.size();
