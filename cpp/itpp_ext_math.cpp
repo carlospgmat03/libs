@@ -413,6 +413,7 @@ itpp::mat exponentiate_real_symmetric(const itpp::mat& Matrix){ // {{{
   return tmp;
 } // }}}
 itpp::cmat exponentiate(const itpp::cmat& Matrix){ // {{{
+//   std::cout << "@exponentiate, 1" << std::endl;
 // template <class Num_T> itpp::Mat<Num_T> exponentiate(itpp::Mat<Num_T> Matrix){
   //Calculates exp(H)
   double how_real_symmetric = test_real_symmetric(Matrix);
@@ -427,6 +428,7 @@ itpp::cmat exponentiate(const itpp::cmat& Matrix){ // {{{
   double revision; 
   revision = itpp::norm(Matrix -
       V*itpp::diag(eigenvalues)* V.hermitian_transpose())/itpp::norm(Matrix);
+//   std::cout << "@exponentiate, 50. Error es " << revision << std::endl;
   if (revision > 10e-12 || !exito){
     std::cerr << "Matrix=" << Matrix << std::endl;  
     std::cerr << "Eigenvalores=" << eigenvalues << std::endl;  
@@ -442,6 +444,7 @@ itpp::cmat exponentiate(const itpp::cmat& Matrix){ // {{{
     abort();
   }
   tmp = V*itpp::diag(itpp::exp(eigenvalues))* V.hermitian_transpose();
+//   std::cout << "@exponentiate, 100" << std::endl;
   return tmp;
 } // }}}
 itpp::cmat exponentiate_nonsym(const itpp::cmat& Matrix){ // {{{
@@ -518,18 +521,24 @@ itpp::cmat UDiagUdagger(const itpp::cmat& U, const itpp::vec& E){ // {{{
 return UDiagUdagger(U, to_cvec(E));
 } // }}}
 itpp::cmat InteractionPicture(const itpp::cmat& H0, const itpp::cmat& As, double t){ // {{{
-  std::cout << "Warning, using a slow routine" << std::endl;
+  std::cout << "Warning, using a slow routine asdfasd" << std::endl;
   // Returns exp[i t H0] As exp[-i t H0]
   // acording to wikipedia, this is the standard sign
   // http://en.wikipedia.org/wiki/Interaction_picture
   itpp::cmat U;
   std::complex<double> I(0.,1.);
   U = exponentiate(-I*t*H0);
+//   std::cout << "She was all dressed up in black" << std::endl;
   itpp::cmat tmp;
-  tmp = itpp::hermitian_transpose(U);
-  tmp = itpp::hermitian_transpose(U)*As;
-  tmp = itpp::hermitian_transpose(U)*As*U;
   return itpp::hermitian_transpose(U)*As*U;
+//   return itpp::hermitian_transpose(U)*As*U;
+} // }}}
+itpp::cmat InteractionPicture(const itpp::cmat& V0, const itpp::cmat& As){ // {{{
+  std::cout << "Warning, using a slow routinen 42384938274" << std::endl;
+  // Returns V0^\dagger As V0
+  // acording to wikipedia, this is the standard sign
+  // http://en.wikipedia.org/wiki/Interaction_picture
+  return itpp::hermitian_transpose(V0)*As*V0;
 //   return itpp::hermitian_transpose(U)*As*U;
 } // }}}
 template <class Num_T> itpp::Mat<Num_T> Proyector(const itpp::Vec<Num_T>& psi){ // {{{
@@ -562,6 +571,14 @@ template <class Num_T> itpp::Vec<Num_T> get_column(const itpp::Array<itpp::Vec<N
   for (int i = 0; i< A.size(); i++){ tmp(i) = A(i)(element); }
   return tmp;
 } //}}}
+// Multiplication
+template <class Num_T> itpp::Mat<Num_T> AtimesDiagB(const itpp::Mat<Num_T>& A, const itpp::Vec<Num_T>& B){ // {{{
+  itpp::Mat<Num_T> tmp(A.cols(),A.rows());
+  for (int i=0; i<tmp.cols(); i++){
+    tmp.set_col(i,B(i)*A.get_col(i));
+  }
+  return tmp;
+} // }}}
 // }}}
 // Reporting {{{
 void PrintCompactHermitian(itpp::Mat<std::complex<double> >& rho){
@@ -593,7 +610,7 @@ itpp::ivec IntegerDigits(int n,int base=2, int length=0){// {{{
     counter ++;
   }
   return result;
-}// }}}
+}// }}} Matrix=
 int bvec_to_int(itpp::bvec bool_array){// {{{
   int tmp=0;
   for (int i=0; i<bool_array.size(); i++){
