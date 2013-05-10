@@ -4,6 +4,7 @@ ApplyMagnetickKick::usage = "ApplyMagnetickKick[state_, b_, Target_] or ApplyMag
 ApplyIsing::usage = "ApplyIsing[state_, J_, Position1_, Position2_]"
 (* }}} *)
 (* {{{ Full topologies*)
+ApplyIsingTorus::usage="Se hace la topologia de un toro. Solo la parte de Ising"
 ApplyIsingChain::usage="Se hace la topologia de una cadena. Solo la parte de Ising"
 ApplyChain::usage="Se hace la topologia de una cadena."
 ApplyInverseChain::usage="Se hace la topologia de una cadena pero hacia atras en el tiempo."
