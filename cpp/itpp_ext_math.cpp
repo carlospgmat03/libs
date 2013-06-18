@@ -1,8 +1,8 @@
 // include files {{{
 #ifndef  ITPP_EXT_MATH_VARIOUS
 #define ITPP_EXT_MATH_VARIOUS
-#include <cpp/itpp_ext_math.h>
-#include <cpp/cfp_math.cpp>
+#include "itpp_ext_math.h"
+#include "cfp_math.cpp"
 // #include <purity_RMT.cpp>
 #include <itpp/itbase.h>
 #include <itpp/stat/misc_stat.h>

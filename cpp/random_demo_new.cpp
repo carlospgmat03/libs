@@ -3,7 +3,7 @@ using namespace std;
 
 //typedef double wp;
 typedef long double wp;
-#include <my_random.hpp>
+#include "my_random.hpp"
 //#include <my_random.hpp>
 
 using namespace random_variables;
@@ -14,7 +14,7 @@ int main()
 //	QuantumState psi(4);
 //	psi.print( );
 
-#include <my_random.hpp>
+#include "my_random.hpp"
   cout.precision(10);
     cout.width(40);
   for(int i = 0; i < 2; i++)

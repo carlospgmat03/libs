@@ -1,12 +1,12 @@
 // include files {{{
 #ifndef  purity_RMT_VARIOUS
 #define purity_RMT_VARIOUS
-#include <RMT.cpp>
+#include "RMT.cpp"
 // #include <purity_RMT.h>
-#include <QuantumStateITPP.cpp>
+#include "QuantumStateITPP.cpp"
 #include <cmath>
-#include <cfp_math.cpp>
-#include <itpp_ext_math.cpp>
+#include "cfp_math.cpp"
+#include "itpp_ext_math.cpp"
 // }}}
 namespace PurityRMT{
   itpp::Mat<std::complex<double> > SpectatorHamiltonian(int dim_env, int dim_cou, int dim_wit, double lambda, double percet_out=0.1){ // {{{

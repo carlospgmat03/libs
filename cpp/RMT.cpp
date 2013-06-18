@@ -4,7 +4,7 @@
 
 #include <itpp/itbase.h>
 #include <itpp/stat/misc_stat.h>
-#include <cpp/RMT.h>
+#include "RMT.h"
 namespace RMT{ // {{{ Headers
   itpp::mat RandomGOEDeltaOne(int const );
   itpp::Mat<std::complex<double> > RandomCUE(int const );

@@ -1,8 +1,8 @@
 // {{{ Include and TCLAP
 #include <iostream>
 #include <tclap/CmdLine.h>
-#include <RMT.cpp>
-#include <purity_RMT.cpp>
+#include "RMT.cpp"
+#include "purity_RMT.cpp"
 using namespace std;
 using namespace itpp;
 using namespace RMT;
