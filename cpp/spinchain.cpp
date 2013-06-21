@@ -1,6 +1,6 @@
 #ifndef  SPIN_CHAIN
 #define SPIN_CHAIN
-#include <cpp/itpp_ext_math.cpp>
+#include "itpp_ext_math.cpp"
 
 //usar namespace conflictúa con los headers de cuda
 //using namespace itpp;

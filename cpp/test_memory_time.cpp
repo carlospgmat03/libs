@@ -1,6 +1,6 @@
 #include <iostream>
 #include <tclap/CmdLine.h>
-#include <RMT.cpp>
+#include "RMT.cpp"
 // #include <purity_RMT.cpp>
 using namespace std;
 
