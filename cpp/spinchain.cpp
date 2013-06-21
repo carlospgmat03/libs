@@ -254,15 +254,15 @@ namespace spinchain{ // {{{
             basis_state.sign=true;
           }
 //           abort();
-          basis_states = concat(basis_states,basis_state);
+          basis_states = itpp::concat(basis_states,basis_state);
 //           std::cout <<"Just added " << basis_state.generator << std::endl; 
         } // }}}
         else {// entonces <n|R P_k |n> == 0 // {{{
           basis_state.degenerate=false;
           basis_state.sign=true;
-          basis_states = concat(basis_states,basis_state);
+          basis_states = itpp::concat(basis_states,basis_state);
           basis_state.sign=false;
-          basis_states = concat(basis_states,basis_state);
+          basis_states = itpp::concat(basis_states,basis_state);
           // so we add both states with signs
           // entonces <n|R P_k |n> = 0
 
@@ -275,7 +275,7 @@ namespace spinchain{ // {{{
     //     std::cout << "Si buenas 1 " << std::endl;
     itpp::Array<CompactSymmetricBaseMember> basis_states(0);
     for (int k=0; k<qubits; k++){
-      basis_states= concat(basis_states,build_rotationally_symmetric_base_states_compact(qubits, k));
+      basis_states= itpp::concat(basis_states,build_rotationally_symmetric_base_states_compact(qubits, k));
     }
     return basis_states;
   } // }}}
@@ -362,7 +362,7 @@ namespace spinchain{ // {{{
       apply_star(state_r, J, magnetic_field,J_interaction, local_magnetic_field);
       for (int j=0; j<d_sector; j++){for (int jq=0; jq<2; jq++){
         state_l=itppextmath::TensorProduct(DecodeCompactRotationallySymetricBasisState(basis_states(j)),state_q(jq));
-        U(2*j+jq, 2*i+iq) =  dot(conj(state_l),state_r) ;
+        U(2*j+jq, 2*i+iq) =  itpp::dot(conj(state_l),state_r) ;
       }}
     }}
     return U;
@@ -383,7 +383,7 @@ namespace spinchain{ // {{{
 //       std::cout << state_r << std::endl << std::endl;
       for (int j=0; j<d_sector; j++){for (int jq=0; jq<2; jq++){
         state_l=itppextmath::TensorProduct(state_q(jq), DecodeCompactRotationallySymetricBasisState(basis_states(j)));
-        U(j+d_sector*jq, i+d_sector*iq) =  dot(conj(state_l),state_r) ;
+        U(j+d_sector*jq, i+d_sector*iq) =  itpp::dot(conj(state_l),state_r) ;
 //         U(2*j+jq, 2*i+iq) =  dot(conj(state_l),state_r) ;
       }}
     }}
