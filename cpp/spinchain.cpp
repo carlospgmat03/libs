@@ -186,6 +186,29 @@ namespace spinchain{ // {{{
     }
     return;
   } // }}}
+  // Symmetries in the 2D case
+  itpp::cvec apply_vertical_rotation(itpp::cvec& state_in, int horizontal_dimension){ // {{{
+    // the bits are ordered as follows
+    //
+    // 8   9  10  11
+    // 4   5   6   7
+    // 0   1   2   3
+    //
+    // In this case, horizontal dimension is 4.
+    // The above state gets transformed into 
+    //
+    // 4   5   6   7
+    // 0   1   2   3
+    // 8   9  10  11
+    //
+    int d=state_in.size();
+    itpp::cvec state(d);
+    int qubits=cfpmath::log_base_2(d);
+    for (int n=0; n<d; n++){
+      state(cfpmath::rotate_bits(n, qubits, horizontal_dimension))=state_in(n);
+    }
+    return state;
+  } // }}}
   // Symmetries in the homogeneous case
   class CompactSymmetricBaseMember{ // {{{
     public:
@@ -349,6 +372,7 @@ namespace spinchain{ // {{{
     return state/norm(state); 
     //Evalute if the state is cero
   } // }}}
+// Matrices for 
   itpp::cmat MatrixForIsing_star(int qubits, double J, itpp::vec magnetic_field, double J_interaction, itpp::vec local_magnetic_field, int sector){// {{{
 
     itpp::Array<CompactSymmetricBaseMember> basis_states;
