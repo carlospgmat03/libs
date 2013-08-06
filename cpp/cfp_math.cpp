@@ -215,33 +215,6 @@ bool parity_order_inversion_base_2(const int number_in){// {{{
    */
   return ((cfpmath::BitCount(number_in)%4)>1); 
 }// }}}
-// 
-// 
-// 
-// 
-// 
-// 
-// 
-// 
-// 
-// 
-// int rotate_bits(int number_in, int starting_digit, int ending_digit, int power){ // {{{
-//   // We want to rotate an "inner" part of the number. Consider
-//   // number_in = 0  0  1  1  0  1  0  1  1  0  0 = 428
-//   // starting digit =3
-//   // ending digit = 8
-//   // Digits to rotate 
-//   // number_in = 0  0  1  1  0  1  0  1  1  0  0 = 428
-//   // digits    = 10 9  8  7  6  5  4  3  2  1  0 
-//   // number    =       x  x  x  x  x  x          = mask
-//   //           =       1  1  0  1  0  1          = 53
-//   //  power = 3, so we have to rotatet it to the left 3 times. 
-//   //  rotated bits =   1  0  1  1  1  0          = 46
-//   // new number= 0  0  1  0  1  1  1  0  1  0  0 = 372
-//   int n_fixed, n_to_rotate, n_rotated;
-//   int mask=pow_2(ending_digit+1)-pow_2(ending_digit);
-//   extract_digits(number_in, 
-// } // }}}
 int rotate_bits(int number_in, int size_register){ // {{{
 // We rotate the bits of a number, but only the first "size_register" bits
 int mask=(1<<(size_register+1))-1;
@@ -251,7 +224,35 @@ return
 int rotate_bits(int number_in, int size_register, int power){ // {{{
 // We rotate the bits of a number, but only the first "size_register" bits
 int n_out=number_in;
+  for (int i=0; i< power; i++){
+    n_out = rotate_bits(n_out, size_register);
+  }
 return n_out;
+} // }}}
+int rotate_bits(int number_in, int starting_digit, int ending_digit, int power){ // {{{
+  // We want to rotate an "inner" part of the number. Consider
+  // number_in = 0  0  1  1  0  1  0  1  1  0  0 = 428
+  // starting digit =3
+  // ending digit = 8
+  // Digits to rotate 
+  // number_in = 0  0  1  1  0  1  0  1  1  0  0 = 428
+  // digits    = 10 9  8  7  6  5  4  3  2  1  0 
+  // number    =       x  x  x  x  x  x          = mask
+  //           =       1  1  0  1  0  1          = 53
+  //  power = 3, so we have to rotatet it to the left 3 times. 
+  //  rotated bits =   1  0  1  1  1  0          = 46
+  // new number= 0  0  1  0  1  1  1  0  1  0  0 = 372
+  int n_fixed, n_to_rotate, n_rotated;
+  int mask=pow_2(ending_digit+1)-pow_2(starting_digit);
+  extract_digits(number_in, n_to_rotate, n_fixed, mask);
+  n_rotated = rotate_bits(n_to_rotate, ending_digit - starting_digit+1, power);
+//   std::cout << "Intentando meter las cosas. " << std::endl
+//     << "number_in      (6) = " << number_in << std::endl
+//     << "starting digit (0) = " << starting_digit << std::endl  
+//     << "ending digit   (3) = " << ending_digit << std::endl
+//     << "mask          (15) = " << mask << std::endl;
+//     << "number_in (6) = " << number_in << std::endl;
+  return merge_two_numbers(n_rotated, n_fixed, mask);
 } // }}}
 int primitive_period_bit_rotation(int n, int size_register){ // {{{
 // Calculates the minumum J such that
