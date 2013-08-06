@@ -227,7 +227,7 @@ namespace spinchain{ // {{{
     itpp::cvec state(d);
     int qubits=cfpmath::log_base_2(d);
     for (int n=0; n<d; n++){
-      state(cfpmath::rotate_bits(n, qubits, horizontal_dimension))=state_in(n);
+      state(cfpmath::apply_horizontal_rotation(n, qubits, horizontal_dimension))=state_in(n);
     }
     return state;
   } // }}}
