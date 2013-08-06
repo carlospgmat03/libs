@@ -18,7 +18,7 @@ test_spins:: $(MYCPP)/test_spins.cpp $(MYCPP)/spinchain.cpp $(MYCPP)/itpp_ext_ma
 test_dev_random_kanbalam :: test_dev_random
 	bsub  -oo salida -eo error -q pruebas -n 5 srun ./test_dev_random
 
-testing :: testing.cpp ../cpp/cfp_math.cpp $(MYCPP)/itpp_ext_math.cpp
+testing :: testing.cpp ../cpp/cfp_math.cpp $(MYCPP)/cpp/itpp_ext_math.cpp
 	$(CXX)  -o $@ -I $(MYCPP) -litpp $@.cpp
 
 % :: %.cpp  $(MYCPP)/itpp_ext_math.cpp
