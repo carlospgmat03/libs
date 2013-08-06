@@ -219,9 +219,9 @@ namespace spinchain{ // {{{
     // In this case, horizontal dimension is 4.
     // The above state gets transformed into 
     //
-    // 4   5   6   7
-    // 0   1   2   3
-    // 8   9  10  11
+    // 11  8   9  10 
+    //  7  4   5   6 
+    //  3  0   1   2 
     //
     int d=state_in.size();
     itpp::cvec state(d);

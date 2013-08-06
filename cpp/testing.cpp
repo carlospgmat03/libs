@@ -99,6 +99,29 @@ int main(int argc, char* argv[]){
   } else if (option == "test_reverse_bits") { // {{{
     cout << reverse_bits(i1.getValue(), i2.getValue()) << endl ;
   // }}}
+  } else if (option == "test_rotate_bits_inner") { // {{{
+    int l=i1.getValue(), r1, r2;
+    int error=0;
+    for (int n =0; n< pow_2(l); n++){
+      r1=  rotate_bits(n, l);
+      r2=  rotate_bits(n, 0, l-1, 1);
+      error += abs(r1-r2);
+    }
+    for (int n =0; n< pow_2(l); n++){
+      for (int k=0; k<l ; k++){
+        error += abs(rotate_bits(n, k, k, 1) -  n);
+      }
+    }
+//     int power=3; //va desde 0 hasta k-l o algo asi
+    for (int n =0; n< pow_2(l); n++){
+      for (int k=0; k<l ; k++){
+        for (int power=0; power < l- k ; power++){
+          error += abs(rotate_bits(n, k, k+power-1, power) -  n);
+        }
+      }
+    }
+    cout << "El error es " << error << endl;
+  // }}}
   } else if (option == "test_partial_trace") { // {{{
     int q=i1.getValue();
     int d=pow_2(q);
