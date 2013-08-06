@@ -216,7 +216,7 @@ itpp::cmat Reorder_state_tensor_form(itpp::cvec vector,int which){ // {{{
   int col, row; 
   //   std::cout << "@Reorder_state_tensor_form 1" << std::endl;
   for (int j=0; j<vector.size(); j++){
-    cfpmath::extract_digits(j,qubits,col,row,which);
+    cfpmath::extract_digits(j,col,row,which);
     out(row,col)=vector(j);
   }
   return out;

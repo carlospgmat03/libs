@@ -141,28 +141,6 @@ void extract_digits(int n, int& n1, int& n2, int which){// {{{
     nrot= nrot>>1; 
   }
 }// }}}
-void extract_digits(int n, int length, int& n1, int& n2, int which){// {{{
-  //   This routine takes numin and puts two numbers
-  //   n1out and n2out which result from the digits
-  //   of numin that are marked with the 1 bits
-  //   of the number nwhich
-  //   exambple
-  //   nwhich=   0 1 0 1 0 0 1 = 41
-  //   numin=    0 1 1 0 1 1 1 = 55
-  //   n1out=      1   0     1 = 5
-  //   n2out=    0   1   1 1   = 7
-  n1=0; n2=0;
-  int counter_1=0, counter_2=0;        
-  for (int j=0; j<length; j++){
-    if(test_bit(which,j)){
-      if (test_bit(n,j)) n1=set_bit(n1, counter_1);
-      counter_1++;
-    } else {
-      if (test_bit(n,j)) n2=set_bit(n2, counter_2);
-      counter_2++;
-    }
-  }
-}// }}}
 bool even_number_of_ones_base_2(const int number_in){// {{{
   //! This function returns true if the number has an even number of ones in its representation in base 2.
   /*! It is useful for fermions to find to which block (even or odd) a particular base member 

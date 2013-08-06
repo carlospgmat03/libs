@@ -99,21 +99,6 @@ int main(int argc, char* argv[]){
   } else if (option == "test_reverse_bits") { // {{{
     cout << reverse_bits(i1.getValue(), i2.getValue()) << endl ;
   // }}}
-  } else if (option == "test_extract_digits") { // {{{
-    int length=i1.getValue();
-    int maxn=pow_2(length);
-    int n1a, n1b, n2a, n2b;
-    int error=0;
-    for (int n=0; n<maxn; n++){
-      for (int nwhich=0; nwhich<maxn; nwhich++){
-        extract_digits(n, n1a, n2a, nwhich);
-        extract_digits(n, length, n1b, n2b, nwhich);
-        error += abs(n1a-n1b) + abs(n2a-n2b );
-//         cout << n1a-n1b << ", " << n2a-n2b << n1a<< n1b << n2a << n2b << endl;
-      }
-    }
-    cout << "The error is " << error << endl; 
-  // }}}
   } else if (option == "test_partial_trace") { // {{{
     int q=i1.getValue();
     int d=pow_2(q);
