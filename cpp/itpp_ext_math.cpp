@@ -382,6 +382,13 @@ template <class Num_T> itpp::Vec<Num_T> TensorProduct(const itpp::Vec<Num_T>& Ve
 //       std::cout << "Hola cabron " << std::endl;
   return tmp;
 } // }}}
+template <class Num_T> itpp::Vec<Num_T> TensorProduct(const itpp::Array<itpp::Vec<Num_T> >& States){ // {{{
+  itpp::Vec<Num_T> tmp=States(0);
+  for (int i=1; i<States.size(); i++){
+    tmp=TensorProduct(tmp,States(i));
+  }
+  return tmp;
+} // }}}
 itpp::cvec TensorProduct(const itpp::cvec& Vec1, const itpp::vec& Vec2){ // {{{
 return TensorProduct(Vec1, to_cvec(Vec2));
 // return Vec1;
