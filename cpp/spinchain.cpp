@@ -253,6 +253,11 @@ namespace spinchain{ // {{{
       // The sign is + if sign=true and - if sign=false
 
   }; // }}}
+std::ostream &operator<<(std::ostream &os, const CompactSymmetricBaseMember &psi){
+  os << "(Generator " << psi.generator << "; symmetry sector " << psi.k << "; qubits " 
+    << psi.qubits << "; degenerate " << psi.degenerate << ", sign " << psi.sign << ")" ;
+  return os;
+}
   itpp::Array<CompactSymmetricBaseMember> build_rotationally_symmetric_base_states_compact(int qubits, int sector){ //{{{
     //     std::cout << "Si buenas 1 " << std::endl;
     itpp::Array<CompactSymmetricBaseMember> basis_states;
@@ -385,7 +390,7 @@ namespace spinchain{ // {{{
       return state; 
     }
 
-    std::complex<double> Imag=std::complex<double>(0,1);
+//     std::complex<double> Imag=std::complex<double>(0,1);
     int n_rotated=base_state;
     for (int j=0; j<J; j++){
       state(n_rotated)=exp(-std::complex<double>(0,1)*2.*itpp::pi*double(j*k/qubits));
