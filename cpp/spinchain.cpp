@@ -253,11 +253,11 @@ namespace spinchain{ // {{{
       // The sign is + if sign=true and - if sign=false
 
   }; // }}}
-std::ostream &operator<<(std::ostream &os, const CompactSymmetricBaseMember &psi){
-  os << "(Generator " << psi.generator << "; symmetry sector " << psi.k << "; qubits " 
-    << psi.qubits << "; degenerate " << psi.degenerate << ", sign " << psi.sign << ")" ;
-  return os;
-}
+  std::ostream &operator<<(std::ostream &os, const CompactSymmetricBaseMember &psi){ // {{{
+    os << "(Generator " << psi.generator << "; symmetry sector " << psi.k << "; qubits " 
+      << psi.qubits << "; degenerate " << psi.degenerate << ", sign " << psi.sign << ")" ;
+    return os;
+  } // }}}
   itpp::Array<CompactSymmetricBaseMember> build_rotationally_symmetric_base_states_compact(int qubits, int sector){ //{{{
     //     std::cout << "Si buenas 1 " << std::endl;
     itpp::Array<CompactSymmetricBaseMember> basis_states;
@@ -367,6 +367,18 @@ std::ostream &operator<<(std::ostream &os, const CompactSymmetricBaseMember &psi
     }
     return state;
   } // }}}
+  itpp::cvec apply_rotation(itpp::cvec& state_in, int power){ // {{{
+    // The operator is defined as
+    // R^k|i_{n-1}  ... i_1 i_0> = |i_{k-1} ... i_0 i_{n-1} ... i_k>
+    // i. e. is a rotation to the right of the bits. 
+    int d=state_in.size();
+    itpp::cvec state(d);
+    int qubits=cfpmath::log_base_2(d);
+    for (int n=0; n<d; n++){
+      state(cfpmath::rotate_bits(n, qubits, power))=state_in(n);
+    }
+    return state;
+  } // }}}
   itpp::cvec apply_rotation(itpp::cvec& state_in){ // {{{
     // The operator is defined as
     // R|i_{n-1}  ... i_1 i_0> = |i_0 i_{n-1} ... i_1>
@@ -395,6 +407,20 @@ std::ostream &operator<<(std::ostream &os, const CompactSymmetricBaseMember &psi
     for (int j=0; j<J; j++){
       state(n_rotated)=exp(-std::complex<double>(0,1)*2.*itpp::pi*double(j*k/qubits));
       n_rotated=cfpmath::rotate_bits(n_rotated, qubits); 
+    }
+    return state/norm(state); 
+    //Evalute if the state is cero
+  } // }}}
+  itpp::cvec project_state(int k, itpp::cvec& state_in){ // {{{
+    // la idea es que agarro un n particular Veo si lo debo considerar. 
+    // luego entonces marco los que no debo considerar porque son ciclos del man
+    // luego reviso si proyecta a 0. 
+    int d=state_in.size();
+    int q=cfpmath::log_base_2(state.size());
+    itpp::cvec state(d);
+    state=state_in;
+    for (int i=1; i<q; i++){
+      state+= exp(-2*pi*Im*k*i/double(q)) * apply
     }
     return state/norm(state); 
     //Evalute if the state is cero

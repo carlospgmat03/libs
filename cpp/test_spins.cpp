@@ -376,7 +376,8 @@ cout <<norm(state-state_out_eduardo) << endl;
     std::cout << "error total=" << error << std::endl;
     //}}}
   } else if(option=="test_create_base_2d") {// {{{
-    Array<CompactSymmetricBaseMember> basis_states, tmp_basis;
+    Array<CompactSymmetricBaseMember> basis_states, tmp_basis, basis_states_many_body;
+    CompactSymmetricBaseMember g;
     cvec state_l, state_r, state;
     int q=qubits.getValue();
     int d=pow_2(q);cmat U(d,d);
@@ -393,13 +394,31 @@ cout <<norm(state-state_out_eduardo) << endl;
 
     basis_states=build_rotationally_symmetric_base_states_compact(nh);
 
-//     int tv_sector=1;
+    int tv_sector=1, mask;
 
-//     basis_states_many_body=build_rotationally_symmetric_base_states_compact(q,tv_sector*nh);
+    basis_states_many_body=build_rotationally_symmetric_base_states_compact(q,tv_sector*nh);
 
-    for (int ib=0; ib< pow_2(nh) ; ib++){
-      std::cout << "basis=" << basis_states(ib) << std::endl;
+    g=basis_states_many_body(0);
+    cout << g << endl;
+    // Here I must generate the list of integers that are relevant for the
+    // superposition
+    //
+//     Get first nh bits then second nh bits
+
+
+    ivec  smaller_generators(nv);
+    for (int i_row=0; i_row < nv; i_row++){
+      mask = ((pow_2(nh)-1)<<(nh*i_row));
+      cout << mask << endl; 
+      smaller_generators(i_row) = g.generator & mask;
+
     }
+    cout << "Smaller generators = " << smaller_generators << endl;
+    for (int ib=0; ib< pow_2(nh) ; ib++){
+//       std::cout << "basis small =" << basis_states(ib) << std::endl;
+    }
+
+    cout << "See that the general projection operator works the same on basis states." << endl; 
     std::cout << "error total=" << error << std::endl;
     //}}}
   } else {// {{{
