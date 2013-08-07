@@ -12,7 +12,7 @@ test_memory_time:: test_memory_time.cpp
 # test_rmt:: test_rmt.cpp
 # 	$(CXX)  -Wall $(INCLUDETCLAP) $(CXXFLAGS) -o $@ $@.cpp -litpp
 
-test_spins:: $(MYCPP)/test_spins.cpp $(MYCPP)/spinchain.cpp $(MYCPP)/itpp_ext_math.cpp
+test_spins:: test_spins.cpp $(MYCPP)/cpp/spinchain.cpp $(MYCPP)/cpp/itpp_ext_math.cpp
 	$(CXX)  -Wall -I . $(INCLUDETCLAP) $(CXXFLAGS) -o $@ $@.cpp -litpp
 
 test_dev_random_kanbalam :: test_dev_random
