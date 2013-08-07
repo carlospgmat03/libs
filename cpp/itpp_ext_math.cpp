@@ -211,7 +211,7 @@ itpp::cmat Reorder_state_tensor_form(itpp::cvec vector,int which){ // {{{
   //   std::cout << "@Reorder_state_tensor_form -1" << std::endl;
   int dim2 = vector.size()/dim1;
   //   std::cout << "@Reorder_state_tensor_form 0" << std::endl;
-  int qubits=cfpmath::log_base_2(vector.size());
+//   int qubits=cfpmath::log_base_2(vector.size());
   itpp::cmat out(dim2,dim1); out=0.;
   int col, row; 
   //   std::cout << "@Reorder_state_tensor_form 1" << std::endl;
@@ -473,7 +473,7 @@ itpp::cmat exponentiate_nonsym(const itpp::cmat& Matrix){ // {{{
   double revition; 
   revition = itpp::norm(Matrix -
       (V*itpp::diag(eigenvalues)* invV));
-  if (revition > 10e-12 || !exito){
+  if (revition > 10e-12 || !exito || !exito2){
     std::cerr << "Algun xxx pedo en exponentiate " << revition << ", " << exito << std::endl; 
     std::cerr << "La rutina de lapack tiene pedos cuando esta muy sparse la matriz,\n"
       <<"por ejemplo un elemento del modelo de free fermions con 2D en primeros vecinos" << std::endl; 
@@ -1485,7 +1485,7 @@ void apply_cnot(itpp::cvec& state, int control, int target){// {{{
 void apply_control_u(itpp::cvec& state, int control, int target, itpp::cmat& u){// {{{
   int mask = cfpmath::pow_2(control) + cfpmath::pow_2(target);
   itpp::cvec moco;
-  int n1, n2;
+//   int n1, n2;
   itpp::ivec pos(2);
   for (int j=0; j<state.size()/4; j++){
     if(control < target){
