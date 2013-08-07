@@ -263,7 +263,8 @@ namespace spinchain{ // {{{
     std::complex<double> phase;
     std::complex<double> Imag(0,1);
     for (int i=1; i<q; i++){
-      phase = exp(-2.*itpp::pi*std::complex<double>(0,1)*double(i*k/double(q)));
+      phase = exp(-2.*itpp::pi*std::complex<double>(0,1)*double(i*k)/double(q));
+//       std::cout << i << ", " << phase << ", " << double(i*k)/double(q) << std::endl;
       state+= phase*apply_horizontal_rotation(state_in, horizontal_dimension, i);
 //       state+= exp(-2*(double(2)*Imag)*k*i/double(q)) * apply_rotation(state_in, i);
 //       state+= exp(-2*itpp::pi*Imag*k*i/double(q)) * apply_rotation(state_in, i);
