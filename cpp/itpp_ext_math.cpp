@@ -16,7 +16,7 @@ namespace itppextmath{ // {{{
     R(0,1)=-R(1,0);
     return R;
   } //}}}
-  double sum_positive_derivatives(const itpp::vec& f){
+  double sum_positive_derivatives(const itpp::vec& f){ // {{{
     double tmp=0;
     for (int i=0; i<f.size()-1; i++){
       if(f(i+1)>f(i)){
@@ -24,7 +24,7 @@ namespace itppextmath{ // {{{
       }
     }
     return tmp;
-  }
+  } // }}}
 // Inquiry {{{
 double compare(const itpp::cmat& A, const itpp::cmat& B){ // {{{
   return itpp::norm(A - B);
