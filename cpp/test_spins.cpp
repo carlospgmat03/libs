@@ -375,6 +375,33 @@ cout <<norm(state-state_out_eduardo) << endl;
     // }}}
     std::cout << "error total=" << error << std::endl;
     //}}}
+  } else if(option=="test_create_base_2d") {// {{{
+    Array<CompactSymmetricBaseMember> basis_states, tmp_basis;
+    cvec state_l, state_r, state;
+    int q=qubits.getValue();
+    int d=pow_2(q);cmat U(d,d);
+    double error=0.;
+//     int size_space=basis_states.size();
+//     int i=3;
+//     state_l=DecodeCompactRotationallySymetricBasisState(basis_states(i));
+
+
+
+    int nv=3;
+    int nh=4;
+    q= nv*nh;
+
+    basis_states=build_rotationally_symmetric_base_states_compact(nh);
+
+//     int tv_sector=1;
+
+//     basis_states_many_body=build_rotationally_symmetric_base_states_compact(q,tv_sector*nh);
+
+    for (int ib=0; ib< pow_2(nh) ; ib++){
+      std::cout << "basis=" << basis_states(ib) << std::endl;
+    }
+    std::cout << "error total=" << error << std::endl;
+    //}}}
   } else {// {{{
     vec b(3);
     b(0)=-0.404;b(1)=0.0844;b(2)=0.361;
