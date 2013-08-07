@@ -231,6 +231,47 @@ namespace spinchain{ // {{{
     }
     return state;
   } // }}}
+  itpp::cvec apply_horizontal_rotation(itpp::cvec& state_in, int horizontal_dimension, int power){ // {{{
+    // the bits are ordered as follows
+    //
+    // 8   9  10  11
+    // 4   5   6   7
+    // 0   1   2   3
+    //
+    // In this case, horizontal dimension is 4.
+    // The above state gets transformed into 
+    //
+    // 11  8   9  10 
+    //  7  4   5   6 
+    //  3  0   1   2 
+    //
+    itpp::cvec state, tmp_state;
+    state = state_in;
+    for (int n=0; n<power; n++){
+      tmp_state = apply_horizontal_rotation(state, horizontal_dimension);
+      state=tmp_state;
+    }
+    return state;
+  } // }}}
+  itpp::cvec project_state_horizontal_momentum(int k, itpp::cvec& state_in, int horizontal_dimension){ // {{{
+    // Creo que la formula general es 
+    // P_k = \sum_{j=0}^L \varphi_{j,k} T^j
+    int d=state_in.size();
+    int q=cfpmath::log_base_2(d);
+    itpp::cvec state(d);
+    state=state_in;
+    std::complex<double> phase;
+    std::complex<double> Imag(0,1);
+    for (int i=1; i<q; i++){
+      phase = exp(-2.*itpp::pi*std::complex<double>(0,1)*double(i*k/double(q)));
+      state+= phase*apply_horizontal_rotation(state_in, horizontal_dimension, i);
+//       state+= exp(-2*(double(2)*Imag)*k*i/double(q)) * apply_rotation(state_in, i);
+//       state+= exp(-2*itpp::pi*Imag*k*i/double(q)) * apply_rotation(state_in, i);
+//       state+= exp(*k*i/double(q)) * apply_rotation(state_in, i);
+    }
+    return state/norm(state); 
+    //Evalute if the state is cero
+  } // }}}
   // Symmetries in the homogeneous case
   class CompactSymmetricBaseMember{ // {{{
     public:
@@ -412,15 +453,17 @@ namespace spinchain{ // {{{
     //Evalute if the state is cero
   } // }}}
   itpp::cvec project_state(int k, itpp::cvec& state_in){ // {{{
-    // la idea es que agarro un n particular Veo si lo debo considerar. 
-    // luego entonces marco los que no debo considerar porque son ciclos del man
-    // luego reviso si proyecta a 0. 
+    // Creo que la formula general es 
+    // P_k = \sum_{j=0}^L \varphi_{j,k} T^j
     int d=state_in.size();
-    int q=cfpmath::log_base_2(state.size());
+    int q=cfpmath::log_base_2(d);
     itpp::cvec state(d);
     state=state_in;
     for (int i=1; i<q; i++){
-      state+= exp(-2*pi*Im*k*i/double(q)) * apply
+      state+= exp(-2.*itpp::pi*std::complex<double>(0,1)*double(i*k/double(q)))* apply_rotation(state_in, i);
+//       state+= exp(-2*(double(2)*Imag)*k*i/double(q)) * apply_rotation(state_in, i);
+//       state+= exp(-2*itpp::pi*Imag*k*i/double(q)) * apply_rotation(state_in, i);
+//       state+= exp(*k*i/double(q)) * apply_rotation(state_in, i);
     }
     return state/norm(state); 
     //Evalute if the state is cero
