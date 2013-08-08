@@ -16,6 +16,9 @@ using namespace spinchain;
 
   TCLAP::ValueArg<string> optionArg("o","option", "Option" ,false,"nichts", "string",cmd);
   TCLAP::ValueArg<int> qubits("q","qubits", "Number of qubits",false, 4,"int",cmd);
+  TCLAP::ValueArg<int> i1("","i1", "Integer parameter",false, 4,"int",cmd);
+  TCLAP::ValueArg<int> i2("","i2", "Integer parameter",false, 4,"int",cmd);
+  TCLAP::ValueArg<int> i3("","i3", "Integer parameter",false, 4,"int",cmd);
   TCLAP::ValueArg<int> position("","position", "The position of something",false, 1,"int",cmd);
   TCLAP::ValueArg<int> position2("","position2", "The position of something",false, 3,"int",cmd);
   TCLAP::ValueArg<double> Ising("","ising_z", "Ising interaction in the z-direction",false, 1.4,"double",cmd);
@@ -375,10 +378,28 @@ cout <<norm(state-state_out_eduardo) << endl;
     // }}}
     std::cout << "error total=" << error << std::endl;
     //}}}
+  } else if(option=="test_horizontal_proyector") {// {{{
+    cvec Ppsi, state;
+    double error=0.;
+    // PArece que en todas las dimensiones funciona 
+    //  ./test_spins -o test_horizontal_proyector --i1 3 --i2 3 --i3 5
+    int nv=i2.getValue(), nh=i3.getValue(); int q= nv*nh; int d=pow_2(q);
+    cout << "Test to see if projector works." << "Grid " << nh << "x" << nv  << endl;
+    std::complex<double> eigen_phase;
+    for (int k=0; k<nh; k++){
+      state = RandomState(d);
+      eigen_phase = exp(2.*itpp::pi*std::complex<double>(0,1)*(double(k)/nh));
+      Ppsi = project_state_horizontal_momentum(k, state, nh);
+      error += norm (eigen_phase*Ppsi - apply_horizontal_rotation(Ppsi, nh));
+      error += abs(norm(Ppsi)-1);
+    }
+    cout << "Error = " << error << endl;
+    //}}}
   } else if(option=="test_create_base_2d") {// {{{
     Array<CompactSymmetricBaseMember> basis_states, tmp_basis, basis_states_many_body;
+    Array<cvec> statesbasic;
     CompactSymmetricBaseMember g;
-    cvec state_l, state_r, state;
+    cvec state_l, state_h, state_r, state, prestate;
     int q=qubits.getValue();
     int d=pow_2(q);cmat U(d,d);
     double error=0.;
@@ -388,24 +409,13 @@ cout <<norm(state-state_out_eduardo) << endl;
 
 
 
-    int nv=3;
-    int nh=4;
-    q= nv*nh;
+    int nv=3, nh=4; q= nv*nh;
 
     basis_states=build_rotationally_symmetric_base_states_compact(nh);
-
     int tv_sector=1, mask;
-
     basis_states_many_body=build_rotationally_symmetric_base_states_compact(q,tv_sector*nh);
-
     g=basis_states_many_body(0);
     cout << g << endl;
-    // Here I must generate the list of integers that are relevant for the
-    // superposition
-    //
-//     Get first nh bits then second nh bits
-
-
     ivec  smaller_generators(nv);
     for (int i_row=0; i_row < nv; i_row++){
       mask = ((pow_2(nh)-1)<<(nh*i_row));
@@ -417,9 +427,22 @@ cout <<norm(state-state_out_eduardo) << endl;
     for (int ib=0; ib< pow_2(nh) ; ib++){
 //       std::cout << "basis small =" << basis_states(ib) << std::endl;
     }
+    statesbasic.set_size(nv);
+    for (int  i_row=0; i_row < nv; i_row++){
+      statesbasic(i_row)=DecodeCompactRotationallySymetricBasisState(basis_states(smaller_generators(i_row)));
+    }
+    prestate=TensorProduct(statesbasic);
 
     cout << "See that the general projection operator works the same on basis states." << endl; 
     std::cout << "error total=" << error << std::endl;
+
+    cout << "Test to see if projector works" << endl;
+    int k=0;
+    std::complex<double> phase;
+    state = RandomState(d);
+    phase = exp(-2.*itpp::pi*std::complex<double>(0,1)*(double(k)/nh));
+    state_h = project_state_horizontal_momentum(k, state, nh);
+    cout << norm (state_h - apply_horizontal_rotation(state_h, nh))  << ", " << norm(state_h) << endl;
     //}}}
   } else {// {{{
     vec b(3);
