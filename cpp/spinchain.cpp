@@ -266,6 +266,37 @@ namespace spinchain{ // {{{
     }
     return state/norm(state); 
   } // }}}
+  itpp::cvec apply_vertical_rotation(itpp::cvec& state_in, int horizontal_dimension, int power){ // {{{
+    // the bits are ordered as follows
+    //
+    // 8   9  10  11
+    // 4   5   6   7
+    // 0   1   2   3
+    //
+    itpp::cvec state, tmp_state;
+    state = state_in;
+    for (int n=0; n<power; n++){
+      tmp_state = apply_vertical_rotation(state, horizontal_dimension);
+      state=tmp_state;
+    }
+    return state;
+  } // }}}
+  itpp::cvec project_state_vertical_momentum(int k, itpp::cvec& state_in, int horizontal_dimension){ // {{{
+    // Creo que la formula general es 
+    // P_k = \sum_{j=0}^L \varphi_{j,k} T^j
+    itpp::cvec state;
+    state=state_in;
+    int qubits=cfpmath::log_base_2(state_in.size());
+    int vertical_dimension = qubits/horizontal_dimension;
+
+    std::complex<double> phase;
+    for (int i=1; i<vertical_dimension; i++){
+      phase = exp(-2.*itpp::pi*std::complex<double>(0,1)*double(i*k)/double(vertical_dimension));
+//       std::cout << i << ", " << phase << ", " << double(i*k)/double(q) << std::endl;
+      state+= phase*apply_vertical_rotation(state_in, horizontal_dimension, i);
+    }
+    return state/norm(state); 
+  } // }}}
   // Symmetries in the homogeneous case
   class CompactSymmetricBaseMember{ // {{{
     public:
