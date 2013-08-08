@@ -395,43 +395,73 @@ cout <<norm(state-state_out_eduardo) << endl;
     }
     cout << "Error = " << error << endl;
     //}}}
+  } else if(option=="test_vertical_proyector") {// {{{
+    cvec Ppsi, state;
+    double error=0.;
+    // PArece que en todas las dimensiones funciona 
+    //  ./test_spins -o test_horizontal_proyector --i1 3 --i2 3 --i3 5
+    int nv=i2.getValue(), nh=i3.getValue(); int q= nv*nh; int d=pow_2(q);
+    cout << "Test to see if vertical projector works." << "Grid " << nh << "x" << nv  << endl;
+    std::complex<double> eigen_phase;
+    for (int k=0; k<nh; k++){
+      state = RandomState(d);
+      eigen_phase = exp(2.*itpp::pi*std::complex<double>(0,1)*(double(k)/nv));
+      Ppsi = project_state_vertical_momentum(k, state, nh);
+      error += norm (eigen_phase*Ppsi - apply_vertical_rotation(Ppsi, nh));
+      error += abs(norm(Ppsi)-1);
+    }
+    cout << "Error = " << error << endl;
+    //}}}
   } else if(option=="test_create_base_2d") {// {{{
     Array<CompactSymmetricBaseMember> basis_states, tmp_basis, basis_states_many_body;
     Array<cvec> statesbasic;
     CompactSymmetricBaseMember g;
     cvec state_l, state_h, state_r, state, prestate;
-    int q=qubits.getValue();
-    int d=pow_2(q);cmat U(d,d);
+    int q, d;
     double error=0.;
-//     int size_space=basis_states.size();
-//     int i=3;
-//     state_l=DecodeCompactRotationallySymetricBasisState(basis_states(i));
 
+    int nv=3, nh=4; q= nv*nh;d=pow_2(q);
 
-
-    int nv=3, nh=4; q= nv*nh;
-
+    // Aca genero los estados que llamare phi_i con i=0,...,15 (2^nh-1) Esos son los que serviran de base
+    // para construir los otros. E
     basis_states=build_rotationally_symmetric_base_states_compact(nh);
-    int tv_sector=1, mask;
-    basis_states_many_body=build_rotationally_symmetric_base_states_compact(q,tv_sector*nh);
-    g=basis_states_many_body(0);
-    cout << g << endl;
-    ivec  smaller_generators(nv);
-    for (int i_row=0; i_row < nv; i_row++){
-      mask = ((pow_2(nh)-1)<<(nh*i_row));
-      cout << mask << endl; 
-      smaller_generators(i_row) = g.generator & mask;
 
+    // Ahora quiero construir uno en particular, del sector con momento vertical igual a 1.
+    int tv_sector=1;
+    basis_states_many_body=build_rotationally_symmetric_base_states_compact(q,tv_sector*nh);
+    for (int i=0; i<basis_states_many_body.size(); i++){
+//       cout << i <<"; " << basis_states_many_body(i) << endl;
     }
-    cout << "Smaller generators = " << smaller_generators << endl;
-    for (int ib=0; ib< pow_2(nh) ; ib++){
+    g=basis_states_many_body(315);
+    cout << g << endl;
+
+
+    int mask;
+    ivec  horizontal_basis_state_numbers(nv);
+    for (int i_row=0; i_row < nv; i_row++){
+      mask = ((pow_2(nh)-1)<<(nh*i_row)); 
+//       cout << "Generator=" << g.generator <<", Mask=" << mask << ", number=" << ( (g.generator & mask) >> (nh*i_row)) << endl; 
+      horizontal_basis_state_numbers(i_row) = (g.generator & mask) >> (nh*i_row);
+
+    } // cout << "Smaller generators = " << horizontal_basis_state_numbers << endl;
+//     for (int ib=0; ib< pow_2(nh) ; ib++){
 //       std::cout << "basis small =" << basis_states(ib) << std::endl;
-    }
+//     }
+    
     statesbasic.set_size(nv);
+    int total_k_horizontal=0;
     for (int  i_row=0; i_row < nv; i_row++){
-      statesbasic(i_row)=DecodeCompactRotationallySymetricBasisState(basis_states(smaller_generators(i_row)));
+      statesbasic(i_row)=DecodeCompactRotationallySymetricBasisState(basis_states(horizontal_basis_state_numbers(i_row)));
+      total_k_horizontal += basis_states(horizontal_basis_state_numbers(i_row)).k; 
+      cout << i_row << ", " << horizontal_basis_state_numbers(i_row) << ", k=" << basis_states(horizontal_basis_state_numbers(i_row)).k<< endl;
     }
+    total_k_horizontal = total_k_horizontal % nh;
+    cout << "Momento horizontal = " << total_k_horizontal << endl;
     prestate=TensorProduct(statesbasic);
+
+
+//     Aca voy, ahora toca hacer las traslaciones en forma vertical. Ver que el momento total de lo anterior es igual a la suma de momentos. 
+
 
     cout << "See that the general projection operator works the same on basis states." << endl; 
     std::cout << "error total=" << error << std::endl;
