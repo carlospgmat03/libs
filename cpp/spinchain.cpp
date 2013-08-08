@@ -256,22 +256,15 @@ namespace spinchain{ // {{{
   itpp::cvec project_state_horizontal_momentum(int k, itpp::cvec& state_in, int horizontal_dimension){ // {{{
     // Creo que la formula general es 
     // P_k = \sum_{j=0}^L \varphi_{j,k} T^j
-    int d=state_in.size();
-    int q=cfpmath::log_base_2(d);
-    itpp::cvec state(d);
+    itpp::cvec state;
     state=state_in;
     std::complex<double> phase;
-    std::complex<double> Imag(0,1);
-    for (int i=1; i<q; i++){
-      phase = exp(-2.*itpp::pi*std::complex<double>(0,1)*double(i*k)/double(q));
+    for (int i=1; i<horizontal_dimension; i++){
+      phase = exp(-2.*itpp::pi*std::complex<double>(0,1)*double(i*k)/double(horizontal_dimension));
 //       std::cout << i << ", " << phase << ", " << double(i*k)/double(q) << std::endl;
       state+= phase*apply_horizontal_rotation(state_in, horizontal_dimension, i);
-//       state+= exp(-2*(double(2)*Imag)*k*i/double(q)) * apply_rotation(state_in, i);
-//       state+= exp(-2*itpp::pi*Imag*k*i/double(q)) * apply_rotation(state_in, i);
-//       state+= exp(*k*i/double(q)) * apply_rotation(state_in, i);
     }
     return state/norm(state); 
-    //Evalute if the state is cero
   } // }}}
   // Symmetries in the homogeneous case
   class CompactSymmetricBaseMember{ // {{{
