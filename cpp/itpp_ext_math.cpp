@@ -26,6 +26,14 @@ namespace itppextmath{ // {{{
     return tmp;
   } // }}}
 // Inquiry {{{
+template <class Num_T> int locateLargestAbs(const itpp::Vec<Num_T>& e){
+  int position=0;
+  for (int i=0; i<e.size(); i++){
+    if (abs(e(i)) > abs(e(position)));
+    position=i;
+  }
+  return position;
+}
 double compare(const itpp::cmat& A, const itpp::cmat& B){ // {{{
   return itpp::norm(A - B);
 } //}}}
@@ -1749,7 +1757,7 @@ void test_GetState_mixed(){ // {{{
   return;
 //  return itpp::norm(H-H.transpose() );
 } // }}}
-double test_reality(const itpp::cmat H){ // {{{
+double test_reality(const itpp::cmat& H){ // {{{
  return itpp::norm(itpp::imag(H)); 
 } // }}}
 double test_real_symmetric(const itpp::cmat H){ // {{{
