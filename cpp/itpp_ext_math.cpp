@@ -26,14 +26,15 @@ namespace itppextmath{ // {{{
     return tmp;
   } // }}}
 // Inquiry {{{
-template <class Num_T> int locateLargestAbs(const itpp::Vec<Num_T>& e){
+template <class Num_T> int locateLargestAbs(const itpp::Vec<Num_T>& e){ // {{{
   int position=0;
   for (int i=0; i<e.size(); i++){
-    if (abs(e(i)) > abs(e(position)));
-    position=i;
+    if (abs(e(i)) > abs(e(position))){
+      position=i;
+    }
   }
   return position;
-}
+} // }}}
 double compare(const itpp::cmat& A, const itpp::cmat& B){ // {{{
   return itpp::norm(A - B);
 } //}}}
@@ -110,6 +111,27 @@ template <class Num_T> double compare(const itpp::Array<Num_T >& a1, const itpp:
     x+= compare(a1(i),a2(i));
   }
   return x;
+} //}}}
+template <class Num_T> Num_T proportionality_constant(const itpp::Vec<Num_T >& a1, const itpp::Vec<Num_T >& a2){// {{{
+//! Attempt to get a proportionality constant between two vectors
+/*! 
+ */
+  if (a1.size() != a2.size()){
+    std::cerr << "Not even wrong" << std::endl;
+    abort();
+  }
+  int position_largest = locateLargestAbs(a1);
+  return a1(position_largest)/a2(position_largest);
+} //}}}
+template <class Num_T> double proportionality_test(const itpp::Vec<Num_T >& a1, const itpp::Vec<Num_T >& a2){// {{{
+//! Routine to check if two vectors are proportional. 
+/*! 
+ */
+  if (a1.size() != a2.size()) return -1;
+  int position_largest = locateLargestAbs(a1);
+//   std::cout << "position_largest " << position_largest <<", a1(p)=" << a1(position_largest) << std::endl; 
+  Num_T proportionality_constant=a1(position_largest)/a2(position_largest);
+  return norm(a1-proportionality_constant*a2)/norm(a1);
 } //}}}
 // }}}
 // Reordering, replacing, inequalities {{{
