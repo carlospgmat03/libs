@@ -427,12 +427,12 @@ cout <<norm(state-state_out_eduardo) << endl;
     basis_states=build_rotationally_symmetric_base_states_compact(nh);
 
     // Ahora quiero construir uno en particular, del sector con momento vertical igual a 1.
-    int tv_sector=1;
+    int tv_sector=0;
     basis_states_many_body=build_rotationally_symmetric_base_states_compact(q,tv_sector*nh);
     for (int i=0; i<basis_states_many_body.size(); i++){
 //       cout << i <<"; " << basis_states_many_body(i) << endl;
     }
-    g=basis_states_many_body(315);
+    g=basis_states_many_body(31);
     cout << g << endl;
 
 
@@ -453,12 +453,21 @@ cout <<norm(state-state_out_eduardo) << endl;
     for (int  i_row=0; i_row < nv; i_row++){
       statesbasic(i_row)=DecodeCompactRotationallySymetricBasisState(basis_states(horizontal_basis_state_numbers(i_row)));
       total_k_horizontal += basis_states(horizontal_basis_state_numbers(i_row)).k; 
-      cout << i_row << ", " << horizontal_basis_state_numbers(i_row) << ", k=" << basis_states(horizontal_basis_state_numbers(i_row)).k<< endl;
+      cout << i_row << ", " << horizontal_basis_state_numbers(i_row) << ", k=" << basis_states(horizontal_basis_state_numbers(i_row)).k
+        <<", norm of state " << norm(statesbasic(i_row)) << endl;
     }
     total_k_horizontal = total_k_horizontal % nh;
     cout << "Momento horizontal = " << total_k_horizontal << endl;
     prestate=TensorProduct(statesbasic);
-
+    cout << "norm of prestate=" << norm(prestate) << endl;
+    cout << "Test if eigenstate of vertical rotation " 
+      << "Proportionality constant " << proportionality_constant(prestate, apply_horizontal_rotation(prestate, nh)) 
+      << " (error=" << proportionality_test(prestate, apply_horizontal_rotation(prestate, nh)) << ")" << endl; 
+    abort();
+    cout << "Test if eigenstate of horizontal rotation " 
+      << "Proportionality constant " << proportionality_constant(prestate, apply_horizontal_rotation(prestate, nh)) 
+      << " (error=" << proportionality_test(prestate, apply_horizontal_rotation(prestate, nh)) << ")" << endl; 
+    cout << "A ver " << norm(prestate - apply_horizontal_rotation(prestate, nh)) << endl; 
 
 //     Aca voy, ahora toca hacer las traslaciones en forma vertical. Ver que el momento total de lo anterior es igual a la suma de momentos. 
 

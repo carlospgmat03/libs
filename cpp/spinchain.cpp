@@ -397,20 +397,21 @@ namespace spinchain{ // {{{
   } // }}}
   itpp::cvec DecodeCompactRotationallySymetricBasisState(CompactSymmetricBaseMember encoded_state){ // {{{
     int q=encoded_state.qubits, n=encoded_state.generator, k=encoded_state.k;
-//     std::cout << "Decoding the state given by q="<<q<<", n="<<n<<", k="<<k
-//       << ", degenerate=" <<encoded_state.degenerate 
-//       << ", sign=" <<encoded_state.sign 
-//       << std::endl;
-//     if (CompactSymmetricBaseMember.degenerate){
-//     if (true ){
+    std::cout << "Decoding the state given by q="<<q<<", n="<<n<<", k="<<k
+      << ", degenerate=" <<encoded_state.degenerate 
+      << ", sign=" <<encoded_state.sign 
+      << std::endl;
+    //     if (CompactSymmetricBaseMember.degenerate){
+    //     if (true ){
     itpp::cvec state_tmp=project_base_state(k, n, q);
-      if ( encoded_state.sign ){
-        itpp::cvec state=state_tmp+conj(apply_external_reflection(state_tmp));
-        return state/norm(state);
-      } else {
-        itpp::cvec state=state_tmp-conj(apply_external_reflection(state_tmp));
-        return state/norm(state);
-      }
+    std::cout << "norma de estado temporal " << norm(state_tmp) << std::endl;
+    if ( encoded_state.sign ){
+      itpp::cvec state=state_tmp+conj(apply_external_reflection(state_tmp));
+      return state/norm(state);
+    } else {
+      itpp::cvec state=state_tmp-conj(apply_external_reflection(state_tmp));
+      return state/norm(state);
+    }
   } // }}}
   itpp::cvec apply_external_reflection(itpp::cvec& state_in){ // {{{
     // The operator is defined as
