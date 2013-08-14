@@ -131,6 +131,13 @@ template <class Num_T> double proportionality_test(const itpp::Vec<Num_T >& a1, 
   int position_largest = locateLargestAbs(a1);
 //   std::cout << "position_largest " << position_largest <<", a1(p)=" << a1(position_largest) << std::endl; 
   Num_T proportionality_constant=a1(position_largest)/a2(position_largest);
+  return proportionality_test(a1, a2, proportionality_constant);
+} //}}}
+template <class Num_T> double proportionality_test(const itpp::Vec<Num_T >& a1, const itpp::Vec<Num_T >& a2, Num_T proportionality_constant){// {{{
+//! Routine to check if two vectors are proportional. 
+/*! 
+ */
+  if (a1.size() != a2.size()) return -1;
   return norm(a1-proportionality_constant*a2)/norm(a1);
 } //}}}
 // }}}

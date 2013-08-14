@@ -450,28 +450,29 @@ cout <<norm(state-state_out_eduardo) << endl;
     
     statesbasic.set_size(nv);
     int total_k_horizontal=0;
+    std::complex<double> phase;
     for (int  i_row=0; i_row < nv; i_row++){
       statesbasic(i_row)=DecodeCompactRotationallySymetricBasisState(basis_states(horizontal_basis_state_numbers(i_row)));
       total_k_horizontal += basis_states(horizontal_basis_state_numbers(i_row)).k; 
-      cout << i_row << ", " << horizontal_basis_state_numbers(i_row) << ", k=" << basis_states(horizontal_basis_state_numbers(i_row)).k
-        <<", XXX FAIL norm of state " << norm(statesbasic(i_row)) << endl;
-      abort(); 
+//       cout << i_row << ", " << horizontal_basis_state_numbers(i_row) << ", k=" << basis_states(horizontal_basis_state_numbers(i_row)).k
+//         <<", XXX FAIL norm of state " << norm(statesbasic(i_row)) << endl;
+//       abort(); 
     }
     total_k_horizontal = total_k_horizontal % nh;
+    phase = exp(2.*itpp::pi*std::complex<double>(0,1)*(double(total_k_horizontal)/nh));
     cout << "Momento horizontal = " << total_k_horizontal << endl;
     prestate=TensorProduct(statesbasic);
-    cout << "norm of prestate=" << norm(prestate) << endl;
     cout << "Test if eigenstate of vertical rotation " 
       << "Proportionality constant " << proportionality_constant(prestate, apply_horizontal_rotation(prestate, nh)) 
       << " (error=" << proportionality_test(prestate, apply_horizontal_rotation(prestate, nh)) << ")" << endl; 
-    abort();
+//     abort();
 
 
 
     cout << "Test if eigenstate of horizontal rotation " 
       << "Proportionality constant " << proportionality_constant(prestate, apply_horizontal_rotation(prestate, nh)) 
       << " (error=" << proportionality_test(prestate, apply_horizontal_rotation(prestate, nh)) << ")" << endl; 
-    cout << "A ver " << norm(prestate - apply_horizontal_rotation(prestate, nh)) << endl; 
+    cout << "A ver " << norm(phase*prestate - apply_horizontal_rotation(prestate, nh)) << endl; 
 
 //     Aca voy, ahora toca hacer las traslaciones en forma vertical. Ver que el momento total de lo anterior es igual a la suma de momentos. 
 
@@ -481,7 +482,6 @@ cout <<norm(state-state_out_eduardo) << endl;
 
     cout << "Test to see if projector works" << endl;
     int k=0;
-    std::complex<double> phase;
     state = RandomState(d);
     phase = exp(-2.*itpp::pi*std::complex<double>(0,1)*(double(k)/nh));
     state_h = project_state_horizontal_momentum(k, state, nh);
