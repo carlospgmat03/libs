@@ -476,7 +476,7 @@ namespace spinchain{ // {{{
 //     std::complex<double> Imag=std::complex<double>(0,1);
     int n_rotated=base_state;
     for (int j=0; j<J; j++){
-      state(n_rotated)=exp(-std::complex<double>(0,1)*2.*itpp::pi*double(j*k/qubits));
+      state(n_rotated)=exp(-std::complex<double>(0,1)*2.*itpp::pi*double(j*k)/double(qubits));
       n_rotated=cfpmath::rotate_bits(n_rotated, qubits); 
     }
     return state/norm(state); 
