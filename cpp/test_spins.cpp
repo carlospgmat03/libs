@@ -454,7 +454,8 @@ cout <<norm(state-state_out_eduardo) << endl;
       statesbasic(i_row)=DecodeCompactRotationallySymetricBasisState(basis_states(horizontal_basis_state_numbers(i_row)));
       total_k_horizontal += basis_states(horizontal_basis_state_numbers(i_row)).k; 
       cout << i_row << ", " << horizontal_basis_state_numbers(i_row) << ", k=" << basis_states(horizontal_basis_state_numbers(i_row)).k
-        <<", norm of state " << norm(statesbasic(i_row)) << endl;
+        <<", XXX FAIL norm of state " << norm(statesbasic(i_row)) << endl;
+      abort(); 
     }
     total_k_horizontal = total_k_horizontal % nh;
     cout << "Momento horizontal = " << total_k_horizontal << endl;
@@ -464,6 +465,9 @@ cout <<norm(state-state_out_eduardo) << endl;
       << "Proportionality constant " << proportionality_constant(prestate, apply_horizontal_rotation(prestate, nh)) 
       << " (error=" << proportionality_test(prestate, apply_horizontal_rotation(prestate, nh)) << ")" << endl; 
     abort();
+
+
+
     cout << "Test if eigenstate of horizontal rotation " 
       << "Proportionality constant " << proportionality_constant(prestate, apply_horizontal_rotation(prestate, nh)) 
       << " (error=" << proportionality_test(prestate, apply_horizontal_rotation(prestate, nh)) << ")" << endl; 
