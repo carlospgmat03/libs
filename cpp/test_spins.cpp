@@ -421,17 +421,18 @@ cout <<norm(state-state_out_eduardo) << endl;
     double error=0.;
 
     int nv=3, nh=4; q= nv*nh;d=pow_2(q);
+    int tv_sector=0;
 
+    // Generacion de los estados base con los que se construira el resto de cosas. {{{
     // Aca genero los estados que llamare phi_i con i=0,...,15 (2^nh-1) Esos son los que serviran de base
     // para construir los otros. E
     basis_states=build_rotationally_symmetric_base_states_compact(nh);
-
     // Ahora quiero construir uno en particular, del sector con momento vertical igual a 1.
-    int tv_sector=0;
-    basis_states_many_body=build_rotationally_symmetric_base_states_compact(q,tv_sector*nh);
+    basis_states_many_body=build_rotationally_symmetric_base_states_compact(q);
     for (int i=0; i<basis_states_many_body.size(); i++){
 //       cout << i <<"; " << basis_states_many_body(i) << endl;
     }
+    // }}}
     g=basis_states_many_body(31);
     cout << g << endl;
 
@@ -454,21 +455,10 @@ cout <<norm(state-state_out_eduardo) << endl;
     for (int  i_row=0; i_row < nv; i_row++){
       statesbasic(i_row)=DecodeCompactRotationallySymetricBasisState(basis_states(horizontal_basis_state_numbers(i_row)));
       total_k_horizontal += basis_states(horizontal_basis_state_numbers(i_row)).k; 
-//       cout << i_row << ", " << horizontal_basis_state_numbers(i_row) << ", k=" << basis_states(horizontal_basis_state_numbers(i_row)).k
-//         <<", XXX FAIL norm of state " << norm(statesbasic(i_row)) << endl;
-//       abort(); 
     }
     total_k_horizontal = total_k_horizontal % nh;
     phase = exp(2.*itpp::pi*std::complex<double>(0,1)*(double(total_k_horizontal)/nh));
-    cout << "Momento horizontal = " << total_k_horizontal << endl;
     prestate=TensorProduct(statesbasic);
-    cout << "Test if eigenstate of vertical rotation " 
-      << "Proportionality constant " << proportionality_constant(prestate, apply_horizontal_rotation(prestate, nh)) 
-      << " (error=" << proportionality_test(prestate, apply_horizontal_rotation(prestate, nh)) << ")" << endl; 
-//     abort();
-
-
-
     cout << "Test if eigenstate of horizontal rotation " 
       << "Proportionality constant " << proportionality_constant(prestate, apply_horizontal_rotation(prestate, nh)) 
       << " (error=" << proportionality_test(prestate, apply_horizontal_rotation(prestate, nh)) << ")" << endl; 
@@ -479,6 +469,16 @@ cout <<norm(state-state_out_eduardo) << endl;
 
     cout << "See that the general projection operator works the same on basis states." << endl; 
     std::cout << "error total=" << error << std::endl;
+
+    cvec bi_symmetric_state; 
+
+    bi_symmetric_state = project_state_vertical_momentum(tv_sector, prestate, nh);
+    cout << "* Test if eigenstate of horizontal rotation " 
+      << "Proportionality constant " << proportionality_constant(bi_symmetric_state, apply_horizontal_rotation(bi_symmetric_state, nh)) 
+      << " (error=" << proportionality_test(bi_symmetric_state, apply_horizontal_rotation(bi_symmetric_state, nh)) << ")" << endl; 
+    cout << "* Test if eigenstate of vertical rotation " 
+      << "Proportionality constant " << proportionality_constant(bi_symmetric_state, apply_vertical_rotation(bi_symmetric_state, nh)) 
+      << " (error=" << proportionality_test(bi_symmetric_state, apply_vertical_rotation(bi_symmetric_state, nh)) << ")" << endl; 
 
     cout << "Test to see if projector works" << endl;
     int k=0;
