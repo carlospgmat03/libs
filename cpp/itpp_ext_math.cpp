@@ -123,6 +123,13 @@ template <class Num_T> Num_T proportionality_constant(const itpp::Vec<Num_T >& a
   int position_largest = locateLargestAbs(a1);
   return a1(position_largest)/a2(position_largest);
 } //}}}
+template <class Num_T> double proportionality_test(const itpp::Vec<Num_T >& a1, const itpp::Vec<Num_T >& a2, Num_T proportionality_constant){// {{{
+//! Routine to check if two vectors are proportional. 
+/*! 
+ */
+  if (a1.size() != a2.size()) return -1;
+  return norm(a1-proportionality_constant*a2)/norm(a1);
+} //}}}
 template <class Num_T> double proportionality_test(const itpp::Vec<Num_T >& a1, const itpp::Vec<Num_T >& a2){// {{{
 //! Routine to check if two vectors are proportional. 
 /*! 
@@ -132,13 +139,6 @@ template <class Num_T> double proportionality_test(const itpp::Vec<Num_T >& a1, 
 //   std::cout << "position_largest " << position_largest <<", a1(p)=" << a1(position_largest) << std::endl; 
   Num_T proportionality_constant=a1(position_largest)/a2(position_largest);
   return proportionality_test(a1, a2, proportionality_constant);
-} //}}}
-template <class Num_T> double proportionality_test(const itpp::Vec<Num_T >& a1, const itpp::Vec<Num_T >& a2, Num_T proportionality_constant){// {{{
-//! Routine to check if two vectors are proportional. 
-/*! 
- */
-  if (a1.size() != a2.size()) return -1;
-  return norm(a1-proportionality_constant*a2)/norm(a1);
 } //}}}
 // }}}
 // Reordering, replacing, inequalities {{{
@@ -362,7 +362,6 @@ template <class Num_T> itpp::Mat<Num_T> postpend_tensor_identity(const itpp::Mat
 template <class Num_T> itpp::Mat<Num_T> extend_qubit_operator(const itpp::Mat<Num_T>& Matrix, const int encoded_nontrivial_positions, const int total_number_of_qubits){ // {{{
 
   itpp::Mat<Num_T> tmp(cfpmath::pow_2(total_number_of_qubits),cfpmath::pow_2(total_number_of_qubits));
-  int i0,i1;
   tmp=0.;
   int number_of_nontrivial_positions = cfpmath::BitCount(encoded_nontrivial_positions);
   int i_col_total, j_col_total;
@@ -776,7 +775,6 @@ template <class Num_T> itpp::Array<Num_T > del(const itpp::Array<Num_T >& A, con
   } else {
     return itpp::concat(A(0,i-1),A(i+1,sA-1));
   }
-  abort();
 }// }}}
 template <class Num_T> itpp::Array<Num_T > minus(const itpp::Array<Num_T >& A, const Num_T & B){// {{{
   itpp::Array<Num_T > A_Union=Union(A);
