@@ -12,6 +12,9 @@ test_memory_time:: test_memory_time.cpp
 # test_rmt:: test_rmt.cpp
 # 	$(CXX)  -Wall $(INCLUDETCLAP) $(CXXFLAGS) -o $@ $@.cpp -litpp
 
+test_spins2d:: test_spins2d.cu 
+	nvcc -I . -arch=sm_13 $(INCLUDECUDA) $(INCLUDETCLAP) $(CXXFLAGS) -o $@ $@.cu -litpp
+
 test_spins:: test_spins.cpp $(MYCPP)/cpp/spinchain.cpp $(MYCPP)/cpp/itpp_ext_math.cpp
 	$(CXX)  -Wall -I . $(INCLUDETCLAP) $(CXXFLAGS) -o $@ $@.cpp -litpp
 
