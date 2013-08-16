@@ -5,14 +5,7 @@
 // #include <purity_RMT.cpp>
 #include "itpp_ext_math.cpp"
 #include "spinchain.cpp"
-
-
-// #include "tools.cpp"
-// #include "cuda_functions.cu"
-// #include "cuda_utils.cu"
 #include "cuda_routines.cu"
-// #include "cuda_functions.cu"
-// #include "cuda_utils.cu"
 
 using namespace std;
 // using namespace itpp;
