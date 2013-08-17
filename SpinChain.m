@@ -90,7 +90,7 @@ If[IntegerQ[Qubits]==False,Print["Error: The state does not correspond to a inte
   statenew=state;
   For[q=1, q<Qubits, q++, 
   statenew = ApplyIsing[statenew, Jint, 0 , q];
-];
+]];
 (* }}} *)
 (* }}} *)
 (* {{{ *)
