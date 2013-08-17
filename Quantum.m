@@ -102,6 +102,7 @@ TransformationMatrixPauliBasisToComputationalBasis::usage = "The matrix that all
 Reshuffle::usage = "Apply the reshufle operation as undestood in Geometry of Quantum States, pags 260-262, and 264"
 RandomTracePreservingMapChoiBasis::usage = "Creates a singlequbit random trace preserving map"
 AveragePurityChannelPauliBasis::usage = "Calculates the average final purity given that the initial states are pure, and chosen with the Haar measure. "
+BlochEllipsoid::usage = "BlochEllipsoid[Cha_] Show the deformation of BlochSphere for a qubit channel in the pauli basis"
 (* }}} *)
 (* }}} *)
 Begin["`Private`"] 
@@ -522,6 +523,18 @@ RandomTracePreservingMapChoiBasis[] := Module[{psi},
   ]
 AveragePurityChannelPauliBasis[Lambda_] := Total[Power[Lambda[[All, 1]], 2]]/2 + Power[Norm[Lambda[[2 ;;, 2 ;;]], "Frobenius"], 2]/6
 (* }}} *)
+(* }}} *)
+(* }}} *)
+(* }}} *)
+(* }}} *)
+BlochEllipsoid[Cha_]:=Module[{center,T,coord,vecs,x,y,z},
+T=Cha[[{2,3,4},{2,3,4}]];
+center={Cha[[2,1]],Cha[[3,1]],Cha[[4,1]]};
+vecs=Graphics3D[{{Red,Arrow[{center,Normalize[T.{1,0,0}]}],{Blue,Arrow[{center,Normalize[T.{0,1,0}]}]},{Green,Arrow[{center,Normalize[T.{0,0,1}]}]}}}];
+coord={x,y,z}-center;
+coord=Inverse[T].coord;
+Show[ContourPlot3D[coord[[1]]^2+coord[[2]]^2+coord[[3]]^2==1,{x,-1,1},{y,-1,1},{z,-1,1},AxesLabel->{"X","Y","Z"}],vecs]
+]
 End[] 
 EndPackage[]
 (* }}} *)
