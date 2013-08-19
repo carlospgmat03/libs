@@ -522,19 +522,18 @@ RandomTracePreservingMapChoiBasis[] := Module[{psi},
   Reshuffle[2 PartialTrace[Proyector[psi], 3]]
   ]
 AveragePurityChannelPauliBasis[Lambda_] := Total[Power[Lambda[[All, 1]], 2]]/2 + Power[Norm[Lambda[[2 ;;, 2 ;;]], "Frobenius"], 2]/6
-(* }}} *)
-(* }}} *)
-(* }}} *)
-(* }}} *)
-(* }}} *)
+
+
+
 BlochEllipsoid[Cha_]:=Module[{center,T,coord,vecs,x,y,z},
 T=Cha[[{2,3,4},{2,3,4}]];
 center={Cha[[2,1]],Cha[[3,1]],Cha[[4,1]]};
-vecs=Graphics3D[{{Red,Arrow[{center,Normalize[T.{1,0,0}]}],{Blue,Arrow[{center,Normalize[T.{0,1,0}]}]},{Green,Arrow[{center,Normalize[T.{0,0,1}]}]}}}];
+vecs=Graphics3D[{{Red,Arrow[{center,Normalize[T.{1,0,0}]}],{Blue,Arrow[{center,Normalize[T.{0,1,0}]}]},{Green,Arrow[{center,Normalize[T.{0,0,1}]}]} } }];
 coord={x,y,z}-center;
 coord=Inverse[T].coord;
 Show[ContourPlot3D[coord[[1]]^2+coord[[2]]^2+coord[[3]]^2==1,{x,-1,1},{y,-1,1},{z,-1,1},AxesLabel->{"X","Y","Z"}],vecs]
 ]
+(* }}} *)
 End[] 
 EndPackage[]
 (* }}} *)
