@@ -272,6 +272,49 @@ int main(int argc, char* argv[]) { //{{{
     state_h = project_state_horizontal_momentum(k, state, nh);
     cout << norm (state_h - apply_horizontal_rotation(state_h, nh))  << ", " << norm(state_h) << endl;
     //}}}
+  } else if(option=="test_commutator") {// {{{
+    itpp::cvec Ppsi, state;
+    double error=0.;
+    // PArece que en todas las dimensiones funciona 
+    //  ./test_spins -o test_horizontal_proyector --i1 3 --i2 3 --i3 5
+    int nv=i2.getValue(), nh=i3.getValue(); int q,  d;
+    cout << "Test to see if vertical projector works." << "Grid " << nh << "x" << nv  << endl;
+    itpp::vec b(3);
+    b(0)=1.42; b(1)=2.534; b(2)=3.78;
+    double J=1.2;
+//     b=0.00001;
+//     b(0)=2*itpp::pi; b(1)=0.; b(2)=0.;
+//     J=itpp::pi/4;
+
+    itpp::cvec state_0 , s1, s2, s3, s4, s5;
+//     state_0=0.;
+//     state_0(i1.getValue())=1.;
+
+    for (int nh=2; nh<5; nh++){ for (int nv=2; nv<5; nv++){
+    	q=nv*nh;
+	d=pow_2(q);
+	state_0 = RandomState(d);
+	// Conmutador [U, Tv] {{{
+	s1=apply_vertical_rotation(state_0, nh);
+	itppcuda::apply_floquet( s1, J, b);
+	s2=state_0;
+	itppcuda::apply_floquet(s2, J, b);
+	s3=apply_vertical_rotation(s2, nh);
+	cout << "Error en [U, Tv]=" << norm (s3 - s1) << endl;
+	error += norm (s3 - s1);
+	// }}}
+	// Conmutador [U, Th] {{{
+	s1=apply_horizontal_rotation(state_0, nh);
+	itppcuda::apply_floquet2d( s1, J, b, nh);
+	s2=state_0;
+	itppcuda::apply_floquet2d(s2, J, b, nh);
+	s3=apply_horizontal_rotation(s2, nh);
+	error += norm (s3 - s1);
+	cout << "Error en [U, Th]=" << norm (s3 - s1) << endl;
+	// }}}
+    } }
+    cout << "Error total = " << error << endl;
+    //}}}
   } else {// {{{
     itpp::vec b(3);
     b(0)=-0.404;b(1)=0.0844;b(2)=0.361;
