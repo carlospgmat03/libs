@@ -223,6 +223,13 @@ namespace spinchain{ // {{{
     //  7  4   5   6 
     //  3  0   1   2 
     //
+    // 9  10  11   8   
+    // 5   6   7   4   
+    // 1   2   3   0   
+    //
+    // For example for a  3x2 |3> goes into |5> :
+    // 0 0 0   => 0 0 0 
+    // 1 1 0   => 1 0 1
     int d=state_in.size();
     itpp::cvec state(d);
     int qubits=cfpmath::log_base_2(d);
@@ -232,18 +239,9 @@ namespace spinchain{ // {{{
     return state;
   } // }}}
   itpp::cvec apply_horizontal_rotation(itpp::cvec& state_in, int horizontal_dimension, int power){ // {{{
-    // the bits are ordered as follows
+    // the documentation is found in the function without the power, that is
     //
-    // 8   9  10  11
-    // 4   5   6   7
-    // 0   1   2   3
-    //
-    // In this case, horizontal dimension is 4.
-    // The above state gets transformed into 
-    //
-    // 11  8   9  10 
-    //  7  4   5   6 
-    //  3  0   1   2 
+    // itpp::cvec apply_horizontal_rotation(itpp::cvec&, int )
     //
     itpp::cvec state, tmp_state;
     state = state_in;
