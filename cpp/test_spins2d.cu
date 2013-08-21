@@ -30,54 +30,6 @@ using namespace spinchain;
   TCLAP::ValueArg<double> bz("","bz", "Magnetic field in z direction",false, 1.4,"double",cmd);
 // }}}
 std::complex<double> Im(0,1);
-class SparsePhaseVector{
-  private:
-  itpp::Array<itpp::ivec> indices;
-  itpp::Array<itpp::vec> phases;
-  public:
-  void SparseVector(){
-    set_size(0);
-    return;
-  }
-  void set_size(int n){
-    indices.set_size(n);
-    phases.set_size(n);
-    return;
-  }
-  void set_pair(int position, int newindex, int newphase){
-    indices(position) = newindex;
-    phases(position)  = newphase;
-    return;
-  }
-};
-SparsePhaseVector project_base_state(CompactSymmetricBaseMember coded_member){ // {{{
-    SparsePhaseVector state; 
-    return state;
-    //Evalute if the state is cero
-  } // }}}
-SparsePhaseVector project_base_state(int k, int base_state, int qubits){ // {{{
-    // la idea es que agarro un n particular Veo si lo debo considerar. 
-    // luego entonces marco los que no debo considerar porque son ciclos del man
-    // luego reviso si proyecta a 0. 
-    int Jp=cfpmath::primitive_period_bit_rotation(base_state, qubits); 
-    SparsePhaseVector state; 
-    if (k*Jp%qubits!=0){ 
-      return state; 
-    }
-    state.set_size(Jp);
-
-//     std::complex<double> Imag=std::complex<double>(0,1);
-    int n_rotated=base_state;
-    double phase;
-    for (int j=0; j<Jp; j++){
-      phase = 2.*itpp::pi*double(j*k)/double(qubits);
-      state.set_pair(j,n_rotated,phase);
-      n_rotated=cfpmath::rotate_bits(n_rotated, qubits); 
-    }
-//     return state/norm(state); 
-    return state;
-    //Evalute if the state is cero
-  } // }}}
 int main(int argc, char* argv[]) { //{{{
 // Random seed, cout configuration, etc {{{
 // 	Random semilla_uran;
@@ -324,12 +276,12 @@ int main(int argc, char* argv[]) { //{{{
   } else if(option=="test_create_small_base_2d") {// {{{
     itpp::Array<CompactSymmetricBaseMember> basis_states_horizontal, basis_states_2d;
 //     itpp::Array<itpp::cvec> statesbasic;
-//     CompactSymmetricBaseMember g;
+    CompactSymmetricBaseMember g;
 //     itpp::cvec state_l, state_h, state_r, state, prestate;
     int q ; // , d;
 //     double error=0.;
 
-    int nv=3, nh=4; q= nv*nh; // d=pow_2(q);
+    int nv=2, nh=3; q= nv*nh; // d=pow_2(q);
 //     int tv_sector=0;
 
     // Generacion de los estados base con los que se construira el resto de cosas. {{{
@@ -337,23 +289,25 @@ int main(int argc, char* argv[]) { //{{{
     // para construir los otros. E
     basis_states_horizontal=build_rotationally_symmetric_base_states_compact(nh);
     // Ahora quiero construir uno en particular, del sector con momento vertical igual a 1.
-    basis_states_many_body=build_rotationally_symmetric_base_states_compact(q);
-    for (int i=0; i<basis_states_many_body.size(); i++){
-//       cout << i <<"; " << basis_states_many_body(i) << endl;
-    }
+    basis_states_2d=build_rotationally_symmetric_base_states_compact(q);
     // }}}
-    cout << "Size basis_states_many_body " <<   basis_states_many_body.size() << endl;
-    g=basis_states_many_body(3);
+    g=basis_states_2d(3);
     cout << g << endl;
-    SparsePhaseVector state_horizontal_i;
-//     apply_proyector
 
-//     int total_k_horizontal=0;
-//     std::complex<double> phase;
-//     phase = exp(2.*itpp::pi*Im*(double(total_k_horizontal)/nh));
-//     prestate=TensorProduct(statesbasic);
 
-    itpp::cvec bi_symmetric_state; 
+    CompactSymmetric2DBaseMember basis_2d_state; 
+    basis_2d_state.generators.set_size(nv);
+    int mask, basis_number;
+    itpp::ivec  horizontal_basis_state_numbers(nv);
+    for (int i_row=0; i_row < nv; i_row++){
+      mask = ((pow_2(nh)-1)<<(nh*i_row)); 
+      basis_number = (g.generator & mask) >> (nh*i_row);
+      basis_2d_state.generators(i_row)=&(basis_states_horizontal(basis_number));
+    } // cout << "Smaller generators = " << horizontal_basis_state_numbers << endl;
+    basis_2d_state.sign = g.sign;
+    basis_2d_state.k_v  = g.k%(nv);
+
+    itpp::cvec state2d = DecodeCompactSymmetric2DBaseMember(basis_2d_state);
 
     cout <<"Malas" << endl;
 //     bi_symmetric_state = project_state_vertical_momentum(tv_sector, prestate, nh);
