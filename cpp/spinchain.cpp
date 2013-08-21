@@ -187,6 +187,13 @@ namespace spinchain{ // {{{
     return;
   } // }}}
   // Symmetries in the 2D case
+  class CompactSymmetric2DBaseMember{ // {{{
+    public:
+      itpp::Array<CompactSymmetricBaseMember>; // This are the equivalents to the generators. The provide
+                                               // the basic elements of the total wave function
+      int k_v;   // Symmetry Sector in the vertical direction
+      bool sign; // Sign, to see if we consider P_k |n> \pm K R P_k |n>
+  }; // }}}
   itpp::cvec apply_vertical_rotation(itpp::cvec& state_in, int horizontal_dimension){ // {{{
     // the bits are ordered as follows
     //
