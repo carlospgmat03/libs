@@ -410,12 +410,14 @@ namespace spinchain{ // {{{
     // 0   1   2   3
     // 8   9  10  11
     //
+//     std::cout << "Entrando a apply_vertical_rotation" << std::endl;
     int d=state_in.size();
     itpp::cvec state(d);
     int qubits=cfpmath::log_base_2(d);
     for (int n=0; n<d; n++){
       state(cfpmath::rotate_bits(n, qubits, horizontal_dimension))=state_in(n);
     }
+//     std::cout << "Saliendo de apply_vertical_rotation" << std::endl;
     return state;
   } // }}}
   itpp::cvec apply_horizontal_rotation(itpp::cvec& state_in, int horizontal_dimension){ // {{{
@@ -491,9 +493,12 @@ namespace spinchain{ // {{{
   itpp::cvec project_state_vertical_momentum(int k, itpp::cvec& state_in, int horizontal_dimension){ // {{{
     // Creo que la formula general es 
     // P_k = \sum_{j=0}^L \varphi_{j,k} T^j
+//     std::cout << "Entrando a project_state_vertical_momentum" << std::endl;
     itpp::cvec state;
     state=state_in;
+//     std::cout << "En project_state_vertical_momentum 424234234 state_in.size()=" << state_in.size()<< std::endl;
     int qubits=cfpmath::log_base_2(state_in.size());
+//     std::cout << "En project_state_vertical_momentum 64646234" << std::endl;
     int vertical_dimension = qubits/horizontal_dimension;
 
     std::complex<double> phase;
@@ -502,6 +507,8 @@ namespace spinchain{ // {{{
 //       std::cout << i << ", " << phase << ", " << double(i*k)/double(q) << std::endl;
       state+= phase*apply_vertical_rotation(state_in, horizontal_dimension, i);
     }
+//     std::cout << "Saliendo de project_state_vertical_momentum" << std::endl;
+
     return state/norm(state); 
   } // }}}
   // }}}

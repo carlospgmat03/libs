@@ -30,8 +30,17 @@ using namespace spinchain;
   TCLAP::ValueArg<double> bz("","bz", "Magnetic field in z direction",false, 1.4,"double",cmd);
 // }}}
 std::complex<double> Im(0,1);
-
+class SparseVector{
+  private:
+  class pair{
+    int index;
+    double phase;
+  };
+  public:
+  itpp::Array<pair> d;
+};
 int main(int argc, char* argv[]) { //{{{
+// Random seed, cout configuration, etc {{{
 // 	Random semilla_uran;
 // 	itpp::RNG_reset(semilla_uran.strong());
 //   	cout << PurityRMT::QubitEnvironmentHamiltonian(3,0.) <<endl;
@@ -41,7 +50,8 @@ int main(int argc, char* argv[]) { //{{{
   cout.precision(16);
 
   string option=optionArg.getValue();
-  if (option=="test_kick_single_spin"){ // {{{// {{{
+// }}}
+  if (option=="test_kick_single_spin"){ // {{{
 
     int dim=pow_2(qubits.getValue());
     itpp::cvec state(dim);
@@ -173,7 +183,7 @@ int main(int argc, char* argv[]) { //{{{
     std::complex<double> eigen_phase;
     for (int k=0; k<nh; k++){
       state = RandomState(d);
-      eigen_phase = exp(2.*itpp::pi*std::complex<double>(0,1)*(double(k)/nh));
+      eigen_phase = exp(2.*itpp::pi*Im*(double(k)/nh));
       Ppsi = project_state_horizontal_momentum(k, state, nh);
       error += norm (eigen_phase*Ppsi - apply_horizontal_rotation(Ppsi, nh));
       error += abs(norm(Ppsi)-1);
@@ -190,7 +200,7 @@ int main(int argc, char* argv[]) { //{{{
     std::complex<double> eigen_phase;
     for (int k=0; k<nh; k++){
       state = RandomState(d);
-      eigen_phase = exp(2.*itpp::pi*std::complex<double>(0,1)*(double(k)/nv));
+      eigen_phase = exp(2.*itpp::pi*Im*(double(k)/nv));
       Ppsi = project_state_vertical_momentum(k, state, nh);
       error += norm (eigen_phase*Ppsi - apply_vertical_rotation(Ppsi, nh));
       error += abs(norm(Ppsi)-1);
@@ -242,7 +252,7 @@ int main(int argc, char* argv[]) { //{{{
       total_k_horizontal += basis_states(horizontal_basis_state_numbers(i_row)).k; 
     }
     total_k_horizontal = total_k_horizontal % nh;
-    phase = exp(2.*itpp::pi*std::complex<double>(0,1)*(double(total_k_horizontal)/nh));
+    phase = exp(2.*itpp::pi*Im*(double(total_k_horizontal)/nh));
     prestate=TensorProduct(statesbasic);
     cout << "Test if eigenstate of horizontal rotation " 
       << "Proportionality constant " << proportionality_constant(prestate, apply_horizontal_rotation(prestate, nh)) 
@@ -268,9 +278,51 @@ int main(int argc, char* argv[]) { //{{{
     cout << "Test to see if projector works" << endl;
     int k=0;
     state = RandomState(d);
-    phase = exp(-2.*itpp::pi*std::complex<double>(0,1)*(double(k)/nh));
+    phase = exp(-2.*itpp::pi*Im*(double(k)/nh));
     state_h = project_state_horizontal_momentum(k, state, nh);
     cout << norm (state_h - apply_horizontal_rotation(state_h, nh))  << ", " << norm(state_h) << endl;
+    //}}}
+  } else if(option=="test_create_small_base_2d") {// {{{
+    itpp::Array<CompactSymmetricBaseMember> basis_states, tmp_basis, basis_states_many_body;
+    itpp::Array<itpp::cvec> statesbasic;
+    CompactSymmetricBaseMember g;
+    itpp::cvec state_l, state_h, state_r, state, prestate;
+    int q ; // , d;
+//     double error=0.;
+
+    int nv=3, nh=4; q= nv*nh; // d=pow_2(q);
+    int tv_sector=0;
+
+    // Generacion de los estados base con los que se construira el resto de cosas. {{{
+    // Aca genero los estados que llamare phi_i con i=0,...,15 (2^nh-1) Esos son los que serviran de base
+    // para construir los otros. E
+    basis_states=build_rotationally_symmetric_base_states_compact(nh);
+    // Ahora quiero construir uno en particular, del sector con momento vertical igual a 1.
+    basis_states_many_body=build_rotationally_symmetric_base_states_compact(q);
+    for (int i=0; i<basis_states_many_body.size(); i++){
+//       cout << i <<"; " << basis_states_many_body(i) << endl;
+    }
+    // }}}
+    cout << "Size basis_states_many_body " <<   basis_states_many_body.size() << endl;
+    g=basis_states_many_body(3);
+    cout << g << endl;
+
+//     int total_k_horizontal=0;
+//     std::complex<double> phase;
+//     phase = exp(2.*itpp::pi*Im*(double(total_k_horizontal)/nh));
+//     prestate=TensorProduct(statesbasic);
+
+    itpp::cvec bi_symmetric_state; 
+
+    cout <<"Malas" << endl;
+//     bi_symmetric_state = project_state_vertical_momentum(tv_sector, prestate, nh);
+
+
+
+    // Ok, ya tengo los generadores. 
+
+    cout <<"Buenas" << endl;
+
     //}}}
   } else if(option=="test_commutator") {// {{{
     itpp::cvec Ppsi, state;
@@ -282,14 +334,7 @@ int main(int argc, char* argv[]) { //{{{
     itpp::vec b(3);
     b(0)=1.42; b(1)=2.534; b(2)=3.78;
     double J=1.2;
-//     b=0.00001;
-//     b(0)=2*itpp::pi; b(1)=0.; b(2)=0.;
-//     J=itpp::pi/4;
-
     itpp::cvec state_0 , s1, s2, s3, s4, s5;
-//     state_0=0.;
-//     state_0(i1.getValue())=1.;
-
     for (int nh=2; nh<5; nh++){ for (int nv=2; nv<5; nv++){
     	q=nv*nh;
 	d=pow_2(q);
