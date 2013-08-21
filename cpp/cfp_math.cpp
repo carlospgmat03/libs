@@ -182,13 +182,15 @@ bool is_integer_power_2(unsigned i){ // {{{
 }// }}}
 int log_base_2(const int n){// {{{
   //     if (! is_integer_power_2(n)){std::cout<<"Error en log_base_2";abort();}
-  if (! is_integer_power_2(n)){std::cout<<"Error en log_base_2\n";abort();}
+  if (! is_integer_power_2(n)){std::cout<<"Error en log_base_2, n=" <<n << "\n";abort();}
+  if ( n== 0){std::cout<<"Error en log_base_2, n=0\n";abort();}
   int tmp=0, n_tmp=n;
   while(tmp<50){
     if (n_tmp==1) return tmp;
     tmp++;
     n_tmp>>=1;
   }
+  std::cout<<"Error desconocido en log_base_2" << std::endl;
   abort();
 }// }}}
 void test_log_base_2(){// {{{
