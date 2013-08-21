@@ -256,7 +256,38 @@ int rotate_bits(int number_in, int starting_digit, int ending_digit, int power){
 //     << "number_in (6) = " << number_in << std::endl;
   return merge_two_numbers(n_rotated, n_fixed, mask);
 } // }}}
-int  apply_horizontal_rotation(int n, int size, int horizontal_dimension){  // {{{
+int apply_vertical_external_reflection(int n, int size, int horizontal_dimension){  // {{{
+// The numerical primitive to make vertical reflections in two dimensional systems
+//
+// the bits are ordered as follows
+//
+// 8   9  10  11
+// 4   5   6   7
+// 0   1   2   3
+//
+// In this case, horizontal dimension is 4.
+// The above state gets transformed into 
+//
+// 0   1   2   3
+// 4   5   6   7
+// 8   9  10  11
+//
+//
+  int vertical_dimension = size/horizontal_dimension;
+//   int n_rot=n;
+  int nf = 0, n_to_move;
+  int mask_ones = pow_2(horizontal_dimension)-1, mask;
+  for (int iv=0; iv<vertical_dimension;iv++){
+    mask = mask_ones <<(horizontal_dimension*iv);
+    n_to_move=(mask & n) >> (horizontal_dimension*iv);
+    n_to_move = n_to_move << (horizontal_dimension*(vertical_dimension-iv));
+    nf += n_to_move;
+
+//     n_rot = rotate_bits(n_rot, iv*horizontal_dimension, iv*horizontal_dimension+horizontal_dimension-1,1);
+  }
+  return nf;
+} // }}}
+int apply_horizontal_rotation(int n, int size, int horizontal_dimension){  // {{{
   // The numerical primitive to make horizontal rotations in two dimensional systems
   //
   // the bits are ordered as follows
