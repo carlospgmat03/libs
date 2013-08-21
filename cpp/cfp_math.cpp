@@ -273,18 +273,25 @@ int apply_vertical_external_reflection(int n, int size, int horizontal_dimension
 // 8   9  10  11
 //
 //
+//   std::cout << "\nIngresando a apply_vertical_external_reflection(" << n <<", " << size 
+//     <<", " << horizontal_dimension << ")" << std::endl;
   int vertical_dimension = size/horizontal_dimension;
 //   int n_rot=n;
-  int nf = 0, n_to_move;
+  int nf = 0, n_to_move, n_to_move_1;
   int mask_ones = pow_2(horizontal_dimension)-1, mask;
+//   std::cout << "En apply_vertical_external_reflection con mask_ones=" << mask_ones << std::endl; 
   for (int iv=0; iv<vertical_dimension;iv++){
     mask = mask_ones <<(horizontal_dimension*iv);
-    n_to_move=(mask & n) >> (horizontal_dimension*iv);
-    n_to_move = n_to_move << (horizontal_dimension*(vertical_dimension-iv));
+    n_to_move_1=(mask & n) >> (horizontal_dimension*iv);
+    n_to_move = n_to_move_1 << (horizontal_dimension*(vertical_dimension-iv-1));
+//     std::cout << "En apply_vertical_external_reflection " << mask << ", "
+//       << n_to_move_1 << ", " << n_to_move << std::endl; 
+
     nf += n_to_move;
 
 //     n_rot = rotate_bits(n_rot, iv*horizontal_dimension, iv*horizontal_dimension+horizontal_dimension-1,1);
   }
+//   std::cout << "Saliendo de  apply_vertical_external_reflection con nf=" << nf << "\n" <<std::endl; 
   return nf;
 } // }}}
 int apply_horizontal_rotation(int n, int size, int horizontal_dimension){  // {{{
