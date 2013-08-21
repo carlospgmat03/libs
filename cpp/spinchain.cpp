@@ -23,7 +23,7 @@ itpp::cvec project_base_state(int, int, int);
 itpp::cvec apply_external_reflection(itpp::cvec&);
 } // }}}
 namespace spinchain{ // {{{
-  // Advanced building blocks
+  // Advanced building blocks {{{
   itpp::cvec apply_chain_spit_state(itpp::cvec state,itpp::vec magnetic_field, double J){// {{{
     itpp::cvec tmp=state;
     apply_chain(tmp, J, magnetic_field);
@@ -109,7 +109,8 @@ namespace spinchain{ // {{{
     apply_ising_z(state, J);
     return;
   } // }}}
-  // Intermediate building blocks
+  // }}}
+  // Intermediate building blocks {{{
   void apply_kick_star_most(itpp::cvec& state, itpp::vec magnetic_field, itpp::vec local_magnetic_field){// {{{
     int qubits=cfpmath::log_base_2(state.size());
     // Kick in the central qubit
@@ -186,6 +187,7 @@ namespace spinchain{ // {{{
     }
     return;
   } // }}}
+  // }}}
   // Symmetries in the homogeneous case {{{
   class CompactSymmetricBaseMember{ // {{{
     public:
@@ -512,7 +514,7 @@ namespace spinchain{ // {{{
     return state/norm(state); 
   } // }}}
   // }}}
-// Matrices for 
+  // Matrices for different evolution operators{{{
   itpp::cmat MatrixForIsing_star(int qubits, double J, itpp::vec magnetic_field, double J_interaction, itpp::vec local_magnetic_field, int sector){// {{{
 
     itpp::Array<CompactSymmetricBaseMember> basis_states;
@@ -581,7 +583,8 @@ namespace spinchain{ // {{{
     }
     return U;
   } // }}}
-  // Basic building blocks
+  // }}}
+  // Basic building blocks of evoution operators {{{
   void apply_ising_z(itpp::cvec& state, double J, int position1, int position2){// {{{
     std::complex<double> expmij=exp(-std::complex<double>(0,1)*J);
     std::complex<double> exppij=exp( std::complex<double>(0,1)*J);
@@ -608,7 +611,8 @@ namespace spinchain{ // {{{
     }
     return;
   } // }}}
-  // Testing
+  // }}}
+  // Testing routines {{{
   itpp::cmat MatrixForIsingZ(int i, int j, int total){// {{{
     int mini=std::min(i,j), maxi=std::max(i,j);
     //     std::cout << "hola papi isingZ\n";
@@ -654,7 +658,8 @@ namespace spinchain{ // {{{
     }
     return tmp;
   } // }}}
-  // Various
+  // }}}
+  // Unsorted
   // itpp::vec eigenvalues(itpp::vec MagenticField, double Ising, int Dimension, std::string type_h){ // {{{
   //   itpp::cmat h= hamiltonian(MagenticField,Ising, Dimension, type_h);
   //   return eig_sym(h);
