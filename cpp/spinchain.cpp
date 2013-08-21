@@ -404,6 +404,7 @@ namespace spinchain{ // {{{
       bool sign; 
   }; // }}}
   itpp::cvec DecodeCompactSymmetric2DBaseMember(CompactSymmetric2DBaseMember g){ // {{{
+//     std::cout << "Gettin in DecodeCompactSymmetric2DBaseMember" << std::endl;
 
     int nh = (*(g.generators(0))).qubits, nv = g.generators.size();
     itpp::Array<CompactSymmetricBaseMember> basis_states;
@@ -415,21 +416,43 @@ namespace spinchain{ // {{{
       statesbasic(i_row)=DecodeCompactRotationallySymetricBasisState(*g.generators(i_row));
 //       total_k_horizontal += basis_states(horizontal_basis_state_numbers(i_row)).k; 
     }
+//     std::cout << "DecodeCompactSymmetric2DBaseMember 094832" << std::endl;
     itpp::cvec prestate, KRprestate;
     prestate=itppextmath::TensorProduct(statesbasic);
+//     std::cout << "DecodeCompactSymmetric2DBaseMember 6554654" << std::endl;
     prestate=project_state_vertical_momentum(g.k_v, prestate, nh);
-    KRprestate = itpp::conj(apply_vertical_external_reflection(prestate, nh));
-
-//     final steta = prestate +- KRprestate;
-
-//       apply_horizontal_rotation(prestate, nh)
-//
+//     std::cout << "DecodeCompactSymmetric2DBaseMember 87979987" << std::endl;
+    KRprestate = apply_vertical_external_reflection(prestate, nh);
+//     std::cout << "DecodeCompactSymmetric2DBaseMember 7856r41kj" << std::endl;
+    KRprestate = itpp::conj(KRprestate);
+//     KRprestate = itpp::conj(apply_vertical_external_reflection(prestate, nh));
+//     std::cout << "Gettin out DecodeCompactSymmetric2DBaseMember" << std::endl;
     if (g.sign){
       return prestate + KRprestate;
     } else {
       return prestate - KRprestate;
     }
   } // }}}
+  CompactSymmetric2DBaseMember CreateCompactSymmetric2DBaseMemberFromGenerator(CompactSymmetricBaseMember g, itpp::Array<CompactSymmetricBaseMember*>& basis_states_horizontal){
+    
+    int nh = (*(g.generators(0))).qubits, nv = g.generators.size();
+    int q=nh*nv;
+      
+    CompactSymmetric2DBaseMember basis_2d_state; 
+    basis_2d_state.generators.set_size(nv);
+    int mask, basis_number;
+    itpp::ivec  horizontal_basis_state_numbers(nv);
+    for (int i_row=0; i_row < nv; i_row++){
+      mask = ((pow_2(nh)-1)<<(nh*i_row)); 
+      basis_number = (g.generator & mask) >> (nh*i_row);
+      basis_2d_state.generators(i_row)=&(basis_states_horizontal(basis_number));
+    } // cout << "Smaller generators = " << horizontal_basis_state_numbers << endl;
+    basis_2d_state.sign = g.sign;
+    basis_2d_state.k_v  = g.k%(nv);
+
+    return basis_2d_state; 
+
+  }
   itpp::cvec apply_vertical_rotation(itpp::cvec& state_in, int horizontal_dimension){ // {{{
     // the bits are ordered as follows
     //
@@ -525,6 +548,7 @@ namespace spinchain{ // {{{
     return state;
   } // }}}
   itpp::cvec apply_vertical_external_reflection(itpp::cvec& state_in, int horizontal_dimension){ // {{{
+//     std::cout << "In apply_vertical_external_reflection 0" << std::endl;
     itpp::Vec<bool> reflected(state_in.size());
     itpp::cvec state=state_in;
     int n_reflected; 
@@ -534,6 +558,8 @@ namespace spinchain{ // {{{
     for (int n=0; n<state.size(); n++){
 //       n_reflected=cfpmath::reverse_bits(n, qubits);
       n_reflected = cfpmath::apply_vertical_external_reflection(n, qubits, horizontal_dimension);
+//       std::cout << "In apply_vertical_external_reflection n=" << n 
+//         <<", n_reflected=" << n_reflected << std::endl;
       if (!reflected(n_reflected)){
         tmp=state(n);
         state(n)=state(n_reflected);
@@ -542,6 +568,7 @@ namespace spinchain{ // {{{
         reflected(n_reflected)=true;
       }
     }
+//     std::cout << "In apply_vertical_external_reflection 999999999999999999999" << std::endl;
     return state;
   } // }}}
   itpp::cvec project_state_vertical_momentum(int k, itpp::cvec& state_in, int horizontal_dimension){ // {{{
