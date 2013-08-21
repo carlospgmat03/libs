@@ -186,123 +186,7 @@ namespace spinchain{ // {{{
     }
     return;
   } // }}}
-  // Symmetries in the 2D case
-  class CompactSymmetric2DBaseMember{ // {{{
-    public:
-      itpp::Array<CompactSymmetricBaseMember>; // This are the equivalents to the generators. The provide
-                                               // the basic elements of the total wave function
-      int k_v;   // Symmetry Sector in the vertical direction
-      bool sign; // Sign, to see if we consider P_k |n> \pm K R P_k |n>
-  }; // }}}
-  itpp::cvec apply_vertical_rotation(itpp::cvec& state_in, int horizontal_dimension){ // {{{
-    // the bits are ordered as follows
-    //
-    // 8   9  10  11
-    // 4   5   6   7
-    // 0   1   2   3
-    //
-    // In this case, horizontal dimension is 4.
-    // The above state gets transformed into 
-    //
-    // 4   5   6   7
-    // 0   1   2   3
-    // 8   9  10  11
-    //
-    int d=state_in.size();
-    itpp::cvec state(d);
-    int qubits=cfpmath::log_base_2(d);
-    for (int n=0; n<d; n++){
-      state(cfpmath::rotate_bits(n, qubits, horizontal_dimension))=state_in(n);
-    }
-    return state;
-  } // }}}
-  itpp::cvec apply_horizontal_rotation(itpp::cvec& state_in, int horizontal_dimension){ // {{{
-    // the bits are ordered as follows
-    //
-    // 8   9  10  11
-    // 4   5   6   7
-    // 0   1   2   3
-    //
-    // In this case, horizontal dimension is 4.
-    // The above state gets transformed into 
-    //
-    // 11  8   9  10 
-    //  7  4   5   6 
-    //  3  0   1   2 
-    //
-    // 9  10  11   8   
-    // 5   6   7   4   
-    // 1   2   3   0   
-    //
-    // For example for a  3x2 |3> goes into |5> :
-    // 0 0 0   => 0 0 0 
-    // 1 1 0   => 1 0 1
-    int d=state_in.size();
-    itpp::cvec state(d);
-    int qubits=cfpmath::log_base_2(d);
-    for (int n=0; n<d; n++){
-      state(cfpmath::apply_horizontal_rotation(n, qubits, horizontal_dimension))=state_in(n);
-    }
-    return state;
-  } // }}}
-  itpp::cvec apply_horizontal_rotation(itpp::cvec& state_in, int horizontal_dimension, int power){ // {{{
-    // the documentation is found in the function without the power, that is
-    //
-    // itpp::cvec apply_horizontal_rotation(itpp::cvec&, int )
-    //
-    itpp::cvec state, tmp_state;
-    state = state_in;
-    for (int n=0; n<power; n++){
-      tmp_state = apply_horizontal_rotation(state, horizontal_dimension);
-      state=tmp_state;
-    }
-    return state;
-  } // }}}
-  itpp::cvec project_state_horizontal_momentum(int k, itpp::cvec& state_in, int horizontal_dimension){ // {{{
-    // Creo que la formula general es 
-    // P_k = \sum_{j=0}^L \varphi_{j,k} T^j
-    itpp::cvec state;
-    state=state_in;
-    std::complex<double> phase;
-    for (int i=1; i<horizontal_dimension; i++){
-      phase = exp(-2.*itpp::pi*std::complex<double>(0,1)*double(i*k)/double(horizontal_dimension));
-//       std::cout << i << ", " << phase << ", " << double(i*k)/double(q) << std::endl;
-      state+= phase*apply_horizontal_rotation(state_in, horizontal_dimension, i);
-    }
-    return state/norm(state); 
-  } // }}}
-  itpp::cvec apply_vertical_rotation(itpp::cvec& state_in, int horizontal_dimension, int power){ // {{{
-    // the bits are ordered as follows
-    //
-    // 8   9  10  11
-    // 4   5   6   7
-    // 0   1   2   3
-    //
-    itpp::cvec state, tmp_state;
-    state = state_in;
-    for (int n=0; n<power; n++){
-      tmp_state = apply_vertical_rotation(state, horizontal_dimension);
-      state=tmp_state;
-    }
-    return state;
-  } // }}}
-  itpp::cvec project_state_vertical_momentum(int k, itpp::cvec& state_in, int horizontal_dimension){ // {{{
-    // Creo que la formula general es 
-    // P_k = \sum_{j=0}^L \varphi_{j,k} T^j
-    itpp::cvec state;
-    state=state_in;
-    int qubits=cfpmath::log_base_2(state_in.size());
-    int vertical_dimension = qubits/horizontal_dimension;
-
-    std::complex<double> phase;
-    for (int i=1; i<vertical_dimension; i++){
-      phase = exp(-2.*itpp::pi*std::complex<double>(0,1)*double(i*k)/double(vertical_dimension));
-//       std::cout << i << ", " << phase << ", " << double(i*k)/double(q) << std::endl;
-      state+= phase*apply_vertical_rotation(state_in, horizontal_dimension, i);
-    }
-    return state/norm(state); 
-  } // }}}
-  // Symmetries in the homogeneous case
+  // Symmetries in the homogeneous case {{{
   class CompactSymmetricBaseMember{ // {{{
     public:
       int generator;
@@ -503,6 +387,124 @@ namespace spinchain{ // {{{
     return state/norm(state); 
     //Evalute if the state is cero
   } // }}}
+  // }}}
+  // Symmetries in the 2D case {{{
+  class CompactSymmetric2DBaseMember{ // {{{
+    public:
+      itpp::Array<CompactSymmetricBaseMember>* generators; // This are the equivalents to the generators. The provide
+                                               // the basic elements of the total wave function
+      int k_v;   // Symmetry Sector in the vertical direction
+      bool sign; // Sign, to see if we consider P_k |n> \pm K R P_k |n>
+  }; // }}}
+  itpp::cvec apply_vertical_rotation(itpp::cvec& state_in, int horizontal_dimension){ // {{{
+    // the bits are ordered as follows
+    //
+    // 8   9  10  11
+    // 4   5   6   7
+    // 0   1   2   3
+    //
+    // In this case, horizontal dimension is 4.
+    // The above state gets transformed into 
+    //
+    // 4   5   6   7
+    // 0   1   2   3
+    // 8   9  10  11
+    //
+    int d=state_in.size();
+    itpp::cvec state(d);
+    int qubits=cfpmath::log_base_2(d);
+    for (int n=0; n<d; n++){
+      state(cfpmath::rotate_bits(n, qubits, horizontal_dimension))=state_in(n);
+    }
+    return state;
+  } // }}}
+  itpp::cvec apply_horizontal_rotation(itpp::cvec& state_in, int horizontal_dimension){ // {{{
+    // the bits are ordered as follows
+    //
+    // 8   9  10  11
+    // 4   5   6   7
+    // 0   1   2   3
+    //
+    // In this case, horizontal dimension is 4.
+    // The above state gets transformed into 
+    //
+    // 11  8   9  10 
+    //  7  4   5   6 
+    //  3  0   1   2 
+    //
+    // 9  10  11   8   
+    // 5   6   7   4   
+    // 1   2   3   0   
+    //
+    // For example for a  3x2 |3> goes into |5> :
+    // 0 0 0   => 0 0 0 
+    // 1 1 0   => 1 0 1
+    int d=state_in.size();
+    itpp::cvec state(d);
+    int qubits=cfpmath::log_base_2(d);
+    for (int n=0; n<d; n++){
+      state(cfpmath::apply_horizontal_rotation(n, qubits, horizontal_dimension))=state_in(n);
+    }
+    return state;
+  } // }}}
+  itpp::cvec apply_horizontal_rotation(itpp::cvec& state_in, int horizontal_dimension, int power){ // {{{
+    // the documentation is found in the function without the power, that is
+    //
+    // itpp::cvec apply_horizontal_rotation(itpp::cvec&, int )
+    //
+    itpp::cvec state, tmp_state;
+    state = state_in;
+    for (int n=0; n<power; n++){
+      tmp_state = apply_horizontal_rotation(state, horizontal_dimension);
+      state=tmp_state;
+    }
+    return state;
+  } // }}}
+  itpp::cvec project_state_horizontal_momentum(int k, itpp::cvec& state_in, int horizontal_dimension){ // {{{
+    // Creo que la formula general es 
+    // P_k = \sum_{j=0}^L \varphi_{j,k} T^j
+    itpp::cvec state;
+    state=state_in;
+    std::complex<double> phase;
+    for (int i=1; i<horizontal_dimension; i++){
+      phase = exp(-2.*itpp::pi*std::complex<double>(0,1)*double(i*k)/double(horizontal_dimension));
+//       std::cout << i << ", " << phase << ", " << double(i*k)/double(q) << std::endl;
+      state+= phase*apply_horizontal_rotation(state_in, horizontal_dimension, i);
+    }
+    return state/norm(state); 
+  } // }}}
+  itpp::cvec apply_vertical_rotation(itpp::cvec& state_in, int horizontal_dimension, int power){ // {{{
+    // the bits are ordered as follows
+    //
+    // 8   9  10  11
+    // 4   5   6   7
+    // 0   1   2   3
+    //
+    itpp::cvec state, tmp_state;
+    state = state_in;
+    for (int n=0; n<power; n++){
+      tmp_state = apply_vertical_rotation(state, horizontal_dimension);
+      state=tmp_state;
+    }
+    return state;
+  } // }}}
+  itpp::cvec project_state_vertical_momentum(int k, itpp::cvec& state_in, int horizontal_dimension){ // {{{
+    // Creo que la formula general es 
+    // P_k = \sum_{j=0}^L \varphi_{j,k} T^j
+    itpp::cvec state;
+    state=state_in;
+    int qubits=cfpmath::log_base_2(state_in.size());
+    int vertical_dimension = qubits/horizontal_dimension;
+
+    std::complex<double> phase;
+    for (int i=1; i<vertical_dimension; i++){
+      phase = exp(-2.*itpp::pi*std::complex<double>(0,1)*double(i*k)/double(vertical_dimension));
+//       std::cout << i << ", " << phase << ", " << double(i*k)/double(q) << std::endl;
+      state+= phase*apply_vertical_rotation(state_in, horizontal_dimension, i);
+    }
+    return state/norm(state); 
+  } // }}}
+  // }}}
 // Matrices for 
   itpp::cmat MatrixForIsing_star(int qubits, double J, itpp::vec magnetic_field, double J_interaction, itpp::vec local_magnetic_field, int sector){// {{{
 
