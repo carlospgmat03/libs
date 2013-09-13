@@ -12,8 +12,12 @@ test_memory_time:: test_memory_time.cpp
 # test_rmt:: test_rmt.cpp
 # 	$(CXX)  -Wall $(INCLUDETCLAP) $(CXXFLAGS) -o $@ $@.cpp -litpp
 
-test_spins2d:: test_spins2d.cu 
-	nvcc -I . -arch=sm_13 $(INCLUDECUDA) $(INCLUDETCLAP) $(CXXFLAGS) -o $@ $@.cu -litpp
+test_spins2d:: test_spins2d.cpp
+# Test if nvcc is available if so, then 
+# 	nvcc -D INCLUDECUDA=TRUE -I . -arch=sm_13 $(INCLUDECUDA) $(INCLUDETCLAP) $(CXXFLAGS) -o $@ $@.cu -litpp
+# else use the usual compilation line, with some preprocessing
+# 	$(CXX) -I . $(INCLUDETCLAP) $(CXXFLAGS) 
+	$(CXX) -I . $(INCLUDETCLAP) $(CXXFLAGS) $< -Wall -o $@ -I $(MYCPP) -litpp
 
 test_spins:: test_spins.cpp $(MYCPP)/cpp/spinchain.cpp $(MYCPP)/cpp/itpp_ext_math.cpp
 	$(CXX)  -Wall -I . $(INCLUDETCLAP) $(CXXFLAGS) -o $@ $@.cpp -litpp
@@ -24,8 +28,8 @@ test_dev_random_kanbalam :: test_dev_random
 testing :: testing.cpp ../cpp/cfp_math.cpp $(MYCPP)/cpp/itpp_ext_math.cpp
 	$(CXX)  -o $@ -I $(MYCPP) -litpp $@.cpp
 
-% :: %.cpp  $(MYCPP)/itpp_ext_math.cpp
-	g++ $< -o $@ -I $(MYCPP) -litpp
+% :: %.cpp  
+	$(CXX) $< -Wall -o $@ -I $(MYCPP) -litpp
 
 test_rmt:: test_rmt.cpp RMT.cpp
 
