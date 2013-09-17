@@ -1,15 +1,20 @@
 // {{{ Include and TCLAP
 #include <iostream>
 #include <tclap/CmdLine.h>
-#include <RMT.cpp>
-#include <purity_RMT.cpp>
+#include "cfp_math.cpp"
+#include "itpp_ext_math.cpp"
+#include "RMT.cpp"
+#include "purity_RMT.cpp"
+#include "dev_random.cpp"
+
 using namespace std;
 using namespace itpp;
+using namespace itppextmath;
 using namespace RMT;
-
+using namespace cfpmath;
 //typedef double wp;
 //typedef long double wp;
-#include <dev_random.cpp>
+
 //#include <my_random.hpp>
 
 //using namespace random_variables;
