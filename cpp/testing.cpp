@@ -1,12 +1,12 @@
  // {{{ includes,  namespaces, and TCLAP (command line options)
 #include <itpp/itbase.h>
 #include <itpp/stat/misc_stat.h>
-#include <cfp_math.cpp>
-#include <itpp_ext_math.cpp>
-#include <RMT.cpp>
+#include "cpp/cfp_math.cpp"
+#include "cpp/itpp_ext_math.cpp"
+#include "RMT.cpp"
 #include <tclap/CmdLine.h>
 
-#include <dev_random.cpp>
+#include "dev_random.cpp"
 // using namespace itpp;
 // using namespace itppextmath;
 // using namespace cfpmath;
@@ -98,6 +98,29 @@ int main(int argc, char* argv[]){
   // }}}
   } else if (option == "test_reverse_bits") { // {{{
     cout << reverse_bits(i1.getValue(), i2.getValue()) << endl ;
+  // }}}
+  } else if (option == "test_rotate_bits_inner") { // {{{
+    int l=i1.getValue(), r1, r2;
+    int error=0;
+    for (int n =0; n< pow_2(l); n++){
+      r1=  rotate_bits(n, l);
+      r2=  rotate_bits(n, 0, l-1, 1);
+      error += abs(r1-r2);
+    }
+    for (int n =0; n< pow_2(l); n++){
+      for (int k=0; k<l ; k++){
+        error += abs(rotate_bits(n, k, k, 1) -  n);
+      }
+    }
+//     int power=3; //va desde 0 hasta k-l o algo asi
+    for (int n =0; n< pow_2(l); n++){
+      for (int k=0; k<l ; k++){
+        for (int power=0; power < l- k ; power++){
+          error += abs(rotate_bits(n, k, k+power-1, power) -  n);
+        }
+      }
+    }
+    cout << "El error es " << error << endl;
   // }}}
   } else if (option == "test_partial_trace") { // {{{
     int q=i1.getValue();

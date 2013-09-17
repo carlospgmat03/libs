@@ -2,7 +2,7 @@
 #include <iostream>
 #include <complex>
 #include <cmath> 
-#include <my_random.hpp>
+#include "my_random.hpp"
 #include <string>
 
 // http://msdn2.microsoft.com/en-us/library/7a40a0e3(VS.80).aspx

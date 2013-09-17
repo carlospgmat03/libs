@@ -1,9 +1,9 @@
  // {{{ includes,  namespaces, and TCLAP (command line options)
 #include <itpp/itbase.h>
 #include <itpp/stat/misc_stat.h>
-#include <cpp/cfp_math.cpp>
-#include <cpp/itpp_ext_math.cpp>
-#include <cpp/RMT.cpp>
+#include "cfp_math.cpp"
+#include "itpp_ext_math.cpp"
+#include "RMT.cpp"
 #include <tclap/CmdLine.h>
 
 #include <cpp/dev_random.cpp>

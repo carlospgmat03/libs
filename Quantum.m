@@ -102,6 +102,9 @@ TransformationMatrixPauliBasisToComputationalBasis::usage = "The matrix that all
 Reshuffle::usage = "Apply the reshufle operation as undestood in Geometry of Quantum States, pags 260-262, and 264"
 RandomTracePreservingMapChoiBasis::usage = "Creates a singlequbit random trace preserving map"
 AveragePurityChannelPauliBasis::usage = "Calculates the average final purity given that the initial states are pure, and chosen with the Haar measure. "
+BlochEllipsoid::usage = "BlochEllipsoid[Cha_] Show the deformation of BlochSphere for a qubit channel in the pauli basis"
+EvolvGate::usage="EvolvGate[Gate_, steps_, env_, state_]... Evoluciona cualquier estado aplicando un numero steps_ de veces la compuerta Gate de  la forma Gate[#, otherparameters_] donde debe ponerse # en el lugar donde Gate toma el estado"
+MakeQuantumChannel::usage="MakeQuantumChannel[Gate_, steps_, env_] Donde Gate va de la forma Gate[#, otherparameters_]  donde debe ponerse # en el lugar donde Gate toma el estado"
 (* }}} *)
 (* }}} *)
 Begin["`Private`"] 
@@ -521,6 +524,43 @@ RandomTracePreservingMapChoiBasis[] := Module[{psi},
   Reshuffle[2 PartialTrace[Proyector[psi], 3]]
   ]
 AveragePurityChannelPauliBasis[Lambda_] := Total[Power[Lambda[[All, 1]], 2]]/2 + Power[Norm[Lambda[[2 ;;, 2 ;;]], "Frobenius"], 2]/6
+
+
+
+BlochEllipsoid[Cha_]:=Module[{center,T,coord,vecs,x,y,z},
+T=Cha[[{2,3,4},{2,3,4}]];
+center={Cha[[2,1]],Cha[[3,1]],Cha[[4,1]]};
+vecs=Graphics3D[{{Red,Arrow[{center,Normalize[T.{1,0,0}]}],{Blue,Arrow[{center,Normalize[T.{0,1,0}]}]},{Green,Arrow[{center,Normalize[T.{0,0,1}]}]} } }];
+coord={x,y,z}-center;
+coord=Inverse[T].coord;
+Show[ContourPlot3D[coord[[1]]^2+coord[[2]]^2+coord[[3]]^2==1,{x,-1,1},{y,-1,1},{z,-1,1},AxesLabel->{"X","Y","Z"}],vecs]
+]
+(* {{{ *) EvolvGate[Gate_, steps_, env_, state_]:=
+ Module[{statefinal, list, gate, j},
+  statefinal = tensorProduct[env,state];
+  gate[statefinal_] := First[Gate & /@ {statefinal}];
+  list = Table[statefinal = gate[statefinal];
+    PartialTrace[statefinal, 1], {j, steps}
+    ];
+  list
+  ]
+(*}}}*)
+(* {{{ *) MakeQuantumChannel[Gate_, steps_, env_] := 
+ Module[{\[Sigma], channel, Y, X, cero, uno},
+  Y = EvolvGate[Gate, steps, env, {-I, 1}];
+  cero = EvolvGate[Gate, steps, env, {0, 1}];
+  uno = EvolvGate[Gate, steps, env, {1, 0}];
+  X = EvolvGate[Gate, steps, env, {1, 1}];
+  \[Sigma][2] = Y - cero - uno;
+  \[Sigma][1] = X - cero - uno;
+  \[Sigma][0] = cero + uno;
+  \[Sigma][3] = uno - cero;
+  Table[channel[i, j] = 
+    1/2 Table[Tr[PauliMatrix[i].\[Sigma][j][[k]]], {k, steps}], {i, 0,
+     3}, {j, 0, 3}];
+  Chop[Table[
+    Table[channel[i, j][[k]], {i, 0, 3}, {j, 0, 3}], {k, steps}]]]
+(* }}} *)
 (* }}} *)
 End[] 
 EndPackage[]

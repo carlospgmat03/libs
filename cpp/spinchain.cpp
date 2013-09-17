@@ -1,6 +1,6 @@
 #ifndef  SPIN_CHAIN
 #define SPIN_CHAIN
-#include <cpp/itpp_ext_math.cpp>
+#include "itpp_ext_math.cpp"
 
 //usar namespace conflictúa con los headers de cuda
 //using namespace itpp;
@@ -21,9 +21,11 @@ void apply_kick_star(itpp::cvec& , itpp::vec , itpp::vec );
 void apply_kick_star_most(itpp::cvec& , itpp::vec , itpp::vec );
 itpp::cvec project_base_state(int, int, int);
 itpp::cvec apply_external_reflection(itpp::cvec&);
+itpp::cvec project_state_vertical_momentum(int , itpp::cvec& , int );
+itpp::cvec apply_vertical_external_reflection(itpp::cvec& , int );
 } // }}}
 namespace spinchain{ // {{{
-  // Advanced building blocks
+  // Advanced building blocks {{{
   itpp::cvec apply_chain_spit_state(itpp::cvec state,itpp::vec magnetic_field, double J){// {{{
     itpp::cvec tmp=state;
     apply_chain(tmp, J, magnetic_field);
@@ -109,7 +111,8 @@ namespace spinchain{ // {{{
     apply_ising_z(state, J);
     return;
   } // }}}
-  // Intermediate building blocks
+  // }}}
+  // Intermediate building blocks {{{
   void apply_kick_star_most(itpp::cvec& state, itpp::vec magnetic_field, itpp::vec local_magnetic_field){// {{{
     int qubits=cfpmath::log_base_2(state.size());
     // Kick in the central qubit
@@ -186,7 +189,8 @@ namespace spinchain{ // {{{
     }
     return;
   } // }}}
-  // Symmetries in the homogeneous case
+  // }}}
+  // Symmetries in the homogeneous case {{{
   class CompactSymmetricBaseMember{ // {{{
     public:
       int generator;
@@ -208,6 +212,11 @@ namespace spinchain{ // {{{
       // The sign is + if sign=true and - if sign=false
 
   }; // }}}
+  std::ostream &operator<<(std::ostream &os, const CompactSymmetricBaseMember &psi){ // {{{
+    os << "(Generator " << psi.generator << "; symmetry sector " << psi.k << "; qubits " 
+      << psi.qubits << "; degenerate " << psi.degenerate << ", sign " << psi.sign << ")" ;
+    return os;
+  } // }}}
   itpp::Array<CompactSymmetricBaseMember> build_rotationally_symmetric_base_states_compact(int qubits, int sector){ //{{{
     //     std::cout << "Si buenas 1 " << std::endl;
     itpp::Array<CompactSymmetricBaseMember> basis_states;
@@ -254,15 +263,15 @@ namespace spinchain{ // {{{
             basis_state.sign=true;
           }
 //           abort();
-          basis_states = concat(basis_states,basis_state);
+          basis_states = itpp::concat(basis_states,basis_state);
 //           std::cout <<"Just added " << basis_state.generator << std::endl; 
         } // }}}
         else {// entonces <n|R P_k |n> == 0 // {{{
           basis_state.degenerate=false;
           basis_state.sign=true;
-          basis_states = concat(basis_states,basis_state);
+          basis_states = itpp::concat(basis_states,basis_state);
           basis_state.sign=false;
-          basis_states = concat(basis_states,basis_state);
+          basis_states = itpp::concat(basis_states,basis_state);
           // so we add both states with signs
           // entonces <n|R P_k |n> = 0
 
@@ -275,7 +284,7 @@ namespace spinchain{ // {{{
     //     std::cout << "Si buenas 1 " << std::endl;
     itpp::Array<CompactSymmetricBaseMember> basis_states(0);
     for (int k=0; k<qubits; k++){
-      basis_states= concat(basis_states,build_rotationally_symmetric_base_states_compact(qubits, k));
+      basis_states= itpp::concat(basis_states,build_rotationally_symmetric_base_states_compact(qubits, k));
     }
     return basis_states;
   } // }}}
@@ -285,16 +294,21 @@ namespace spinchain{ // {{{
 //       << ", degenerate=" <<encoded_state.degenerate 
 //       << ", sign=" <<encoded_state.sign 
 //       << std::endl;
-//     if (CompactSymmetricBaseMember.degenerate){
-//     if (true ){
+    //     if (CompactSymmetricBaseMember.degenerate){
+    //     if (true ){
     itpp::cvec state_tmp=project_base_state(k, n, q);
-      if ( encoded_state.sign ){
-        itpp::cvec state=state_tmp+conj(apply_external_reflection(state_tmp));
-        return state/norm(state);
-      } else {
-        itpp::cvec state=state_tmp-conj(apply_external_reflection(state_tmp));
-        return state/norm(state);
-      }
+//     std::cout << "norma de estado temporal " << norm(state_tmp) << std::endl
+//       << "Estado: " << state_tmp << std::endl;
+    if ( encoded_state.sign ){
+      itpp::cvec state=state_tmp+conj(apply_external_reflection(state_tmp));
+//       std::cout << "norma de estado (x) " << norm(state) << std::endl;
+      return state/norm(state);
+    } else {
+      itpp::cvec state=state_tmp-conj(apply_external_reflection(state_tmp));
+//       std::cout << "norma de estado (y) " << norm(state) << std::endl;
+//       abort(); 
+      return state/norm(state);
+    }
   } // }}}
   itpp::cvec apply_external_reflection(itpp::cvec& state_in){ // {{{
     // The operator is defined as
@@ -314,6 +328,18 @@ namespace spinchain{ // {{{
         reflected(n)=true;
         reflected(n_reflected)=true;
       }
+    }
+    return state;
+  } // }}}
+  itpp::cvec apply_rotation(itpp::cvec& state_in, int power){ // {{{
+    // The operator is defined as
+    // R^k|i_{n-1}  ... i_1 i_0> = |i_{k-1} ... i_0 i_{n-1} ... i_k>
+    // i. e. is a rotation to the right of the bits. 
+    int d=state_in.size();
+    itpp::cvec state(d);
+    int qubits=cfpmath::log_base_2(d);
+    for (int n=0; n<d; n++){
+      state(cfpmath::rotate_bits(n, qubits, power))=state_in(n);
     }
     return state;
   } // }}}
@@ -340,15 +366,277 @@ namespace spinchain{ // {{{
       return state; 
     }
 
-    std::complex<double> Imag=std::complex<double>(0,1);
+//     std::complex<double> Imag=std::complex<double>(0,1);
     int n_rotated=base_state;
     for (int j=0; j<J; j++){
-      state(n_rotated)=exp(-std::complex<double>(0,1)*2.*itpp::pi*double(j*k/qubits));
+      state(n_rotated)=exp(-std::complex<double>(0,1)*2.*itpp::pi*double(j*k)/double(qubits));
       n_rotated=cfpmath::rotate_bits(n_rotated, qubits); 
     }
     return state/norm(state); 
     //Evalute if the state is cero
   } // }}}
+  itpp::cvec project_state(int k, itpp::cvec& state_in){ // {{{
+    // Creo que la formula general es 
+    // P_k = \sum_{j=0}^L \varphi_{j,k} T^j
+    int d=state_in.size();
+    int q=cfpmath::log_base_2(d);
+    itpp::cvec state(d);
+    state=state_in;
+    for (int i=1; i<q; i++){
+      state+= exp(-2.*itpp::pi*std::complex<double>(0,1)*double(i*k/double(q)))* apply_rotation(state_in, i);
+//       state+= exp(-2*(double(2)*Imag)*k*i/double(q)) * apply_rotation(state_in, i);
+//       state+= exp(-2*itpp::pi*Imag*k*i/double(q)) * apply_rotation(state_in, i);
+//       state+= exp(*k*i/double(q)) * apply_rotation(state_in, i);
+    }
+    return state/norm(state); 
+    //Evalute if the state is cero
+  } // }}}
+  // }}}
+  // Symmetries in the 2D case {{{
+  class CompactSymmetric2DBaseMember{ // {{{
+    public:
+      // This are the equivalents to the generators. The provide
+      // the basic elements of the total wave function
+      itpp::Array<CompactSymmetricBaseMember*> generators; 
+      // Symmetry Sector in the vertical direction
+      int k_v;
+      // Sign, to see if we consider P_k |n> \pm K R P_k |n>
+      bool sign; 
+      int vertical_dimension( ){ // {{{
+        return generators.size();
+      } // }}}
+      int horizontal_dimension( ){ // {{{
+        return (*(generators(0))).qubits;
+      } // }}}
+      int vertical_momentum( ){ // {{{
+        return k_v;
+      } // }}}
+      int horizontal_momentum( ){ // {{{
+        int total_k_h=0;
+        for (int i=0; i<generators.size(); i++){
+          total_k_h += (*(generators(i))).k;
+        }
+        return total_k_h%horizontal_dimension();
+      } // }}}
+  }; // }}}
+  CompactSymmetric2DBaseMember CreateCompactSymmetric2DBaseMemberFromGenerator(CompactSymmetricBaseMember g, itpp::Array<CompactSymmetricBaseMember>& basis_states_horizontal){ // {{{
+//     std::cout <<  "Getting in CreateCompactSymmetric2DBaseMemberFromGenerator\n" ;
+    int nh = (basis_states_horizontal(0)).qubits;
+//     int q=g.generators.size();
+//     int nv = cfpmath::log_base_2(basis_states_horizontal.size());
+    int q=g.qubits;
+    int nv=q/nh;
+//     std::cout << "CreateCompactSymmetric2DBaseMemberFromGenerator nh, nv= " << nh << ", " << nv << std::endl;
+//     abort();
+      
+    CompactSymmetric2DBaseMember basis_2d_state; 
+    basis_2d_state.generators.set_size(nv);
+    int mask, basis_number;
+    itpp::ivec  horizontal_basis_state_numbers(nv);
+//     std::cout <<  "In CreateCompactSymmetric2DBaseMemberFromGenerator jklaljkdfa\n" ;
+    for (int i_row=0; i_row < nv; i_row++){
+      mask = ((cfpmath::pow_2(nh)-1)<<(nh*i_row)); 
+      basis_number = (g.generator & mask) >> (nh*i_row);
+      basis_2d_state.generators(i_row)=&basis_states_horizontal(basis_number);
+    } // cout << "Smaller generators = " << horizontal_basis_state_numbers << endl;
+    basis_2d_state.sign = g.sign;
+    basis_2d_state.k_v  = g.k%(nv);
+
+//     std::cout <<  "Getting out CreateCompactSymmetric2DBaseMemberFromGenerator\n" ;
+    return basis_2d_state; 
+
+  } // }}}
+  void build_rotationally_symmetric_2D_base(int nh, int nv, itpp::Mat<itpp::Array<CompactSymmetric2DBaseMember> >& AllMatrixElements, itpp::Array<CompactSymmetricBaseMember>& basis_states_horizontal){ //{{{
+
+    int q= nv*nh; int d=cfpmath::pow_2(q);
+    itpp::Array<CompactSymmetricBaseMember> basis_states_2d;
+    basis_states_horizontal=build_rotationally_symmetric_base_states_compact(nh);
+    basis_states_2d=build_rotationally_symmetric_base_states_compact(q);
+    CompactSymmetric2DBaseMember basis_2d_state; 
+    AllMatrixElements.set_size(nh, nv);
+    int kv, kh;
+    for (int i=0; i< d; i++){
+      basis_2d_state = CreateCompactSymmetric2DBaseMemberFromGenerator(basis_states_2d(i), basis_states_horizontal);
+      kh=basis_2d_state.horizontal_momentum();
+      kv=basis_2d_state.vertical_momentum();
+      AllMatrixElements(kh, kv)=itpp::concat(AllMatrixElements(kh, kv), basis_2d_state);
+//       itpp::cvec state2d = DecodeCompactSymmetric2DBaseMember(basis_2d_state);
+    }
+    return;
+    
+  } // }}}
+  itpp::cvec DecodeCompactSymmetric2DBaseMember(CompactSymmetric2DBaseMember g){ // {{{
+//     std::cout << "Gettin in DecodeCompactSymmetric2DBaseMember" << std::endl;
+
+    int nh = g.horizontal_dimension(), nv = g.vertical_dimension();
+//     std::cout << "DecodeCompactSymmetric2DBaseMember " << nh << ", " << nv << std::endl;
+    itpp::Array<CompactSymmetricBaseMember> basis_states;
+    basis_states=build_rotationally_symmetric_base_states_compact(nh);
+ 
+    itpp::Array<itpp::cvec> statesbasic;
+    statesbasic.set_size(nv);
+    for (int  i_row=0; i_row < nv; i_row++){
+      statesbasic(i_row)=DecodeCompactRotationallySymetricBasisState(*g.generators(i_row));
+//       total_k_horizontal += basis_states(horizontal_basis_state_numbers(i_row)).k; 
+    }
+//     std::cout << "DecodeCompactSymmetric2DBaseMember 094832" << std::endl;
+    itpp::cvec prestate, KRprestate;
+    prestate=itppextmath::TensorProduct(statesbasic);
+//     std::cout << "DecodeCompactSymmetric2DBaseMember 6554654 prestate.size()=" << prestate.size() << std::endl;
+    prestate=project_state_vertical_momentum(g.k_v, prestate, nh);
+//     std::cout << "DecodeCompactSymmetric2DBaseMember 87979987" << std::endl;
+    KRprestate = apply_vertical_external_reflection(prestate, nh);
+//     std::cout << "DecodeCompactSymmetric2DBaseMember 7856r41kj" << std::endl;
+    KRprestate = itpp::conj(KRprestate);
+//     KRprestate = itpp::conj(apply_vertical_external_reflection(prestate, nh));
+//     std::cout << "Gettin out DecodeCompactSymmetric2DBaseMember" << std::endl;
+    if (g.sign){
+      return prestate + KRprestate;
+    } else {
+      return prestate - KRprestate;
+    }
+  } // }}}
+  itpp::cvec apply_vertical_rotation(itpp::cvec& state_in, int horizontal_dimension){ // {{{
+    // the bits are ordered as follows
+    //
+    // 8   9  10  11
+    // 4   5   6   7
+    // 0   1   2   3
+    //
+    // In this case, horizontal dimension is 4.
+    // The above state gets transformed into 
+    //
+    // 4   5   6   7
+    // 0   1   2   3
+    // 8   9  10  11
+    //
+//     std::cout << "Entrando a apply_vertical_rotation" << std::endl;
+    int d=state_in.size();
+    itpp::cvec state(d);
+    int qubits=cfpmath::log_base_2(d);
+    for (int n=0; n<d; n++){
+      state(cfpmath::rotate_bits(n, qubits, horizontal_dimension))=state_in(n);
+    }
+//     std::cout << "Saliendo de apply_vertical_rotation" << std::endl;
+    return state;
+  } // }}}
+  itpp::cvec apply_horizontal_rotation(itpp::cvec& state_in, int horizontal_dimension){ // {{{
+    // the bits are ordered as follows
+    //
+    // 8   9  10  11
+    // 4   5   6   7
+    // 0   1   2   3
+    //
+    // In this case, horizontal dimension is 4.
+    // The above state gets transformed into 
+    //
+    // 11  8   9  10 
+    //  7  4   5   6 
+    //  3  0   1   2 
+    //
+    // 9  10  11   8   
+    // 5   6   7   4   
+    // 1   2   3   0   
+    //
+    // For example for a  3x2 |3> goes into |5> :
+    // 0 0 0   => 0 0 0 
+    // 1 1 0   => 1 0 1
+    int d=state_in.size();
+    itpp::cvec state(d);
+    int qubits=cfpmath::log_base_2(d);
+    for (int n=0; n<d; n++){
+      state(cfpmath::apply_horizontal_rotation(n, qubits, horizontal_dimension))=state_in(n);
+    }
+    return state;
+  } // }}}
+  itpp::cvec apply_horizontal_rotation(itpp::cvec& state_in, int horizontal_dimension, int power){ // {{{
+    // the documentation is found in the function without the power, that is
+    //
+    // itpp::cvec apply_horizontal_rotation(itpp::cvec&, int )
+    //
+    itpp::cvec state, tmp_state;
+    state = state_in;
+    for (int n=0; n<power; n++){
+      tmp_state = apply_horizontal_rotation(state, horizontal_dimension);
+      state=tmp_state;
+    }
+    return state;
+  } // }}}
+  itpp::cvec project_state_horizontal_momentum(int k, itpp::cvec& state_in, int horizontal_dimension){ // {{{
+    // Creo que la formula general es 
+    // P_k = \sum_{j=0}^L \varphi_{j,k} T^j
+    itpp::cvec state;
+    state=state_in;
+    std::complex<double> phase;
+    for (int i=1; i<horizontal_dimension; i++){
+      phase = exp(-2.*itpp::pi*std::complex<double>(0,1)*double(i*k)/double(horizontal_dimension));
+//       std::cout << i << ", " << phase << ", " << double(i*k)/double(q) << std::endl;
+      state+= phase*apply_horizontal_rotation(state_in, horizontal_dimension, i);
+    }
+    return state/norm(state); 
+  } // }}}
+  itpp::cvec apply_vertical_rotation(itpp::cvec& state_in, int horizontal_dimension, int power){ // {{{
+    // the bits are ordered as follows
+    //
+    // 8   9  10  11
+    // 4   5   6   7
+    // 0   1   2   3
+    //
+    itpp::cvec state, tmp_state;
+    state = state_in;
+    for (int n=0; n<power; n++){
+      tmp_state = apply_vertical_rotation(state, horizontal_dimension);
+      state=tmp_state;
+    }
+    return state;
+  } // }}}
+  itpp::cvec apply_vertical_external_reflection(itpp::cvec& state_in, int horizontal_dimension){ // {{{
+//     std::cout << "In apply_vertical_external_reflection 0" << std::endl;
+    itpp::Vec<bool> reflected(state_in.size());
+    itpp::cvec state=state_in;
+    int n_reflected; 
+    std::complex<double> tmp;
+    reflected=false;
+    int qubits=cfpmath::log_base_2(state.size());
+    for (int n=0; n<state.size(); n++){
+//       n_reflected=cfpmath::reverse_bits(n, qubits);
+      n_reflected = cfpmath::apply_vertical_external_reflection(n, qubits, horizontal_dimension);
+//       std::cout << "In apply_vertical_external_reflection n=" << n 
+//         <<", n_reflected=" << n_reflected << std::endl;
+      if (!reflected(n_reflected)){
+        tmp=state(n);
+        state(n)=state(n_reflected);
+        state(n_reflected)=tmp;
+        reflected(n)=true;
+        reflected(n_reflected)=true;
+      }
+    }
+//     std::cout << "In apply_vertical_external_reflection 999999999999999999999" << std::endl;
+    return state;
+  } // }}}
+  itpp::cvec project_state_vertical_momentum(int k, itpp::cvec& state_in, int horizontal_dimension){ // {{{
+    // Creo que la formula general es 
+    // P_k = \sum_{j=0}^L \varphi_{j,k} T^j
+//     std::cout << "Entrando a project_state_vertical_momentum" << std::endl;
+    itpp::cvec state;
+    state=state_in;
+//     std::cout << "En project_state_vertical_momentum 424234234 state_in.size()=" << state_in.size()<< std::endl;
+    int qubits=cfpmath::log_base_2(state_in.size());
+//     std::cout << "En project_state_vertical_momentum 64646234" << std::endl;
+    int vertical_dimension = qubits/horizontal_dimension;
+
+    std::complex<double> phase;
+    for (int i=1; i<vertical_dimension; i++){
+      phase = exp(-2.*itpp::pi*std::complex<double>(0,1)*double(i*k)/double(vertical_dimension));
+//       std::cout << i << ", " << phase << ", " << double(i*k)/double(q) << std::endl;
+      state+= phase*apply_vertical_rotation(state_in, horizontal_dimension, i);
+    }
+//     std::cout << "Saliendo de project_state_vertical_momentum" << std::endl;
+
+    return state/norm(state); 
+  } // }}}
+  // }}}
+  // Matrices for different evolution operators{{{
   itpp::cmat MatrixForIsing_star(int qubits, double J, itpp::vec magnetic_field, double J_interaction, itpp::vec local_magnetic_field, int sector){// {{{
 
     itpp::Array<CompactSymmetricBaseMember> basis_states;
@@ -362,7 +650,7 @@ namespace spinchain{ // {{{
       apply_star(state_r, J, magnetic_field,J_interaction, local_magnetic_field);
       for (int j=0; j<d_sector; j++){for (int jq=0; jq<2; jq++){
         state_l=itppextmath::TensorProduct(DecodeCompactRotationallySymetricBasisState(basis_states(j)),state_q(jq));
-        U(2*j+jq, 2*i+iq) =  dot(conj(state_l),state_r) ;
+        U(2*j+jq, 2*i+iq) =  itpp::dot(conj(state_l),state_r) ;
       }}
     }}
     return U;
@@ -383,7 +671,7 @@ namespace spinchain{ // {{{
 //       std::cout << state_r << std::endl << std::endl;
       for (int j=0; j<d_sector; j++){for (int jq=0; jq<2; jq++){
         state_l=itppextmath::TensorProduct(state_q(jq), DecodeCompactRotationallySymetricBasisState(basis_states(j)));
-        U(j+d_sector*jq, i+d_sector*iq) =  dot(conj(state_l),state_r) ;
+        U(j+d_sector*jq, i+d_sector*iq) =  itpp::dot(conj(state_l),state_r) ;
 //         U(2*j+jq, 2*i+iq) =  dot(conj(state_l),state_r) ;
       }}
     }}
@@ -417,7 +705,8 @@ namespace spinchain{ // {{{
     }
     return U;
   } // }}}
-  // Basic building blocks
+  // }}}
+  // Basic building blocks of evoution operators {{{
   void apply_ising_z(itpp::cvec& state, double J, int position1, int position2){// {{{
     std::complex<double> expmij=exp(-std::complex<double>(0,1)*J);
     std::complex<double> exppij=exp( std::complex<double>(0,1)*J);
@@ -444,7 +733,8 @@ namespace spinchain{ // {{{
     }
     return;
   } // }}}
-  // Testing
+  // }}}
+  // Testing routines {{{
   itpp::cmat MatrixForIsingZ(int i, int j, int total){// {{{
     int mini=std::min(i,j), maxi=std::max(i,j);
     //     std::cout << "hola papi isingZ\n";
@@ -490,7 +780,8 @@ namespace spinchain{ // {{{
     }
     return tmp;
   } // }}}
-  // Various
+  // }}}
+  // Unsorted
   // itpp::vec eigenvalues(itpp::vec MagenticField, double Ising, int Dimension, std::string type_h){ // {{{
   //   itpp::cmat h= hamiltonian(MagenticField,Ising, Dimension, type_h);
   //   return eig_sym(h);
@@ -498,4 +789,3 @@ namespace spinchain{ // {{{
   // Unsorted 
 } // }}}
 #endif // SPIN_CHAIN
-

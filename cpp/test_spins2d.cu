@@ -5,8 +5,10 @@
 // #include <purity_RMT.cpp>
 #include "itpp_ext_math.cpp"
 #include "spinchain.cpp"
+#include "cuda_routines.cu"
+
 using namespace std;
-using namespace itpp;
+// using namespace itpp;
 using namespace itppextmath;
 using namespace cfpmath;
 using namespace spinchain;
@@ -28,8 +30,8 @@ using namespace spinchain;
   TCLAP::ValueArg<double> bz("","bz", "Magnetic field in z direction",false, 1.4,"double",cmd);
 // }}}
 std::complex<double> Im(0,1);
-
 int main(int argc, char* argv[]) { //{{{
+// Random seed, cout configuration, etc {{{
 // 	Random semilla_uran;
 // 	itpp::RNG_reset(semilla_uran.strong());
 //   	cout << PurityRMT::QubitEnvironmentHamiltonian(3,0.) <<endl;
@@ -39,10 +41,11 @@ int main(int argc, char* argv[]) { //{{{
   cout.precision(16);
 
   string option=optionArg.getValue();
-  if (option=="test_kick_single_spin"){ // {{{// {{{
+// }}}
+  if (option=="test_kick_single_spin"){ // {{{
 
     int dim=pow_2(qubits.getValue());
-    cvec state(dim);
+    itpp::cvec state(dim);
     double x,y;
     ifstream myReadFile;
     myReadFile.open("/tmp/estado.dat");
@@ -52,239 +55,22 @@ int main(int argc, char* argv[]) { //{{{
     }
     myReadFile.close();
     
-    vec b(3); b(0)=bx.getValue(); b(1)=by.getValue(); b(2)=bz.getValue();
+    itpp::vec b(3); b(0)=bx.getValue(); b(1)=by.getValue(); b(2)=bz.getValue();
     apply_magnetic_kick(state,b,position.getValue());
     for (int i=0; i<dim; i++){
       cout << real(state(i)) << " " << real(-Im*state(i)) << endl;
     }//}}}
-  } else if(option=="test_kick") { // {{{
-    int dim=pow_2(qubits.getValue());
-    cvec state(dim);
-    double x,y;
-    ifstream myReadFile;
-    myReadFile.open("/tmp/estado.dat");
-    for (int i=0; i<dim; i++){
-      myReadFile >> x >> y ;
-      state(i) = complex<double>(x,y) ;
-    }
-    myReadFile.close();
-    
-    vec b(3); b(0)=bx.getValue(); b(1)=by.getValue(); b(2)=bz.getValue();
-    apply_magnetic_kick(state,b);
-    for (int i=0; i<dim; i++){
-      cout << real(state(i)) << " " << real(-Im*state(i)) << endl;
-    }
-    // }}}
-  } else if(option=="test_hadamard") { // {{{
-    int dim=pow_2(qubits.getValue());
-    cvec state(dim);
-    double x,y;
-    for (int i=0; i<dim; i++){
-      cin >> x >> y ;
-      state(i) = complex<double>(x,y) ;
-    }
-    apply_hadamard(state,position.getValue());
-    for (int i=0; i<dim; i++){
-      cout << real(state(i)) << " " << real(-Im*state(i)) << endl;
-    }
-    // }}}
-  } else if(option=="test_apply_chain") {// {{{
-    int dim=pow_2(qubits.getValue());
-    cvec state(dim);
-    double x,y;
-    ifstream myReadFile;
-    myReadFile.open("/tmp/estado.dat");
-    for (int i=0; i<dim; i++){
-      myReadFile >> x >> y ;
-      state(i) = complex<double>(x,y) ;
-//       cout << x <<", "<<y<<endl;
-    }
-    myReadFile.close();
-        
-    vec b(3); b(0)=bx.getValue(); b(1)=by.getValue(); b(2)=bz.getValue();
-
-    apply_chain(state,Ising.getValue(),b);
-    for (int i=0; i<dim; i++){
-      cout << real(state(i)) << " " << real(-Im*state(i)) << endl;
-    }//}}}
-  } else if(option=="test_kicked_ising_chain_eduardo") {// {{{
-    int dim=pow_2(10);
-    vec b(3);
-    b(0)=1.;
-    b(1)=0.;
-    b(2)=1.;
-    double J=1.;
-    cvec state(dim);
-    cvec state_out_eduardo(dim);
-    double x,y;
-    ifstream myReadFile;
-    myReadFile.open("/tmp/c.dat");
-//     myReadFile.open("/home/carlosp/Desktop/salida.dat");
-    for (int i=0; i<dim; i++){
-      myReadFile >> x >> y ;
-      state(i) = complex<double>(x,y) ;
-//       cout << i << ", " << state(i) << endl;
-//       cout << x <<", "<<y<<endl;
-    }
-    for (int i=0; i<dim; i++){
-      myReadFile >> x >> y ;
-      state_out_eduardo(i) = complex<double>(x,y) ;
-//       cout << x <<", "<<y<<endl;
-    }
-    for (int i=0; i<dim; i++){
-//       state_out_eduardo(i) = complex<double>(x,y) ;
-//       cout << i<< "; " << state(i) <<", "<<state_out_eduardo(i)<<endl;
-    }
-    myReadFile.close();
-apply_chain(state,J,b);
-// norm(state,state_out_eduardo)
-// cout <<state<<endl<<endl<<state_out_eduardo;
-cout <<norm(state) << endl;
-cout <<norm(state_out_eduardo) << endl;
-cout <<norm(state-state_out_eduardo) << endl;
-    
-//     apply_ising_z(state,J,b);
-    for (int i=0; i<dim; i++){
-//       cout << real(state(i)) << " " << real(-Im*state(i)) << endl;
-    }//}}}
-  } else if(option=="test_ising_single") {// {{{
-    int dim=pow_2(qubits.getValue());
-    cvec state(dim);
-    double x,y;
-    ifstream myReadFile;
-    myReadFile.open("/tmp/estado.dat");
-    for (int i=0; i<dim; i++){
-      myReadFile >> x >> y ;
-      state(i) = complex<double>(x,y) ;
-//       cout << x <<", "<<y<<endl;
-    }
-    myReadFile.close();
-    
-    apply_ising_z(state,Ising.getValue(),position.getValue(), position2.getValue());
-    for (int i=0; i<dim; i++){
-      cout << real(state(i)) << " " << real(-Im*state(i)) << endl;
-    }//}}}
-  } else if(option=="test_apply_common_environment_chain") {// {{{
-    int dim=pow_2(qubits.getValue());
-    cvec state(dim);
-    double x,y;
-    ifstream myReadFile;
-    myReadFile.open("/tmp/estado.dat");
-    for (int i=0; i<dim; i++){ myReadFile >> x >> y ; state(i) = complex<double>(x,y) ; }
-    myReadFile.close();
-    vec b(3); b(0)=bx.getValue(); b(1)=by.getValue(); b(2)=bz.getValue();
-    apply_common_environment_chain(state,Ising.getValue(),coupling.getValue(), b);
-    for (int i=0; i<dim; i++){
-      cout << real(state(i)) << " " << real(-Im*state(i)) << endl;
-    }//}}}
-  } else if(option=="test_reduced_MatrixForIsing_star") {// {{{
-    int q=qubits.getValue();
-    int dim=pow_2(q);
-    vec b(3); b(0)=bx.getValue(); b(1)=by.getValue(); b(2)=bz.getValue();
-    vec local_b(3); local_b=0.;
-    double  J=itpp::randu(), J_interaction=0.;
-//     cmat U=MatrixForIsing_star(q, J, b, J_interaction, local_b);
-    cvec state_env, state, state_q;
-    cmat rho;
-    state_env=RandomState(dim);
-    state_q=RandomState(2);
-    state_q=0.;
-    state_q(0)=1.;
-    state=TensorProduct(state_env,state_q);
-    apply_star(state,J, b, J_interaction, local_b);
-    rho= partial_trace_qubits(state,1);
-    cout << rho << " "  << endl;
-  //}}}
-  } else if(option=="test_MatrixForIsing_star") {// {{{
-    int q=qubits.getValue();
-    int dim=pow_2(q);
-    vec b=itpp::randu(3), local_b=itpp::randu(3);double  J=itpp::randu(), J_interaction=itpp::randu();
-    cmat U=MatrixForIsing_star(q, J, b, J_interaction, local_b);
-    cvec state, state_matrix;
-    state=RandomState(dim); state_matrix=state;
-    apply_star(state,J, b, J_interaction, local_b);
-    cout << norm(U*state_matrix - state) << " "  << endl;
-  //}}}
-  } else if(option=="test_extended_base_orthonormality") {// {{{
-    cout << "quiero probar la unitariedad en la base computacional"
-      << " del operador de estrella y verificar la completez de la "
-      << "base rotacional extendida a un qubit" << endl;
-    int q=qubits.getValue(); // con i1=2 hay problemas
-    int d=pow_2(q);
-    vec b=itpp::randu(3), local_b=itpp::randu(3);
-//     double  J=itpp::randu(), J_interaction=itpp::randu(); J=0.; J_interaction=0.;
-    b=1.; local_b=0.; 
-    b=vec_3(pi/2.,0.,0.);
-    Array<cvec> state_q(2);
-    cvec state_r, state_l;
-    state_q(0)=to_cvec(vec_2(1.,0.)); state_q(1)=to_cvec(vec_2(0.,1.));
-//     cmat U=MatrixForIsing_star(q, J, b, J_interaction, local_b);
-    cmat U(d,d);
-    Array<CompactSymmetricBaseMember> basis_states=build_rotationally_symmetric_base_states_compact(q);
-    for (int i=0; i<d/2; i++){ for (int iq=0; iq<2; iq++){
-      state_r=TensorProduct(DecodeCompactRotationallySymetricBasisState(basis_states(i)),state_q(iq));
-      cout << "norm(state_r)=" << norm(state_r) << endl;
-      for (int j=0; j<d/2; j++){for (int jq=0; jq<2; jq++){
-        state_l=TensorProduct(DecodeCompactRotationallySymetricBasisState(basis_states(j)),state_q(jq));
-        U(2*j+jq, 2*i+iq) =  dot(conj(state_l),state_r) ;
-      }}
-    }}
-    
-    cout << "Primero debemos escribir eficientemente la U en forma de bloque. Luego "
-      <<" calcular el canal cuantico y verificar que da lo mismo" << endl;
-    cout << "Is U=1 " << test_unit_matrix(U)<< endl;
-//     cout << "Is U unitary? " << test_unitarity(U)<< endl;
-
-    // }}}
-  } else if(option=="test_start_unitarity") {// {{{
-    cout << "quiero probar la unitariedad en la base computacional"
-      << " del operador de estrella y verificar la completez de la "
-      << "base rotacional extendida a un qubit" << endl;
-    int q=qubits.getValue(); // con i1=2 hay problemas
-    int d=pow_2(q);
-    vec b=itpp::randu(3), local_b=itpp::randu(3);double  J=itpp::randu(), J_interaction=itpp::randu();
-    Array<cvec> state_q(2); state_q(0)=to_cvec(vec_2(1.,0.)); state_q(1)=to_cvec(vec_2(0.,1.));
-    cvec state_r, state_l;
-    cmat U(d,d);
-    Array<CompactSymmetricBaseMember> basis_states=build_rotationally_symmetric_base_states_compact(q-1);
-    for (int i=0; i<d/2; i++){ for (int iq=0; iq<2; iq++){
-      state_r=TensorProduct(DecodeCompactRotationallySymetricBasisState(basis_states(i)),state_q(iq));
-      apply_star(state_r, J, b,J_interaction, local_b);
-      // cout << "norm(state_r)=" << norm(state_r) << endl;
-      // cout << "state_r=" <<state_r << endl;
-      for (int j=0; j<d/2; j++){for (int jq=0; jq<2; jq++){
-        state_l=TensorProduct(DecodeCompactRotationallySymetricBasisState(basis_states(j)),state_q(jq));
-        // cout << "state_l=" <<state_l << endl;
-        U(2*j+jq, 2*i+iq) =  dot(conj(state_l),state_r) ;
-      }}
-    }}
-    
-    cout << "Is U unitary? " << test_unitarity(U)<< endl;
-
-    // }}}
-  } else if(option=="test_start_equivalence") {// {{{
-
-    vec b=itpp::randu(3), local_b=itpp::randu(3);double  J=itpp::randu(), J_interaction=itpp::randu();
-    cvec state_least, state_most, state_most_least;
-    state_least=RandomState(pow_2(qubits.getValue()));
-    state_most=apply_rotation(state_least);
-    apply_star_most(state_most, J, b, J_interaction, local_b);
-    apply_star(state_least, J, b, J_interaction, local_b);
-    state_most_least = apply_rotation(state_least);
-    cout << "Are the two operators equivalen? " << norm(state_most_least-state_most) << endl;
-
-    // }}}
   } else if(option=="test_project_base_state") {// {{{
-    Array<CompactSymmetricBaseMember> basis_states, tmp_basis;
-    cvec state_l, state_r, state;
+    itpp::Array<CompactSymmetricBaseMember> basis_states, tmp_basis;
+    itpp::cvec state_l, state_r, state;
     int q=qubits.getValue();
-    int d=pow_2(q);cmat U(d,d);
+    int d=pow_2(q);itpp::cmat U(d,d);
     double error=0.;
     // orthonormality in each sector {{{
     for (int k=0; k<q; k++){
       basis_states=build_rotationally_symmetric_base_states_compact(q, k);
       int size_space=basis_states.size();
-      cmat U(size_space, size_space);
+      itpp::cmat U(size_space, size_space);
       U=0.;
       for (int i=0; i<size_space; i++){
         state_l=DecodeCompactRotationallySymetricBasisState(basis_states(i));
@@ -294,18 +80,18 @@ cout <<norm(state-state_out_eduardo) << endl;
           state_r=DecodeCompactRotationallySymetricBasisState(basis_states(j));
           //         cout << "norma(state_r)=" << norm(state_r) << endl;
           //         if (j==1) abort(); 
-          U(i,j) =  dot(conj(state_l),state_r) ;
-          //         cout << dot(conj(state_l),state_r) << endl;
+          U(i,j) =  itpp::dot(conj(state_l),state_r) ;
+          //         cout << itpp::dot(conj(state_l),state_r) << endl;
         }
       }
       //     cout << U << endl;
       //     cout << "ortonormalidad del sector k=" << k << endl;
-      error += norm(eye_c(size_space)-U); 
+      error += norm(itpp::eye_c(size_space)-U); 
     }
     cout <<"error de la ortonormalidad en casa sector es " << error << endl;
     // }}}
     basis_states.set_size(0); // {{{ Total dimension must be ok
-    ivec sizes_k(q);
+    itpp::ivec sizes_k(q);
     for (int k=0; k<q; k++){
 //       tmp_basis =  build_rotationally_symmetric_base_states_compact(q, k);
       basis_states= build_rotationally_symmetric_base_states_compact(q, k);
@@ -319,7 +105,7 @@ cout <<norm(state-state_out_eduardo) << endl;
     U=0.;
 
     for (int k=0; k<q; k++){
-      basis_states= concat(basis_states,build_rotationally_symmetric_base_states_compact(q, k));
+      basis_states= itpp::concat(basis_states,build_rotationally_symmetric_base_states_compact(q, k));
     }
     for (int i=0; i<d; i++){
       state_l=DecodeCompactRotationallySymetricBasisState(basis_states(i));
@@ -329,13 +115,13 @@ cout <<norm(state-state_out_eduardo) << endl;
         state_r=DecodeCompactRotationallySymetricBasisState(basis_states(j));
         //         cout << "norma(state_r)=" << norm(state_r) << endl;
         //         if (j==1) abort(); 
-        U(i,j) =  dot(conj(state_l),state_r) ;
-        //         cout << dot(conj(state_l),state_r) << endl;
+        U(i,j) =  itpp::dot(conj(state_l),state_r) ;
+        //         cout << itpp::dot(conj(state_l),state_r) << endl;
       }
     }
     //     cout << U << endl;
     //     cout << "ortonormalidad del sector k=" << k << endl;
-    error += norm(eye_c(d)-U); 
+    error += norm(itpp::eye_c(d)-U); 
     cout <<"error de la ortonormalidad en todo el espacio es " << error << endl;
     // }}}
     // in each sector the eigenvectors are eigenvectors {{{
@@ -344,7 +130,7 @@ cout <<norm(state-state_out_eduardo) << endl;
       int size_space=basis_states.size();
       for (int i=0; i<size_space; i++){
         state=DecodeCompactRotationallySymetricBasisState(basis_states(i));
-        error+=norm(apply_rotation(state)-exp((2.*pi*Im*k)/q)*state);
+        error+=norm(apply_rotation(state)-exp((2.*itpp::pi*Im*double(k))/double(q))*state);
 //         cout << "k= "<< k << ", i=" << i << "... error=" << error << endl;
 //         if( k==0 && i==0){
 //           cout << norm(state) << endl; 
@@ -360,26 +146,26 @@ cout <<norm(state-state_out_eduardo) << endl;
       }
       //     cout << U << endl;
       //     cout << "ortonormalidad del sector k=" << k << endl;
-//       error += norm(eye_c(size_space)-U); 
+//       error += norm(itpp::eye_c(size_space)-U); 
     }
     cout <<"error de los eigenvalores  " << error << endl;
     // }}}
     basis_states.set_size(0); // {{{ Completeness in the whole hilbert space
     U=0.;
     for (int k=0; k<q; k++){
-      basis_states= concat(basis_states,build_rotationally_symmetric_base_states_compact(q, k));
+      basis_states= itpp::concat(basis_states,build_rotationally_symmetric_base_states_compact(q, k));
     }
     for (int i=0; i<d; i++){
       state_l=DecodeCompactRotationallySymetricBasisState(basis_states(i));
       U+=Proyector(state_l);
     }
-    error += norm(eye_c(d)-U); 
+    error += norm(itpp::eye_c(d)-U); 
     cout <<"error de la completes en todo el espacio es " << error << endl;
     // }}}
     std::cout << "error total=" << error << std::endl;
     //}}}
   } else if(option=="test_horizontal_proyector") {// {{{
-    cvec Ppsi, state;
+    itpp::cvec Ppsi, state;
     double error=0.;
     // PArece que en todas las dimensiones funciona 
     //  ./test_spins -o test_horizontal_proyector --i1 3 --i2 3 --i3 5
@@ -388,7 +174,7 @@ cout <<norm(state-state_out_eduardo) << endl;
     std::complex<double> eigen_phase;
     for (int k=0; k<nh; k++){
       state = RandomState(d);
-      eigen_phase = exp(2.*itpp::pi*std::complex<double>(0,1)*(double(k)/nh));
+      eigen_phase = exp(2.*itpp::pi*Im*(double(k)/nh));
       Ppsi = project_state_horizontal_momentum(k, state, nh);
       error += norm (eigen_phase*Ppsi - apply_horizontal_rotation(Ppsi, nh));
       error += abs(norm(Ppsi)-1);
@@ -396,7 +182,7 @@ cout <<norm(state-state_out_eduardo) << endl;
     cout << "Error = " << error << endl;
     //}}}
   } else if(option=="test_vertical_proyector") {// {{{
-    cvec Ppsi, state;
+    itpp::cvec Ppsi, state;
     double error=0.;
     // PArece que en todas las dimensiones funciona 
     //  ./test_spins -o test_horizontal_proyector --i1 3 --i2 3 --i3 5
@@ -405,7 +191,7 @@ cout <<norm(state-state_out_eduardo) << endl;
     std::complex<double> eigen_phase;
     for (int k=0; k<nh; k++){
       state = RandomState(d);
-      eigen_phase = exp(2.*itpp::pi*std::complex<double>(0,1)*(double(k)/nv));
+      eigen_phase = exp(2.*itpp::pi*Im*(double(k)/nv));
       Ppsi = project_state_vertical_momentum(k, state, nh);
       error += norm (eigen_phase*Ppsi - apply_vertical_rotation(Ppsi, nh));
       error += abs(norm(Ppsi)-1);
@@ -413,10 +199,10 @@ cout <<norm(state-state_out_eduardo) << endl;
     cout << "Error = " << error << endl;
     //}}}
   } else if(option=="test_create_base_2d") {// {{{
-    Array<CompactSymmetricBaseMember> basis_states, tmp_basis, basis_states_many_body;
-    Array<cvec> statesbasic;
+    itpp::Array<CompactSymmetricBaseMember> basis_states, tmp_basis, basis_states_many_body;
+    itpp::Array<itpp::cvec> statesbasic;
     CompactSymmetricBaseMember g;
-    cvec state_l, state_h, state_r, state, prestate;
+    itpp::cvec state_l, state_h, state_r, state, prestate;
     int q, d;
     double error=0.;
 
@@ -438,7 +224,7 @@ cout <<norm(state-state_out_eduardo) << endl;
 
 
     int mask;
-    ivec  horizontal_basis_state_numbers(nv);
+    itpp::ivec  horizontal_basis_state_numbers(nv);
     for (int i_row=0; i_row < nv; i_row++){
       mask = ((pow_2(nh)-1)<<(nh*i_row)); 
 //       cout << "Generator=" << g.generator <<", Mask=" << mask << ", number=" << ( (g.generator & mask) >> (nh*i_row)) << endl; 
@@ -457,7 +243,7 @@ cout <<norm(state-state_out_eduardo) << endl;
       total_k_horizontal += basis_states(horizontal_basis_state_numbers(i_row)).k; 
     }
     total_k_horizontal = total_k_horizontal % nh;
-    phase = exp(2.*itpp::pi*std::complex<double>(0,1)*(double(total_k_horizontal)/nh));
+    phase = exp(2.*itpp::pi*Im*(double(total_k_horizontal)/nh));
     prestate=TensorProduct(statesbasic);
     cout << "Test if eigenstate of horizontal rotation " 
       << "Proportionality constant " << proportionality_constant(prestate, apply_horizontal_rotation(prestate, nh)) 
@@ -470,7 +256,7 @@ cout <<norm(state-state_out_eduardo) << endl;
     cout << "See that the general projection operator works the same on basis states." << endl; 
     std::cout << "error total=" << error << std::endl;
 
-    cvec bi_symmetric_state; 
+    itpp::cvec bi_symmetric_state; 
 
     bi_symmetric_state = project_state_vertical_momentum(tv_sector, prestate, nh);
     cout << "* Test if eigenstate of horizontal rotation " 
@@ -483,12 +269,88 @@ cout <<norm(state-state_out_eduardo) << endl;
     cout << "Test to see if projector works" << endl;
     int k=0;
     state = RandomState(d);
-    phase = exp(-2.*itpp::pi*std::complex<double>(0,1)*(double(k)/nh));
+    phase = exp(-2.*itpp::pi*Im*(double(k)/nh));
     state_h = project_state_horizontal_momentum(k, state, nh);
     cout << norm (state_h - apply_horizontal_rotation(state_h, nh))  << ", " << norm(state_h) << endl;
     //}}}
+  } else if(option=="test_create_small_base_2d") {// {{{
+    itpp::Array<CompactSymmetricBaseMember> basis_states_horizontal, basis_states_2d;
+//     itpp::Array<itpp::cvec> statesbasic;
+    CompactSymmetricBaseMember g;
+//     itpp::cvec state_l, state_h, state_r, state, prestate;
+    int q ; // , d;
+//     double error=0.;
+
+    int nv=2, nh=3; q= nv*nh; // d=pow_2(q);
+//     int tv_sector=0;
+
+    // Generacion de los estados base con los que se construira el resto de cosas. {{{
+    // Aca genero los estados que llamare phi_i con i=0,...,15 (2^nh-1) Esos son los que serviran de base
+    // para construir los otros. E
+    basis_states_horizontal=build_rotationally_symmetric_base_states_compact(nh);
+    // Ahora quiero construir uno en particular, del sector con momento vertical igual a 1.
+    basis_states_2d=build_rotationally_symmetric_base_states_compact(q);
+    // }}}
+    g=basis_states_2d(3);
+    cout << g << endl;
+
+
+    CompactSymmetric2DBaseMember basis_2d_state; 
+    basis_2d_state.generators.set_size(nv);
+    int mask, basis_number;
+    itpp::ivec  horizontal_basis_state_numbers(nv);
+    for (int i_row=0; i_row < nv; i_row++){
+      mask = ((pow_2(nh)-1)<<(nh*i_row)); 
+      basis_number = (g.generator & mask) >> (nh*i_row);
+      basis_2d_state.generators(i_row)=&(basis_states_horizontal(basis_number));
+    } // cout << "Smaller generators = " << horizontal_basis_state_numbers << endl;
+    basis_2d_state.sign = g.sign;
+    basis_2d_state.k_v  = g.k%(nv);
+
+    itpp::cvec state2d = DecodeCompactSymmetric2DBaseMember(basis_2d_state);
+
+    cout <<"Malas" << endl;
+//     bi_symmetric_state = project_state_vertical_momentum(tv_sector, prestate, nh);
+
+    //}}}
+  } else if(option=="test_commutator") {// {{{
+    itpp::cvec Ppsi, state;
+    double error=0.;
+    // PArece que en todas las dimensiones funciona 
+    //  ./test_spins -o test_horizontal_proyector --i1 3 --i2 3 --i3 5
+    int nv=i2.getValue(), nh=i3.getValue(); int q,  d;
+    cout << "Test to see if vertical projector works." << "Grid " << nh << "x" << nv  << endl;
+    itpp::vec b(3);
+    b(0)=1.42; b(1)=2.534; b(2)=3.78;
+    double J=1.2;
+    itpp::cvec state_0 , s1, s2, s3, s4, s5;
+    for (int nh=2; nh<5; nh++){ for (int nv=2; nv<5; nv++){
+    	q=nv*nh;
+	d=pow_2(q);
+	state_0 = RandomState(d);
+	// Conmutador [U, Tv] {{{
+	s1=apply_vertical_rotation(state_0, nh);
+	itppcuda::apply_floquet( s1, J, b);
+	s2=state_0;
+	itppcuda::apply_floquet(s2, J, b);
+	s3=apply_vertical_rotation(s2, nh);
+	cout << "Error en [U, Tv]=" << norm (s3 - s1) << endl;
+	error += norm (s3 - s1);
+	// }}}
+	// Conmutador [U, Th] {{{
+	s1=apply_horizontal_rotation(state_0, nh);
+	itppcuda::apply_floquet2d( s1, J, b, nh);
+	s2=state_0;
+	itppcuda::apply_floquet2d(s2, J, b, nh);
+	s3=apply_horizontal_rotation(s2, nh);
+	error += norm (s3 - s1);
+	cout << "Error en [U, Th]=" << norm (s3 - s1) << endl;
+	// }}}
+    } }
+    cout << "Error total = " << error << endl;
+    //}}}
   } else {// {{{
-    vec b(3);
+    itpp::vec b(3);
     b(0)=-0.404;b(1)=0.0844;b(2)=0.361;
     cout <<   exp_minus_i_b_sigma(b) << endl;
     // b = {-0.404, 0.084, 0.361};

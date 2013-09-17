@@ -12,6 +12,7 @@ phasespace/wigner
 phasespace/test
 
 
+test_spins2d
 external
 CustomTicks.m
 *.mod

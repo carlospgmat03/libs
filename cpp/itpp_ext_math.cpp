@@ -16,7 +16,25 @@ namespace itppextmath{ // {{{
     R(0,1)=-R(1,0);
     return R;
   } //}}}
+  double sum_positive_derivatives(const itpp::vec& f){ // {{{
+    double tmp=0;
+    for (int i=0; i<f.size()-1; i++){
+      if(f(i+1)>f(i)){
+        tmp+=f(i+1)-f(i);
+      }
+    }
+    return tmp;
+  } // }}}
 // Inquiry {{{
+template <class Num_T> int locateLargestAbs(const itpp::Vec<Num_T>& e){ // {{{
+  int position=0;
+  for (int i=0; i<e.size(); i++){
+    if (abs(e(i)) > abs(e(position))){
+      position=i;
+    }
+  }
+  return position;
+} // }}}
 double compare(const itpp::cmat& A, const itpp::cmat& B){ // {{{
   return itpp::norm(A - B);
 } //}}}
@@ -93,6 +111,34 @@ template <class Num_T> double compare(const itpp::Array<Num_T >& a1, const itpp:
     x+= compare(a1(i),a2(i));
   }
   return x;
+} //}}}
+template <class Num_T> Num_T proportionality_constant(const itpp::Vec<Num_T >& a1, const itpp::Vec<Num_T >& a2){// {{{
+//! Attempt to get a proportionality constant between two vectors
+/*! 
+ */
+  if (a1.size() != a2.size()){
+    std::cerr << "Not even wrong" << std::endl;
+    abort();
+  }
+  int position_largest = locateLargestAbs(a1);
+  return a1(position_largest)/a2(position_largest);
+} //}}}
+template <class Num_T> double proportionality_test(const itpp::Vec<Num_T >& a1, const itpp::Vec<Num_T >& a2, Num_T proportionality_constant){// {{{
+//! Routine to check if two vectors are proportional. 
+/*! 
+ */
+  if (a1.size() != a2.size()) return -1;
+  return norm(a1-proportionality_constant*a2)/norm(a1);
+} //}}}
+template <class Num_T> double proportionality_test(const itpp::Vec<Num_T >& a1, const itpp::Vec<Num_T >& a2){// {{{
+//! Routine to check if two vectors are proportional. 
+/*! 
+ */
+  if (a1.size() != a2.size()) return -1;
+  int position_largest = locateLargestAbs(a1);
+//   std::cout << "position_largest " << position_largest <<", a1(p)=" << a1(position_largest) << std::endl; 
+  Num_T proportionality_constant=a1(position_largest)/a2(position_largest);
+  return proportionality_test(a1, a2, proportionality_constant);
 } //}}}
 // }}}
 // Reordering, replacing, inequalities {{{
@@ -202,12 +248,12 @@ itpp::cmat Reorder_state_tensor_form(itpp::cvec vector,int which){ // {{{
   //   std::cout << "@Reorder_state_tensor_form -1" << std::endl;
   int dim2 = vector.size()/dim1;
   //   std::cout << "@Reorder_state_tensor_form 0" << std::endl;
-  int qubits=cfpmath::log_base_2(vector.size());
+//   int qubits=cfpmath::log_base_2(vector.size());
   itpp::cmat out(dim2,dim1); out=0.;
   int col, row; 
   //   std::cout << "@Reorder_state_tensor_form 1" << std::endl;
   for (int j=0; j<vector.size(); j++){
-    cfpmath::extract_digits(j,qubits,col,row,which);
+    cfpmath::extract_digits(j,col,row,which);
     out(row,col)=vector(j);
   }
   return out;
@@ -316,7 +362,6 @@ template <class Num_T> itpp::Mat<Num_T> postpend_tensor_identity(const itpp::Mat
 template <class Num_T> itpp::Mat<Num_T> extend_qubit_operator(const itpp::Mat<Num_T>& Matrix, const int encoded_nontrivial_positions, const int total_number_of_qubits){ // {{{
 
   itpp::Mat<Num_T> tmp(cfpmath::pow_2(total_number_of_qubits),cfpmath::pow_2(total_number_of_qubits));
-  int i0,i1;
   tmp=0.;
   int number_of_nontrivial_positions = cfpmath::BitCount(encoded_nontrivial_positions);
   int i_col_total, j_col_total;
@@ -371,6 +416,13 @@ template <class Num_T> itpp::Vec<Num_T> TensorProduct(const itpp::Vec<Num_T>& Ve
     }
   }
 //       std::cout << "Hola cabron " << std::endl;
+  return tmp;
+} // }}}
+template <class Num_T> itpp::Vec<Num_T> TensorProduct(const itpp::Array<itpp::Vec<Num_T> >& States){ // {{{
+  itpp::Vec<Num_T> tmp=States(0);
+  for (int i=1; i<States.size(); i++){
+    tmp=TensorProduct(tmp,States(i));
+  }
   return tmp;
 } // }}}
 itpp::cvec TensorProduct(const itpp::cvec& Vec1, const itpp::vec& Vec2){ // {{{
@@ -464,7 +516,7 @@ itpp::cmat exponentiate_nonsym(const itpp::cmat& Matrix){ // {{{
   double revition; 
   revition = itpp::norm(Matrix -
       (V*itpp::diag(eigenvalues)* invV));
-  if (revition > 10e-12 || !exito){
+  if (revition > 10e-12 || !exito || !exito2){
     std::cerr << "Algun xxx pedo en exponentiate " << revition << ", " << exito << std::endl; 
     std::cerr << "La rutina de lapack tiene pedos cuando esta muy sparse la matriz,\n"
       <<"por ejemplo un elemento del modelo de free fermions con 2D en primeros vecinos" << std::endl; 
@@ -723,7 +775,6 @@ template <class Num_T> itpp::Array<Num_T > del(const itpp::Array<Num_T >& A, con
   } else {
     return itpp::concat(A(0,i-1),A(i+1,sA-1));
   }
-  abort();
 }// }}}
 template <class Num_T> itpp::Array<Num_T > minus(const itpp::Array<Num_T >& A, const Num_T & B){// {{{
   itpp::Array<Num_T > A_Union=Union(A);
@@ -1476,7 +1527,7 @@ void apply_cnot(itpp::cvec& state, int control, int target){// {{{
 void apply_control_u(itpp::cvec& state, int control, int target, itpp::cmat& u){// {{{
   int mask = cfpmath::pow_2(control) + cfpmath::pow_2(target);
   itpp::cvec moco;
-  int n1, n2;
+//   int n1, n2;
   itpp::ivec pos(2);
   for (int j=0; j<state.size()/4; j++){
     if(control < target){
@@ -1733,7 +1784,7 @@ void test_GetState_mixed(){ // {{{
   return;
 //  return itpp::norm(H-H.transpose() );
 } // }}}
-double test_reality(const itpp::cmat H){ // {{{
+double test_reality(const itpp::cmat& H){ // {{{
  return itpp::norm(itpp::imag(H)); 
 } // }}}
 double test_real_symmetric(const itpp::cmat H){ // {{{

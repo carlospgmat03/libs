@@ -9,6 +9,9 @@ ApplyIsingChain::usage="Se hace la topologia de una cadena. Solo la parte de Isi
 ApplyChain::usage="Se hace la topologia de una cadena."
 ApplyInverseChain::usage="Se hace la topologia de una cadena pero hacia atras en el tiempo."
 ApplyCommonEnvironment::usage="Se refiere a la topologia (a) del PRL de n-body Bell en PRA."
+ApplyChainStar::usage="ApplyChainStar[state_, Jenv_,Jint_, b_] Se hace la topologia de la estrella con el magnetic kick"
+ApplyIsingStar::usage="Se hace la topologia de una estrella, solo la parte de Ising"
+(* }}} *)
 (* }}} *)
 Begin["`Private`"] 
 (* {{{ Primitives*)
@@ -71,6 +74,20 @@ Begin["`Private`"]
   J[[2]] = Jcoupling;
   J[[-1]] = Jcoupling;
   ApplyIsing[ApplyMagnetickKick[state, b], J]]
+(* }}} *)
+(* {{{ *) ApplyChainStar[state_?VectorQ, Jenv_,Jint_, b_] := Module[{statenew},
+ statenew = state;
+ statenew = ApplyIsingStar[statenew, Jenv, Jint];
+ statenew = ApplyMagnetickKick[statenew, b];
+ statenew ]
+(* }}} *)
+(* {{{ *) ApplyIsingStar[state_?VectorQ, Jenv_, Jint_] := Module[{Qubits, statenew, QubitToAdress, q},
+  Qubits = Log[2, Length[state]];
+If[IntegerQ[Qubits]==False,Print["Error: The state does not correspond to a integer number of qubits"];Abort[]];
+  statenew=state;
+  For[q=1, q<Qubits, q++, 
+  statenew = ApplyIsing[statenew, Jint, 0 , q];
+]];
 (* }}} *)
 (* }}} *)
 End[] 
