@@ -143,14 +143,27 @@ namespace RMT{ // {{{ Implementation
   // }}}
   // }}}
 // PUE Collection {{{
-  itpp::vec RandomPUEspectrum(int const dim){ //{{{
+  itpp::vec RandomPUEspectrum(int const dim, double eigen){ //{{{
     itpp::vec temp(dim);
-    temp=itpp::randu(dim)-0.5;
+    temp=2*eigen*(itpp::randu(dim)-0.5);
     return temp;
   }
   // }}}
-  itpp::cmat RandomPUE(int const dim){ //{{{
-    itpp::vec lambda=RandomPUEspectrum(dim);
+  itpp::cmat RandomPUE(int const dim, double eigen){ //{{{
+    itpp::vec lambda=RandomPUEspectrum(dim, eigen);
+    itpp::cmat U=RandomCUE(dim);
+    return itppextmath::UDiagUdagger(U, lambda);
+//     temp=itpp::randu(dim)-0.5;
+//     return temp;
+  }
+  itpp::vec RandomPUEspectrum_G(int const dim, double eigen){ //{{{
+    itpp::vec temp(dim);
+    temp=2*eigen*(itpp::randn(dim)-0.5);
+    return temp;
+  }
+  // }}}
+  itpp::cmat RandomPUE_G(int const dim, double eigen){ //{{{
+    itpp::vec lambda=RandomPUEspectrum_G(dim, eigen);
     itpp::cmat U=RandomCUE(dim);
     return itppextmath::UDiagUdagger(U, lambda);
 //     temp=itpp::randu(dim)-0.5;
