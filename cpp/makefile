@@ -1,5 +1,23 @@
 #CXXFLAGS=-O
 include ~/makefile
+# Configuration details. Adjust to your needs with 
+# LOGNAME and, for example, ifeq ($(HOSTNAME),jesus) 
+LDLIBS = -litpp
+NVCCFLAGS= -arch=sm_13
+# Carlos Pineda {{{
+ifeq ($(LOGNAME),carlosp)
+    include ~/makefile
+    INCLUDES := -I. -I../cpp/ 
+endif
+# }}}
+# Eduardo Villaseñor {{{
+ifeq ($(LOGNAME),eduardo)
+  INCLUDES := -I. -I ../libs/cpp/
+  ifeq ($(HOSTNAME),jesus) 
+    INCLUDES := -I. -I ../libs/cpp/
+  endif
+endif
+# }}}
 
 documentation ::
 	doxygen 
