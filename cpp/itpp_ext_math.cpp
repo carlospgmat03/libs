@@ -25,6 +25,7 @@ namespace itppextmath{ // {{{
     }
     return tmp;
   } // }}}
+  // number theoretical
 // Inquiry {{{
 template <class Num_T> int locateLargestAbs(const itpp::Vec<Num_T>& e){ // {{{
   int position=0;
