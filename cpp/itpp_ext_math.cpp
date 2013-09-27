@@ -288,6 +288,8 @@ itpp::cmat partial_trace(const itpp::cvec& state, int dim_leave){ // {{{
 itpp::cmat partial_trace_qubits(itpp::cvec state, int which){ // {{{
 //   std::cout << "@partial_trace_qubits 1" << std::endl;
   int size_rho=cfpmath::pow_2(cfpmath::BitCount(which));
+//   std::cout << "@partial_trace_qubits size_rho=" << size_rho 
+//     << ", which = " << which << std::endl;
   itpp::cmat reordered_state = Reorder_state_tensor_form(state, which), rho(size_rho,size_rho );
 //   std::cout << "@partial_trace_qubits 2" << itpp::norm(reordered_state) <<std::endl;
   for (int i1 =0; i1< size_rho; i1++){
