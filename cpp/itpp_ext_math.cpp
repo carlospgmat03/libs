@@ -1316,6 +1316,14 @@ itpp::vec BellState(int dim=4){// {{{
   tmp(dim-1)=1;
   return tmp/sqrt(2.);
 }// }}}
+itpp::cvec BlochToQubit(double theta, double phi){// {{{
+  itpp::cvec tmp(2);
+  std::complex<double> I(0,1);
+  tmp.zeros();
+  tmp(0)=cos(theta/2);
+  tmp(1)=sin(theta/2)*exp(I*phi);
+  return tmp;
+}// }}}
 itpp::vec BellState(double theta){// {{{
   int dim=4;
   itpp::vec tmp(dim);
