@@ -29,6 +29,7 @@ double linear_interval(int iterator, int max_iterator, double min, double max){/
   return min + iterator*(max-min)/(max_iterator-1);
 }// }}}
 double next_point_secant(double tnm1, double tnm2, double fnm1, double fnm2){// {{{
+  //possibly to implement newton method to find roots.
  return tnm1-fnm1*(tnm1-tnm2)/(fnm1-fnm2); 
   
 }// }}}
