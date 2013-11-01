@@ -12,6 +12,12 @@ ApplyCommonEnvironment::usage="Se refiere a la topologia (a) del PRL de n-body B
 ApplyChainStar::usage="ApplyChainStar[state_, Jenv_,Jint_, b_] Se hace la topologia de la estrella con el magnetic kick"
 ApplyIsingStar::usage="Se hace la topologia de una estrella, solo la parte de Ising"
 (* }}} *)
+(* {{{ Explicit Matrices *)
+IsingMatrix::usage="Get the matrix for the Ising Interaction Sigma_i Sigma_j, or for \sumSigma_i Sigma_j. In the first case, call as IsingMatrix[{IsingPosition1_Integer, IsingPosition2_Integer}, Qubits_Integer], and in the second,  IsingMatrix[IsingPositions_List, Qubits_Integer]"
+SpinChainIsingMatrix::usage="The Ising matrix that has to come in the IsingMatrix routine, for a perdic spin chain. Call as SpinChainIsingMatrix[Qubits_]  "
+MatrixPauliMagneticField::usage="Matrix corresponding to the hamiltonian b.\sum \sigma_j"
+HamiltonianMagenitcChain::usage="Matrix Corresponding to the continuous Periodic ising spin chain with magnetic field"
+(* }}} *)
 (* }}} *)
 Begin["`Private`"] 
 (* {{{ Primitives*)
@@ -89,6 +95,13 @@ If[IntegerQ[Qubits]==False,Print["Error: The state does not correspond to a inte
   statenew = ApplyIsing[statenew, Jint, 0 , q];
 ]];
 (* }}} *)
+(* }}} *)
+(* {{{ Explicit Matrices *)
+IsingMatrix[{IsingPosition1_Integer, IsingPosition2_Integer}, Qubits_Integer] := Pauli[Table[ If[l == Qubits - IsingPosition1 || l == Qubits - IsingPosition2, 3, 0], {l, Qubits}]];
+IsingMatrix[IsingPositions_List, Qubits_Integer] := Module[{IsingPosition}, Sum[IsingMatrix[IsingPosition, Qubits], {IsingPosition, IsingPositions}]]
+SpinChainIsingMatrix[Qubits_] := Table[{Mod[i, Qubits], Mod[i + 1, Qubits]}, {i, 0, Qubits - 1}]
+MatrixPauliMagneticField[MagneticField_, Qubits_] := MagneticField.{SumSigmaX[Qubits], SumSigmaY[Qubits], SumSigmaZ[Qubits]}
+HamiltonianMagenitcChain[MagneticField_, J_, Qubits_] := MatrixPauliMagneticField[MagneticField, Qubits] + J IsingMatrix[SpinChainIsingMatrix[Qubits], Qubits]
 (* }}} *)
 End[] 
 EndPackage[]

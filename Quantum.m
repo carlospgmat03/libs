@@ -75,6 +75,9 @@ BlochNormalFormFromVectors::usage = "Density matrix in normal form, see arXiv:11
 StateToBlochBasisRepresentation::usage = "The so called Bloch matrix, see arXiv:1103.3189v1"
 Pauli::usage = "Pauli[0-3] gives Pauli Matrices according to wikipedia, and Pauli[{i1,i2,...,in}] gives Pauli[i1] \[CircleTimes]Pauli[i2] \[CircleTimes] ... \[CircleTimes] Pauli[in]"
 Paulib::usage = "Pauli[b_] gives b.Sigma, if b is a 3 entry vector"
+SumSigmaX::usage = "Matrix correspoding to \sum_j Pauli[1]_j"
+SumSigmaY::usage = "Matrix correspoding to \sum_j Pauli[2]_j"
+SumSigmaZ::usage = "Matrix correspoding to \sum_j Pauli[3]_j"
 ValidDensityMatrix::usage = "Test whether a given density matrix is valid"
 Dagger::usage = "Hermitian Conjugate"
 Concurrence::usage = "Concurrence of a 2 qubit density matrix density matrix"
@@ -374,6 +377,12 @@ Pauli[3]=Pauli[{3}]={{1,0}, {0,-1}};
 Pauli[Indices_List] := KroneckerProduct @@ (Pauli /@ Indices)
 (* }}} *)
 (* {{{ *) Paulib[{b1_,b2_,b3_}] := b1 Pauli[1]+ b2 Pauli[2]+ b3 Pauli[3]
+(* }}} *)
+(* {{{ *) SumSigmaX[Qubits_] := SumSigmaX[Qubits] = Table[If[DigitCount[BitXor[i - 1, j - 1], 2, 1] == 1, 1, 0], {i, Power[2, Qubits]}, {j, Power[2, Qubits]}]
+(* }}} *)
+(* {{{ *) SumSigmaY[Qubits_] := SumSigmaY[Qubits] = Table[ If[DigitCount[BitXor[i - 1, j - 1], 2, 1] == 1, If[i > j, I, -I], 0], {i, Power[2, Qubits]}, {j, Power[2, Qubits]}]
+(* }}} *)
+(* {{{ *) SumSigmaZ[Qubits_] := SumSigmaZ[Qubits] = DiagonalMatrix[ Table[Qubits - 2 DigitCount[i, 2, 1], {i, 0, Power[2, Qubits] - 1}]]
 (* }}} *)
 (* {{{ *) ValidDensityMatrix[Rho_?MatrixQ] := (Abs[Tr[Rho] - 1]<Power[10,-13] && 
 	Length[Select[# >= 0 & /@ Chop[Eigenvalues[Rho]], ! # &]] == 0)
