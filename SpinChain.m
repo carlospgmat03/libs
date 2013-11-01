@@ -13,13 +13,15 @@ ApplyChainStar::usage="ApplyChainStar[state_, Jenv_,Jint_, b_] Se hace la topolo
 ApplyIsingStar::usage="Se hace la topologia de una estrella, solo la parte de Ising"
 (* }}} *)
 (* {{{ Explicit Matrices *)
-IsingMatrix::usage="Get the matrix for the Ising Interaction Sigma_i Sigma_j, or for \sumSigma_i Sigma_j. In the first case, call as IsingMatrix[{IsingPosition1_Integer, IsingPosition2_Integer}, Qubits_Integer], and in the second,  IsingMatrix[IsingPositions_List, Qubits_Integer]"
+IsingMatrix::usage="Get the matrix for the Ising Interaction Sigma_i Sigma_j, or for sum Sigma_i Sigma_j. In the first case, call as IsingMatrix[{IsingPosition1_Integer, IsingPosition2_Integer}, Qubits_Integer], and in the second,  IsingMatrix[IsingPositions_List, Qubits_Integer]"
 SpinChainIsingMatrix::usage="The Ising matrix that has to come in the IsingMatrix routine, for a perdic spin chain. Call as SpinChainIsingMatrix[Qubits_]  "
-MatrixPauliMagneticField::usage="Matrix corresponding to the hamiltonian b.\sum \sigma_j"
+SpinGridIsingMatrix::usage="The Ising matrix that has to come in the IsingMatrix routine, for a toric spin grid. Call as SpinGridIsingMatrix[{nx_, ny_}]"
+MatrixPauliMagneticField::usage="Matrix corresponding to the hamiltonian b.sum sigma_j"
 HamiltonianMagenitcChain::usage="Matrix Corresponding to the continuous Periodic ising spin chain with magnetic field"
+HamiltonianMagenitcGrid::usage="Matrix Corresponding to the continuous toric ising grid chain with magnetic field"
 (* }}} *)
 (* }}} *)
-Begin["`Private`"] 
+Begin["Private`"] 
 (* {{{ Primitives*)
 (* {{{ *) ApplyMagnetickKick[state_?VectorQ, b_, Target_] := 
  Module[{RotationMatrix, statenew, i, pos},
@@ -100,8 +102,12 @@ If[IntegerQ[Qubits]==False,Print["Error: The state does not correspond to a inte
 IsingMatrix[{IsingPosition1_Integer, IsingPosition2_Integer}, Qubits_Integer] := Pauli[Table[ If[l == Qubits - IsingPosition1 || l == Qubits - IsingPosition2, 3, 0], {l, Qubits}]];
 IsingMatrix[IsingPositions_List, Qubits_Integer] := Module[{IsingPosition}, Sum[IsingMatrix[IsingPosition, Qubits], {IsingPosition, IsingPositions}]]
 SpinChainIsingMatrix[Qubits_] := Table[{Mod[i, Qubits], Mod[i + 1, Qubits]}, {i, 0, Qubits - 1}]
+
+SpinGridIsingMatrix[{nx_, ny_}] := Join[Table[{i, i + 1 + If[Mod[i, nx] == nx - 1, -nx, 0]}, {i, 0, nx ny - 1}], Table[{i, Mod[i + nx, nx ny]}, {i, 0, nx ny - 1}]]
+
 MatrixPauliMagneticField[MagneticField_, Qubits_] := MagneticField.{SumSigmaX[Qubits], SumSigmaY[Qubits], SumSigmaZ[Qubits]}
 HamiltonianMagenitcChain[MagneticField_, J_, Qubits_] := MatrixPauliMagneticField[MagneticField, Qubits] + J IsingMatrix[SpinChainIsingMatrix[Qubits], Qubits]
+HamiltonianMagenitcGrid[MagneticField_, J_, {nx_, ny_}] := MatrixPauliMagneticField[MagneticField, nx ny] + J IsingMatrix[SpinGridIsingMatrix[{nx, ny}]]
 (* }}} *)
 End[] 
 EndPackage[]

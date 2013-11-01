@@ -110,7 +110,7 @@ EvolvGate::usage="EvolvGate[Gate_, steps_, env_, state_]... Evoluciona cualquier
 MakeQuantumChannel::usage="MakeQuantumChannel[Gate_, steps_, env_] Donde Gate va de la forma Gate[#, otherparameters_]  donde debe ponerse # en el lugar donde Gate toma el estado"
 (* }}} *)
 (* }}} *)
-Begin["`Private`"] 
+Begin["Private`"] 
 (* {{{ Bitwise manipulation and basic math*)
 (* {{{ *) ExtractDigits[NumberIn_, LocationDigits_] := Module[{AuxArray, NumberOfDigits}, 
 	NumberOfDigits = IntegerLength[NumberIn, 2]; 
