@@ -158,7 +158,7 @@ namespace RMT{ // {{{ Implementation
   }
   itpp::vec RandomPUEspectrum_G(int const dim, double eigen){ //{{{
     itpp::vec temp(dim);
-    temp=2*eigen*(itpp::randn(dim)-0.5);
+    temp=eigen*(itpp::randn(dim));//Gaussian distribution with sigma = eigen
     return temp;
   }
   // }}}
