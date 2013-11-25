@@ -25,6 +25,7 @@ namespace itppextmath{ // {{{
     }
     return tmp;
   } // }}}
+  // number theoretical
 // Inquiry {{{
 template <class Num_T> int locateLargestAbs(const itpp::Vec<Num_T>& e){ // {{{
   int position=0;
@@ -287,6 +288,8 @@ itpp::cmat partial_trace(const itpp::cvec& state, int dim_leave){ // {{{
 itpp::cmat partial_trace_qubits(itpp::cvec state, int which){ // {{{
 //   std::cout << "@partial_trace_qubits 1" << std::endl;
   int size_rho=cfpmath::pow_2(cfpmath::BitCount(which));
+//   std::cout << "@partial_trace_qubits size_rho=" << size_rho 
+//     << ", which = " << which << std::endl;
   itpp::cmat reordered_state = Reorder_state_tensor_form(state, which), rho(size_rho,size_rho );
 //   std::cout << "@partial_trace_qubits 2" << itpp::norm(reordered_state) <<std::endl;
   for (int i1 =0; i1< size_rho; i1++){
@@ -1312,6 +1315,14 @@ itpp::vec BellState(int dim=4){// {{{
   tmp(0)=1;
   tmp(dim-1)=1;
   return tmp/sqrt(2.);
+}// }}}
+itpp::cvec BlochToQubit(double theta, double phi){// {{{
+  itpp::cvec tmp(2);
+  std::complex<double> I(0,1);
+  tmp.zeros();
+  tmp(0)=cos(theta/2);
+  tmp(1)=sin(theta/2)*exp(I*phi);
+  return tmp;
 }// }}}
 itpp::vec BellState(double theta){// {{{
   int dim=4;

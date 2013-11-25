@@ -76,7 +76,7 @@ EllipseCharacteristics::usage="Get center, angle of rotation and semiaxis of an 
 
 
 (* }}} *)
-Begin["`private`"];
+Begin["Private`"];
 
 (*  Geometry *)
 EllipseCharacteristics[poly_, vars_] :=  (* {{{ *)

@@ -17,6 +17,7 @@
   TCLAP::ValueArg<int> i2("","i2", "Second integer argument",false, 2,"int",cmd);
   TCLAP::ValueArg<int> i3("","i3", "Third integer argument",false, 1,"int",cmd);
   TCLAP::ValueArg<double> d1("","d1", "First double argument",false, 0.,"double",cmd);
+  TCLAP::ValueArg<double> d2("","d2", "Second double argument",false, 0.,"double",cmd);
   TCLAP::SwitchArg no_general_report("","no_general_report", "Print the general report", cmd);
 // }}}
 using namespace std;  
@@ -395,6 +396,12 @@ int main(int argc, char* argv[]){
       }
     } }// }}}
     cout << "Error total = " << total_error << endl; 
+      
+  // }}}
+  } else if (option == "test_bloch") { // {{{
+    double theta=d1.getValue();
+    double phi=d2.getValue();
+    cout << "Estado = " << BlochToQubit(theta,phi)<< endl; 
       
   // }}}
   } else if (option == "nichts") { // {{{
