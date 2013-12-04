@@ -1869,6 +1869,15 @@ void test_trAB(){ // {{{
 } // }}}
 //  }}}
 // Not yet ordered {{{
+itpp::cvec read_state(int d){ // {{{
+  itpp::cvec psi(d);
+  double x,y;
+  for (int j=0; j<d; j++){
+    std::cin >> x  >> y ;
+    psi(j)=x+std::complex<double>(0,1)*y;
+  }
+  return psi;
+} // }}}
 itpp::Vec<std::string> split_string(std::string sentence){// {{{
   // http://stackoverflow.com/questions/236129/c-how-to-split-a-string
   std::string word;
