@@ -11,14 +11,19 @@ void apply_ising_z(itpp::cvec&, itpp::vec&);
 void apply_ising_z(itpp::cvec&, double);
 void apply_ising_z(itpp::cvec&, double, int, int);
 void apply_ising_z_spectator(itpp::cvec&, double, double);
+void apply_ising_z_spectator_double_chain(itpp::cvec&, double, double, double, int);
 void apply_ising_z_vinayak(itpp::cvec&, double, double);
 void apply_ising_z_common_environment_chain(itpp::cvec&, double, double);
 void apply_common_environment_chain(itpp::cvec&, double, double, itpp::vec);
 void apply_chain(itpp::cvec& state, double J, itpp::vec magnetic_field);
 void apply_ising_star(itpp::cvec& , double , double );
+void apply_ising_star_double(itpp::cvec& , double , double, double, int);
+void apply_ising_star_double_closed(itpp::cvec& , double , double, double, int);
 void apply_ising_star_most(itpp::cvec& , double , double );
 void apply_kick_star(itpp::cvec& , itpp::vec , itpp::vec );
+void apply_kick_spectator_double_chain(itpp::cvec& , itpp::vec , itpp::vec, itpp::vec, int);
 void apply_kick_star_most(itpp::cvec& , itpp::vec , itpp::vec );
+
 itpp::cvec project_base_state(int, int, int);
 itpp::cvec apply_external_reflection(itpp::cvec&);
 itpp::cvec project_state_vertical_momentum(int , itpp::cvec& , int );
@@ -55,6 +60,24 @@ namespace spinchain{ // {{{
     apply_kick_star(state, magnetic_field, local_magnetic_field);
     return;
   } //}}}
+
+void apply_star_double(itpp::cvec& state, double J, itpp::vec magnetic_field, double Jcoupling1,double Jcoupling2, itpp::vec local_magnetic_field,int qubits_env1){// {{{
+   
+    apply_ising_star_double(state, J, Jcoupling1,Jcoupling2,qubits_env1);
+    apply_kick_star(state, magnetic_field, local_magnetic_field);
+    return;
+  } //}}}
+
+void apply_star_double_closed(itpp::cvec& state, double J, itpp::vec magnetic_field, double Jcoupling1,double Jcoupling2, itpp::vec local_magnetic_field,int qubits_env1){// {{{
+   
+    apply_ising_star_double_closed(state, J, Jcoupling1,Jcoupling2,qubits_env1);
+    apply_kick_star(state, magnetic_field, local_magnetic_field);
+    return;
+  } //}}}
+
+
+
+
   void apply_chain(itpp::cvec& state, double J, itpp::vec magnetic_field){// {{{
     apply_ising_z(state, J);
     apply_magnetic_kick(state, magnetic_field);
@@ -65,6 +88,14 @@ namespace spinchain{ // {{{
     apply_magnetic_kick(state, magnetic_field);
     return;
   } //}}}
+
+//esto tambien:
+  void apply_spectator_double_chain(itpp::cvec& state, double Jenv, double Jcoupling1, double Jcoupling2,int qubits_env1, itpp::vec magnetic_field_central, itpp::vec magnetic_field_env1, itpp::vec magnetic_field_env2){// {{{
+    apply_ising_z_spectator_double_chain(state, Jenv, Jcoupling1,Jcoupling2,qubits_env1);
+    apply_kick_spectator_double_chain(state, magnetic_field_central, magnetic_field_env1, magnetic_field_env2, qubits_env1);
+    return;
+  } //}}}
+
   void apply_vinayak(itpp::cvec& state, double Jenv, double Jcoupling, itpp::vec magnetic_field){// {{{
     apply_ising_z_vinayak(state, Jenv, Jcoupling);
     apply_magnetic_kick(state, magnetic_field);
@@ -101,6 +132,16 @@ namespace spinchain{ // {{{
     apply_ising_z(state, J);
     return;
   } // }}}
+//intento mio:
+ void apply_ising_z_spectator_double_chain(itpp::cvec& state, double Jenv, double Jcoupling1,double Jcoupling2,int qubits_env1){// {{{
+    int qubits=cfpmath::log_base_2(state.size());
+    itpp::vec J(qubits);
+    J=Jenv;
+    J(0)=0.; J(1)=Jcoupling1; J(qubits_env1+1)=Jcoupling2; J(qubits-1)=0.;
+    apply_ising_z(state, J);
+    return;
+  } // }}}
+
   void apply_ising_z_common_environment_chain(itpp::cvec& state, double Jenv, double Jcoupling){// {{{
     //   std::cout << "la j es " << J <<" y la constante es " << expmij << std::endl;
     int qubits=cfpmath::log_base_2(state.size());
@@ -134,6 +175,25 @@ namespace spinchain{ // {{{
     }
     return;
   } // }}}
+  void apply_kick_spectator_double_chain(itpp::cvec& state, itpp::vec magnetic_field_central,itpp::vec magnetic_field_env1,
+itpp::vec magnetic_field_env2, int qubits_env1){// {{{
+    int qubits=cfpmath::log_base_2(state.size());
+    
+    // Kick in the central system: a Bell pair
+    apply_magnetic_kick(state,magnetic_field_central,0);
+    apply_magnetic_kick(state,magnetic_field_central,1);
+    // kick in the near environment
+    for (int Position=2; Position<qubits_env1+2; Position++){
+      apply_magnetic_kick(state,magnetic_field_env1,Position);
+    }
+    // kick in the far environment
+    for (int Position=qubits_env1+2; Position<qubits; Position++){
+      apply_magnetic_kick(state,magnetic_field_env2,Position);
+    }
+
+    return;
+  } // }}}
+
   void apply_magnetic_kick(itpp::cvec& state, itpp::vec magnetic_field){// {{{
     int qubits=cfpmath::log_base_2(state.size());
     for (int Position=0; Position<qubits; Position++){
@@ -174,6 +234,65 @@ namespace spinchain{ // {{{
 //     std::cout << "Step 4 " << state << std::endl;
     return;
   } // }}}
+
+
+
+void apply_ising_star_double(itpp::cvec& state, double J, double Jcoupling1,double Jcoupling2, int qubits_env1){// {{{
+   
+    int qubits=cfpmath::log_base_2(state.size());
+    
+      apply_ising_z(state, Jcoupling1, 0, 1);
+  
+    for (int Position=1; Position<qubits-1; Position++){
+
+
+      apply_ising_z(state, J, Position, (Position+1)%qubits);
+
+    }
+    apply_ising_z(state, Jcoupling2, qubits_env1, qubits_env1+1);
+    apply_ising_z(state, Jcoupling2, qubits-1, 1);
+    return;
+  } // }}}
+
+ void apply_ising_star_double_closed(itpp::cvec& state, double J, double Jcoupling1,double Jcoupling2,int qubits_env1){// {{{
+//     std::cout << "En apply_ising_star J_interaction="<<J_interaction << std::endl;
+    int qubits=cfpmath::log_base_2(state.size());
+    // Interaction of the central qubit with fthe rest
+//     std::cout << "Step 1 " << state << std::endl;
+    for (int Position=1; Position<qubits_env1; Position++){
+//       std::cout << "Apply J_interaction between " <<  itpp::vec_2(0, Position) << std::endl ;
+      apply_ising_z(state, Jcoupling1, 0, Position);
+    }
+//     std::cout << "Step 2 " << state << std::endl;
+    for (int Position=1; Position<qubits_env1-1; Position++){
+//       std::cout << "Apply J  between " <<  itpp::vec_2(Position, (Position+1)%qubits) << std::endl ;
+      apply_ising_z(state, J, Position, (Position+1)%qubits_env1);
+
+    }
+//     std::cout << "Step 3 " << state << std::endl;
+    apply_ising_z(state, J, qubits_env1-1, 1);
+//     std::cout << "Step 4 " << state << std::endl;
+   
+    for (int Position=1; Position<qubits-qubits_env1; Position++){
+//       std::cout << "Apply J_interaction between " <<  itpp::vec_2(0, Position) << std::endl ;
+      apply_ising_z(state, Jcoupling2, Position, Position+qubits_env1);
+    }
+    
+    for (int Position=qubits_env1+1; Position<qubits-qubits_env1-1; Position++){
+//       std::cout << "Apply J  between " <<  itpp::vec_2(Position, (Position+1)%qubits) << std::endl ;
+      apply_ising_z(state, J, Position, (Position+1)%qubits);
+
+    }
+    
+    apply_ising_z(state, J, qubits-1, qubits_env1+1);
+//     std::cout << "Step 4 " << state << std::endl;
+   
+
+
+ return;
+  } // }}}
+
+
   void apply_ising_z(itpp::cvec& state, double J){// {{{
     int qubits=cfpmath::log_base_2(state.size());
     itpp::vec Jv(qubits);
@@ -186,7 +305,7 @@ namespace spinchain{ // {{{
     int qubits=cfpmath::log_base_2(state.size());
     for (int i=0; i<qubits; i++){
       apply_ising_z(state, J(i), i, (i+1)%qubits);
-    }
+    } 
     return;
   } // }}}
   // }}}
