@@ -158,7 +158,7 @@ namespace RMT{ // {{{ Implementation
   }
   itpp::vec RandomPUEspectrum_G(int const dim, double eigen){ //{{{
     itpp::vec temp(dim);
-    temp=2*eigen*(itpp::randn(dim)-0.5);
+    temp=eigen*(itpp::randn(dim));//Gaussian distribution with sigma = eigen
     return temp;
   }
   // }}}
@@ -166,8 +166,6 @@ namespace RMT{ // {{{ Implementation
     itpp::vec lambda=RandomPUEspectrum_G(dim, eigen);
     itpp::cmat U=RandomCUE(dim);
     return itppextmath::UDiagUdagger(U, lambda);
-//     temp=itpp::randu(dim)-0.5;
-//     return temp;
   }
   // }}}
   // }}}
@@ -251,9 +249,13 @@ namespace RMT{ // {{{ Implementation
   }
   // }}}
   itpp::Mat<std::complex<double> > RandomCUE(int const dim){ //{{{
+    itpp::Mat<std::complex<double> > H;
+    H = RandomGUEDeltaOne(dim);
+
     itpp::Mat<std::complex<double> > U(dim,dim);
     itpp::Vec<double> eigenvalues(dim);
-    FlatSpectrumGUE(U, eigenvalues);
+    eig_sym(H, eigenvalues, U);
+//     FlatSpectrumGUE(U, eigenvalues);
     //     return exp( 2*itpp::pi*std::complex<double>(0.,1.)*  itpp:randu())*U;
     return exp(2.*itpp::pi*std::complex<double>(0.,1.) *itpp::randu() )*U;
   }

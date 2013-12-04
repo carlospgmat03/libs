@@ -288,6 +288,8 @@ itpp::cmat partial_trace(const itpp::cvec& state, int dim_leave){ // {{{
 itpp::cmat partial_trace_qubits(itpp::cvec state, int which){ // {{{
 //   std::cout << "@partial_trace_qubits 1" << std::endl;
   int size_rho=cfpmath::pow_2(cfpmath::BitCount(which));
+//   std::cout << "@partial_trace_qubits size_rho=" << size_rho 
+//     << ", which = " << which << std::endl;
   itpp::cmat reordered_state = Reorder_state_tensor_form(state, which), rho(size_rho,size_rho );
 //   std::cout << "@partial_trace_qubits 2" << itpp::norm(reordered_state) <<std::endl;
   for (int i1 =0; i1< size_rho; i1++){
@@ -1314,6 +1316,14 @@ itpp::vec BellState(int dim=4){// {{{
   tmp(dim-1)=1;
   return tmp/sqrt(2.);
 }// }}}
+itpp::cvec BlochToQubit(double theta, double phi){// {{{
+  itpp::cvec tmp(2);
+  std::complex<double> I(0,1);
+  tmp.zeros();
+  tmp(0)=cos(theta/2);
+  tmp(1)=sin(theta/2)*exp(I*phi);
+  return tmp;
+}// }}}
 itpp::vec BellState(double theta){// {{{
   int dim=4;
   itpp::vec tmp(dim);
@@ -1874,6 +1884,15 @@ void test_trAB(){ // {{{
 } // }}}
 //  }}}
 // Not yet ordered {{{
+itpp::cvec read_state(int d){ // {{{
+  itpp::cvec psi(d);
+  double x,y;
+  for (int j=0; j<d; j++){
+    std::cin >> x  >> y ;
+    psi(j)=x+std::complex<double>(0,1)*y;
+  }
+  return psi;
+} // }}}
 itpp::Vec<std::string> split_string(std::string sentence){// {{{
   // http://stackoverflow.com/questions/236129/c-how-to-split-a-string
   std::string word;
