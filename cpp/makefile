@@ -1,5 +1,5 @@
 #CXXFLAGS=-O
-include ~/makefile
+-include ~/makefile
 # Configuration details. Adjust to your needs with 
 # LOGNAME and, for example, ifeq ($(HOSTNAME),jesus) 
 LDLIBS = -litpp
