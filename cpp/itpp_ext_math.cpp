@@ -1411,7 +1411,6 @@ void apply_sigma(itpp::cvec& state, int Pauli_i, int PositionQubit){ // {{{
   } 
   return;
 } // }}}
-
 itpp:: cvec apply_sum_sigma_x(itpp::cvec& state){ // {{{
 // Applies the operator \sum_i \sigma_x^i to state
 itpp:: cvec psi=state,new_state=itpp::zeros_c(state.size());
@@ -1424,8 +1423,6 @@ for(int i=0;i<qubits;i++){
 }
   return new_state;
 } // }}}
-
-
 void apply_gate(itpp::cvec& state, int nwhich, itpp::cmat gate){// {{{
   // This gate has to be applied with care. Notice for example that
   // with nwhich=3=11, the gate XY and YX are different. We are assuming
