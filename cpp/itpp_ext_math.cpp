@@ -1411,17 +1411,17 @@ void apply_sigma(itpp::cvec& state, int Pauli_i, int PositionQubit){ // {{{
   } 
   return;
 } // }}}
-itpp:: cvec apply_sum_sigma_x(itpp::cvec& state){ // {{{
-// Applies the operator \sum_i \sigma_x^i to state
-itpp:: cvec psi=state,new_state=itpp::zeros_c(state.size());
-int qubits=cfpmath::log_base_2(state.size());
-for(int i=0;i<qubits;i++){
-	apply_sigma_x(state,i);
-	new_state=new_state+state;
-
-	state=psi;
-}
-  return new_state;
+void apply_sum_sigma_x(itpp::cvec& state){ // {{{
+  // Applies the operator \sum_i \sigma_x^i to state
+  itpp:: cvec state_orig=state, new_state=itpp::zeros_c(state.size());
+  int qubits=cfpmath::log_base_2(state.size());
+  for(int i=0;i<qubits;i++){
+    apply_sigma_x(state_orig,i);
+    new_state=new_state+state_orig;
+    state_orig=state;
+  }
+  state=new_state;
+  return;
 } // }}}
 void apply_gate(itpp::cvec& state, int nwhich, itpp::cmat gate){// {{{
   // This gate has to be applied with care. Notice for example that

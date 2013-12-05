@@ -104,14 +104,10 @@ int main(int argc, char* argv[]){
     for (int i=0; i<d; i++){
         cin >> x  >> y ;
         psi(i)=x+std::complex<double>(0,1)*y;
-//         cout << rho(i,j) << endl;
     }
-//     cout << rho << "\n";
-//     cvec state=RandomState(d); rho=Proyector(state);
-    psip = apply_sum_sigma_x(psi);
-//     cout << rho_A << "\n";
+    apply_sum_sigma_x(psi);
     for (int i=0; i<d; i++){
-        cout << real(psip(i)) << " " << imag(psip(i)) <<endl;
+        cout << real(psi(i)) << " " << imag(psi(i)) <<endl;
     }
   // }}}
   } else if (option == "test_reverse_bits") { // {{{
