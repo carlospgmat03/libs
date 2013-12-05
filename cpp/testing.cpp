@@ -97,6 +97,23 @@ int main(int argc, char* argv[]){
       }
     }
   // }}}
+  } else if (option == "test_sum_sigma_x") { // {{{
+    int qubits=i1.getValue(); int d=pow_2(qubits); 
+    double x,y;
+    cvec psi(d), psip;
+    for (int i=0; i<d; i++){
+        cin >> x  >> y ;
+        psi(i)=x+std::complex<double>(0,1)*y;
+//         cout << rho(i,j) << endl;
+    }
+//     cout << rho << "\n";
+//     cvec state=RandomState(d); rho=Proyector(state);
+    psip = apply_sum_sigma_x(psi);
+//     cout << rho_A << "\n";
+    for (int i=0; i<d; i++){
+        cout << real(psip(i)) << " " << imag(psip(i)) <<endl;
+    }
+  // }}}
   } else if (option == "test_reverse_bits") { // {{{
     cout << reverse_bits(i1.getValue(), i2.getValue()) << endl ;
   // }}}
