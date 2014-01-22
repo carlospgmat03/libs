@@ -93,21 +93,21 @@ Begin["Private`"]
   Qubits = Log[2, Length[state]];
 If[IntegerQ[Qubits]==False,Print["Error: The state does not correspond to a integer number of qubits"];Abort[]];
   statenew=state;
-  statenew = ApplyIsingStarQubitEnvironment[statenew, Jint]
-  statenew = ApplyIsingStarQubitEnvironment[statenew, Jenv]
+  statenew = ApplyIsingStarEnvironment[statenew, Jenv]
+  statenew = ApplyIsingStarInteractionQubitEnvironment[statenew, Jint]
   statenew
   ];
 (* }}} *)
-(* {{{ *) ApplyIsingStarInternalInteraction[state_?VectorQ, Jenv_, Jint_] := Module[{Qubits, statenew, QubitToAdress, q},
+(* {{{ *) ApplyIsingStarEnvironment[state_?VectorQ, Jenv_] := Module[{Qubits, statenew, QubitToAdress, q},
   Qubits = Log[2, Length[state]];
 If[IntegerQ[Qubits]==False,Print["Error: The state does not correspond to a integer number of qubits"];Abort[]];
   statenew=state;
-  For[q=1, q<Qubits-1, q++, statenew = ApplyIsing[statenew, Jint, q , q+1]; ];
-  statenew = ApplyIsing[statenew, Jint, Qubits-1 , 1]; 
+  For[q=1, q<Qubits-1, q++, statenew = ApplyIsing[statenew, Jenv, q , q+1]; ];
+  statenew = ApplyIsing[statenew, Jenv, Qubits-1 , 1]; 
   statenew
   ];
 (* }}} *)
-(* {{{ *) ApplyIsingStarQubitEnvironment[state_?VectorQ, Jint_] := Module[{Qubits, statenew, QubitToAdress, q},
+(* {{{ *) ApplyIsingStarInteractionQubitEnvironment[state_?VectorQ, Jint_] := Module[{Qubits, statenew, QubitToAdress, q},
   Qubits = Log[2, Length[state]];
 If[IntegerQ[Qubits]==False,Print["Error: The state does not correspond to a integer number of qubits"];Abort[]];
   statenew=state;
