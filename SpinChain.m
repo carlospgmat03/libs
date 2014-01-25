@@ -11,6 +11,9 @@ ApplyInverseChain::usage="Se hace la topologia de una cadena pero hacia atras en
 ApplyCommonEnvironment::usage="Se refiere a la topologia (a) del PRL de n-body Bell en PRA."
 ApplyChainStar::usage="ApplyChainStar[state_, Jenv_,Jint_, b_] Se hace la topologia de la estrella con el magnetic kick"
 ApplyIsingStar::usage="Se hace la topologia de una estrella, solo la parte de Ising"
+ApplyIsingStarEnvironment::usage="Se hace la topologia de una estrella, solo la parte de Ising, en el environment"
+ApplyMagnetickKickStarEnvironment::usage="Se hace el kick pero solo en los qubits que son del environment"
+ApplyIsingStarInteractionQubitEnvironment::usage="Se hace el kick pero solo la interaccion con el  environment"
 (* }}} *)
 (* {{{ Explicit Matrices *)
 IsingMatrix::usage="Get the matrix for the Ising Interaction Sigma_i Sigma_j, or for sum Sigma_i Sigma_j. In the first case, call as IsingMatrix[{IsingPosition1_Integer, IsingPosition2_Integer}, Qubits_Integer], and in the second,  IsingMatrix[IsingPositions_List, Qubits_Integer]"
@@ -38,6 +41,15 @@ Begin["Private`"]
   Qubits = Log[2, Length[state]];
   statenew = state;
   For[QubitToAdress = 0, QubitToAdress < Qubits, QubitToAdress++, 
+   (*Print["en el loop QubitToAdress="<>ToString[QubitToAdress]];*)
+   statenew = ApplyMagnetickKick[statenew, b, QubitToAdress]];
+  statenew]
+(* }}} *)
+(* {{{ *) ApplyMagnetickKickStarEnvironment[state_?VectorQ, b_] := 
+ Module[{Qubits, statenew, QubitToAdress},
+  Qubits = Log[2, Length[state]];
+  statenew = state;
+  For[QubitToAdress = 1, QubitToAdress < Qubits, QubitToAdress++, 
    (*Print["en el loop QubitToAdress="<>ToString[QubitToAdress]];*)
    statenew = ApplyMagnetickKick[statenew, b, QubitToAdress]];
   statenew]
