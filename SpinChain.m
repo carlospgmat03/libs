@@ -9,6 +9,7 @@ ApplyIsingChain::usage="Se hace la topologia de una cadena. Solo la parte de Isi
 ApplyChain::usage="Se hace la topologia de una cadena."
 ApplyInverseChain::usage="Se hace la topologia de una cadena pero hacia atras en el tiempo."
 ApplyCommonEnvironment::usage="Se refiere a la topologia (a) del PRL de n-body Bell en PRA."
+ApplyDephasingChain::usage="Se hace la topologia de una cadena que solo hace dephasing"
 ApplyChainStar::usage="ApplyChainStar[state_, Jenv_,Jint_, b_] Se hace la topologia de la estrella con el magnetic kick"
 ApplyIsingStar::usage="Se hace la topologia de una estrella, solo la parte de Ising"
 ApplyIsingStarEnvironment::usage="Se hace la topologia de una estrella, solo la parte de Ising, en el environment"
@@ -94,6 +95,17 @@ Begin["Private`"]
   J[[2]] = Jcoupling;
   J[[-1]] = Jcoupling;
   ApplyIsing[ApplyMagnetickKick[state, b], J]]
+(* }}} *)
+(* {{{ *) ApplyDephasingChain[psi0_, Delta_, Jenv_, benv_, Jinteraction_] := Module[{statenew},
+  statenew = psi0;
+ (* En el qubit solo se hace en direccion z, en el resto de la cadena
+    donde sea, para que sea integrable/caotica. 
+ *)
+ statenew = ApplyMagnetickKick[statenew, {0, 0, Delta/2}, 0];
+ statenew = ApplyMagnetickKickStarEnvironment[statenew, benv];
+ (*U2 interno del env, las ising y la interaccion con el medio*)
+ statenew = ApplyIsingStar[statenew, Jenv, Jinteraction];
+ statenew]
 (* }}} *)
 (* {{{ *) ApplyChainStar[state_?VectorQ, Jenv_,Jint_, b_] := Module[{statenew},
  statenew = state;
