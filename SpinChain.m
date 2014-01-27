@@ -98,13 +98,13 @@ Begin["Private`"]
 (* }}} *)
 (* {{{ *) ApplyDephasingChain[psi0_, Delta_, Jenv_, benv_, Jinteraction_] := Module[{statenew},
   statenew = psi0;
+ (*U2 interno del env, las ising y la interaccion con el medio*)
+ statenew = ApplyIsingStar[statenew, Jenv, Jinteraction];
  (* En el qubit solo se hace en direccion z, en el resto de la cadena
     donde sea, para que sea integrable/caotica. 
  *)
  statenew = ApplyMagnetickKick[statenew, {0, 0, Delta/2}, 0];
  statenew = ApplyMagnetickKickStarEnvironment[statenew, benv];
- (*U2 interno del env, las ising y la interaccion con el medio*)
- statenew = ApplyIsingStar[statenew, Jenv, Jinteraction];
  statenew]
 (* }}} *)
 (* {{{ *) ApplyChainStar[state_?VectorQ, Jenv_,Jint_, b_] := Module[{statenew},

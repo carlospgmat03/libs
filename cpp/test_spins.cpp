@@ -23,6 +23,7 @@ using namespace spinchain;
   TCLAP::ValueArg<int> position2("","position2", "The position of something",false, 3,"int",cmd);
   TCLAP::ValueArg<double> Ising("","ising_z", "Ising interaction in the z-direction",false, 1.4,"double",cmd);
   TCLAP::ValueArg<double> coupling("","coupling", "Ising interaction for the coupling",false, 0.01,"double",cmd);
+  TCLAP::ValueArg<double> Delta("","Delta", "Energy separation",false, 1,"double",cmd);
   TCLAP::ValueArg<double> bx("","bx", "Magnetic field in x direction",false, 1.4,"double",cmd);
   TCLAP::ValueArg<double> by("","by", "Magnetic field in y direction",false, 1.4,"double",cmd);
   TCLAP::ValueArg<double> bz("","bz", "Magnetic field in z direction",false, 1.4,"double",cmd);
@@ -161,6 +162,20 @@ cout <<norm(state-state_out_eduardo) << endl;
     myReadFile.close();
     
     apply_ising_z(state,Ising.getValue(),position.getValue(), position2.getValue());
+    for (int i=0; i<dim; i++){
+      cout << real(state(i)) << " " << real(-Im*state(i)) << endl;
+    }//}}}
+  } else if(option=="test_dephasing_chain") {// {{{
+    int dim=pow_2(qubits.getValue());
+    cvec state(dim);
+    double x,y;
+    ifstream myReadFile;
+    myReadFile.open("/tmp/estado.dat");
+    for (int i=0; i<dim; i++){ myReadFile >> x >> y ; state(i) = complex<double>(x,y) ; }
+    myReadFile.close();
+    vec b_env(3); b_env(0)=bx.getValue(); b_env(1)=by.getValue(); b_env(2)=bz.getValue();
+    double J_interaction_qubit_env=coupling.getValue();
+    apply_dephasing_chain(state,Ising.getValue(),b_env, J_interaction_qubit_env, Delta.getValue());
     for (int i=0; i<dim; i++){
       cout << real(state(i)) << " " << real(-Im*state(i)) << endl;
     }//}}}

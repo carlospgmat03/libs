@@ -60,24 +60,30 @@ namespace spinchain{ // {{{
     apply_kick_star(state, magnetic_field, local_magnetic_field);
     return;
   } //}}}
-
-void apply_star_double(itpp::cvec& state, double J, itpp::vec magnetic_field, double Jcoupling1,double Jcoupling2, itpp::vec local_magnetic_field,int qubits_env1){// {{{
+  void apply_star_double(itpp::cvec& state, double J, itpp::vec magnetic_field, double Jcoupling1,double Jcoupling2, itpp::vec local_magnetic_field,int qubits_env1){// {{{
    
     apply_ising_star_double(state, J, Jcoupling1,Jcoupling2,qubits_env1);
     apply_kick_star(state, magnetic_field, local_magnetic_field);
     return;
   } //}}}
-
-void apply_star_double_closed(itpp::cvec& state, double J, itpp::vec magnetic_field, double Jcoupling1,double Jcoupling2, itpp::vec local_magnetic_field,int qubits_env1){// {{{
+  void apply_star_double_closed(itpp::cvec& state, double J, itpp::vec magnetic_field, double Jcoupling1,double Jcoupling2, itpp::vec local_magnetic_field,int qubits_env1){// {{{
    
     apply_ising_star_double_closed(state, J, Jcoupling1,Jcoupling2,qubits_env1);
     apply_kick_star(state, magnetic_field, local_magnetic_field);
     return;
   } //}}}
-
-
-
-
+  void apply_dephasing_chain(itpp::cvec& state, double Jenv, itpp::vec magnetic_field_env,  double  J_interaction_qubit_env, double Delta){// {{{
+// ApplyDephasingChain[psi0_, Delta_, Jenv_, benv_, Jinteraction_] 
+//  statenew = ApplyMagnetickKick[statenew, {0, 0, Delta/2}, 0];
+//  statenew = ApplyMagnetickKickStarEnvironment[statenew, benv];
+//  (*U2 interno del env, las ising y la interaccion con el medio*)
+//  statenew = ApplyIsingStar[statenew, Jenv, Jinteraction];
+    itpp::vec bz(3);
+    bz=0.;
+    bz(2)=Delta/2;
+    apply_star(state, Jenv, magnetic_field_env, J_interaction_qubit_env, bz);
+    return;
+  } //}}}
   void apply_chain(itpp::cvec& state, double J, itpp::vec magnetic_field){// {{{
     apply_ising_z(state, J);
     apply_magnetic_kick(state, magnetic_field);
@@ -88,7 +94,6 @@ void apply_star_double_closed(itpp::cvec& state, double J, itpp::vec magnetic_fi
     apply_magnetic_kick(state, magnetic_field);
     return;
   } //}}}
-
 //esto tambien:
   void apply_spectator_double_chain(itpp::cvec& state, double Jenv, double Jcoupling1, double Jcoupling2,int qubits_env1, itpp::vec magnetic_field_central, itpp::vec magnetic_field_env1, itpp::vec magnetic_field_env2){// {{{
     apply_ising_z_spectator_double_chain(state, Jenv, Jcoupling1,Jcoupling2,qubits_env1);
