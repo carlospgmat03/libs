@@ -105,8 +105,8 @@ Begin["Private`"]
   Qubits = Log[2, Length[state]];
 If[IntegerQ[Qubits]==False,Print["Error: The state does not correspond to a integer number of qubits"];Abort[]];
   statenew=state;
-  statenew = ApplyIsingStarEnvironment[statenew, Jenv]
-  statenew = ApplyIsingStarInteractionQubitEnvironment[statenew, Jint]
+  statenew = ApplyIsingStarEnvironment[statenew, Jenv];
+  statenew = ApplyIsingStarInteractionQubitEnvironment[statenew, Jint];
   statenew
   ];
 (* }}} *)
