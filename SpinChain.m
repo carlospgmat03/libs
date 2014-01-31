@@ -103,8 +103,8 @@ Begin["Private`"]
  (* En el qubit solo se hace en direccion z, en el resto de la cadena
     donde sea, para que sea integrable/caotica. 
  *)
- statenew = ApplyMagnetickKick[statenew, {0, 0, Delta/2}, 0];
  statenew = ApplyMagnetickKickStarEnvironment[statenew, benv];
+ statenew = ApplyMagnetickKick[statenew, {0, 0, Delta/2}, 0];
  statenew]
 (* }}} *)
 (* {{{ *) ApplyChainStar[state_?VectorQ, Jenv_,Jint_, b_] := Module[{statenew},
