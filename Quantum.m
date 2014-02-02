@@ -454,10 +454,8 @@ Proyector[psi_] := Proyector[psi, psi]
 (* }}} *)
 (* {{{  *) BlochSphereToState[CartesianCoordinatesOfPoint_List] :=  
  Module[{r, \[Theta], \[Phi]}, 
-  r = CoordinatesFromCartesian[CartesianCoordinatesOfPoint, Spherical]; \[Theta] = 
-   r[[2]]; \[Phi] = r[[3]]; {Cos[\[Theta]/2], 
-   Exp[I \[Phi]] Sin[\[Theta]/2]}]
-
+  r = CoordinateTransform["Cartesian"->"Spherical", CartesianCoordinatesOfPoint]; 
+	\[Theta] = r[[2]]; \[Phi] = r[[3]]; {Cos[\[Theta]/2], Exp[I \[Phi]] Sin[\[Theta]/2]}]
 (* }}} *)
 (* {{{  *) QuantumMutualInformationReducedEntropies[r_?MatrixQ] := Module[{ra, rb},
   ra = PartialTrace[r, 1]; rb = PartialTrace[r, 2];
