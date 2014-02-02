@@ -1,3 +1,5 @@
+(* ::Package:: *)
+
 (* {{{ *) BeginPackage["Quantum`"]
 (* {{{ TODO
 Crear un swap matrix en el mismo espiritu que la CNOT. 
@@ -73,6 +75,7 @@ matrix to superoperator space using the Pauli matrices and tensor products"
 BlochNormalFormVectors::usage = "Vectors to calculate normal form, see arXiv:1103.3189v1"
 BlochNormalFormFromVectors::usage = "Density matrix in normal form, see arXiv:1103.3189v1"
 StateToBlochBasisRepresentation::usage = "The so called Bloch matrix, see arXiv:1103.3189v1"
+CoherentState::usage = "CoherentState[\[Theta]_, \[Phi]_, n_] Makes a Coherent Spin state where the inputs are the Bloch angles and the number of qubits"
 Pauli::usage = "Pauli[0-3] gives Pauli Matrices according to wikipedia, and Pauli[{i1,i2,...,in}] gives Pauli[i1] \[CircleTimes]Pauli[i2] \[CircleTimes] ... \[CircleTimes] Pauli[in]"
 Paulib::usage = "Pauli[b_] gives b.Sigma, if b is a 3 entry vector"
 SumSigmaX::usage = "Matrix correspoding to sum_j Pauli[1]_j"
@@ -108,6 +111,7 @@ AveragePurityChannelPauliBasis::usage = "Calculates the average final purity giv
 BlochEllipsoid::usage = "BlochEllipsoid[Cha_] Show the deformation of BlochSphere for a qubit channel in the pauli basis"
 EvolvGate::usage="EvolvGate[Gate_, steps_, env_, state_]... Evoluciona cualquier estado aplicando un numero steps_ de veces la compuerta Gate de  la forma Gate[#, otherparameters_] donde debe ponerse # en el lugar donde Gate toma el estado"
 MakeQuantumChannel::usage="MakeQuantumChannel[Gate_, steps_, env_] Donde Gate va de la forma Gate[#, otherparameters_]  donde debe ponerse # en el lugar donde Gate toma el estado"
+
 (* }}} *)
 (* }}} *)
 Begin["Private`"] 
@@ -183,7 +187,7 @@ Options[GUEMember] = {Normalization -> "Default"};
 Options[GOEMember] = {Normalization -> "Default"};
 
 (* }}} *)
-(* {{{ *) CUEMember[n_] := Transpose[ Inner[Times, Table[Exp[\[ImaginaryI] Random[Real, 2 \[Pi]]], {n}], 
+(* {{{ *) CUEMember[n_] := Transpose[ Inner[Times, Table[Exp[I Random[Real, 2 \[Pi]]], {n}], 
 	Eigenvectors[GUEMember[n]], List]]
 
 
@@ -302,7 +306,7 @@ Triangular[n_] := n (n + 1)/2
   eks = Transpose[
      Sort[Transpose[Eigensystem[F]], 
       Abs[#1[[1]] - 1] < Abs[#2[[1]] - 1] &]][[2]];
-  Exp[\[ImaginaryI] (Arg[psi[[1]]] - Arg[eks[[1, 1]]])] #/Norm[#] & /@
+  Exp[I (Arg[psi[[1]]] - Arg[eks[[1, 1]]])] #/Norm[#] & /@
     eks]
 (* }}} *)
 (* {{{  *) GetMatrixForm[Gate_, Qubits_] := Transpose[Gate /@ IdentityMatrix[Power[2, Qubits]]]
@@ -368,6 +372,11 @@ ControlNot[QubitControl_Integer, QubitTarget_Integer, NumeroACambiar_Integer] :=
 
 (* }}} *)
 (* {{{  *) StateToBlochBasisRepresentation[r_?MatrixQ] := Table[Tr[r.Pauli[{i, j}]], {i, 0, 3}, {j, 0, 3}]
+(* }}} *)
+(* {{{ *) CoherentState[\[Theta]_, \[Phi]_, n_] := 
+ N[Flatten[
+   tensorPower[{Cos[\[Theta]/2], Exp[I \[Phi]] Sin[\[Theta]/2]}, n], 
+   1]]
 (* }}} *)
 (* {{{ Pauli matrices*)  
 Pauli[0]=Pauli[{0}]={{1,0}, {0,1}}; 
