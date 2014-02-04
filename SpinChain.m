@@ -1,3 +1,5 @@
+(* ::Package:: *)
+
 (* {{{ *) BeginPackage["SpinChain`",{"Carlos`", "Quantum`"}]
 (* {{{ Primitives *)
 ApplyMagnetickKick::usage = "ApplyMagnetickKick[state_, b_, Target_] or ApplyMagnetickKick[state_, b_]"
@@ -9,7 +11,7 @@ ApplyIsingChain::usage="Se hace la topologia de una cadena. Solo la parte de Isi
 ApplyChain::usage="Se hace la topologia de una cadena."
 ApplyInverseChain::usage="Se hace la topologia de una cadena pero hacia atras en el tiempo."
 ApplyCommonEnvironment::usage="Se refiere a la topologia (a) del PRL de n-body Bell en PRA."
-ApplyDephasingChain::usage="Se hace la topologia de una cadena que solo hace dephasing"
+ApplyDephasingChain::usage="ApplyDephasingChain[psi0_, Delta_, Jenv_, benv_, Jinteraction_] Se hace la topologia de una cadena que solo hace dephasing"
 ApplyChainStar::usage="ApplyChainStar[state_, Jenv_,Jint_, b_] Se hace la topologia de la estrella con el magnetic kick"
 ApplyIsingStar::usage="Se hace la topologia de una estrella, solo la parte de Ising"
 ApplyIsingStarEnvironment::usage="Se hace la topologia de una estrella, solo la parte de Ising, en el environment"
