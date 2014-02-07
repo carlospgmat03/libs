@@ -148,7 +148,7 @@ If[IntegerQ[Qubits]==False,Print["Error: The state does not correspond to a inte
   statenew=state;
 statenew=ApplyIsing[statenew, J10, 0, 1];
   For[q=2, q<Qubits, q++, 
-	statenew = ApplyIsing[statenew, J, 0 , q]; 
+	statenew = ApplyIsing[statenew, J, q , q + 1]; 
 	];
   statenew = ApplyIsing[statenew, J, 0 , Qubits-1];
 	statenew = ApplyMagnetickKick[statenew, b];
