@@ -147,7 +147,7 @@ If[IntegerQ[Qubits]==False,Print["Error: The state does not correspond to a inte
 If[IntegerQ[Qubits]==False,Print["Error: The state does not correspond to a integer number of qubits"];Abort[]];
   statenew=state;
 statenew=ApplyIsing[statenew, J10, 0, 1];
-  For[q=2, q<Qubits, q++, 
+  For[q=1, q<Qubits-1, q++, 
 	statenew = ApplyIsing[statenew, J, q , q + 1]; 
 	];
   statenew = ApplyIsing[statenew, J, 0 , Qubits-1];
