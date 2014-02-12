@@ -1743,6 +1743,14 @@ itpp::cmat GetState(itpp::cmat& U, itpp::vec& eigenvalues, itpp::cvec& psi_0, do
 template <class Num_T>  double test_symmetry(const itpp::Mat<Num_T > H){ // {{{
  return itpp::norm(H-H.transpose() );
 } // }}}
+template <class Num_T>  bool sorted(const itpp::Vec<Num_T > v){ // {{{ Test if it is sorted, from smallest to greatest
+  int n=v.size();
+  if (n==0){return true;}
+  for (int i=1; i<n; i++){
+    if(v(i)<v(i-1)) return false;
+  }
+  return true;
+} // }}}
 void test_GetState_pure(){ // {{{
 //   So the idea is to have a Hamiltonian, its eigenvectors and eigenvalues, 
 //   time and check if the evolution is good. 
