@@ -1,3 +1,5 @@
+(* ::Package:: *)
+
 (* {{{ *) BeginPackage["SpinChain`",{"Carlos`", "Quantum`"}]
 (* {{{ Primitives *)
 ApplyMagnetickKick::usage = "ApplyMagnetickKick[state_, b_, Target_] or ApplyMagnetickKick[state_, b_]"
@@ -9,12 +11,13 @@ ApplyIsingChain::usage="Se hace la topologia de una cadena. Solo la parte de Isi
 ApplyChain::usage="Se hace la topologia de una cadena."
 ApplyInverseChain::usage="Se hace la topologia de una cadena pero hacia atras en el tiempo."
 ApplyCommonEnvironment::usage="Se refiere a la topologia (a) del PRL de n-body Bell en PRA."
-ApplyDephasingChain::usage="Se hace la topologia de una cadena que solo hace dephasing"
+ApplyDephasingChain::usage="ApplyDephasingChain[psi0_, Delta_, Jenv_, benv_, Jinteraction_] Se hace la topologia de una cadena que solo hace dephasing"
 ApplyChainStar::usage="ApplyChainStar[state_, Jenv_,Jint_, b_] Se hace la topologia de la estrella con el magnetic kick"
 ApplyIsingStar::usage="Se hace la topologia de una estrella, solo la parte de Ising"
 ApplyIsingStarEnvironment::usage="Se hace la topologia de una estrella, solo la parte de Ising, en el environment"
 ApplyMagnetickKickStarEnvironment::usage="Se hace el kick pero solo en los qubits que son del environment"
 ApplyIsingStarInteractionQubitEnvironment::usage="Se hace el kick pero solo la interaccion con el  environment"
+ApplyInomogeneousChain::usage="ApplyInomogeneousChain[state_?VectorQ, J_, J10_, b_] Se hace la cadena inhomogenea donde J10 indica la interaccion ising entre el primero y segundo qubit"
 (* }}} *)
 (* {{{ Explicit Matrices *)
 IsingMatrix::usage="Get the matrix for the Ising Interaction Sigma_i Sigma_j, or for sum Sigma_i Sigma_j. In the first case, call as IsingMatrix[{IsingPosition1_Integer, IsingPosition2_Integer}, Qubits_Integer], and in the second,  IsingMatrix[IsingPositions_List, Qubits_Integer]"
@@ -67,7 +70,7 @@ Begin["Private`"]
 (* }}} *)
 (* }}} *)
 (* {{{ Full topologies *)
-(* {{{ *) ApplyIsingChain[state_?VectorQ, J_] := Module[{Qubits, statenew, QubitToAdress},
+(* {{{ *) ApplyIsingChain[state_?VectorQ, J_] := Module[{Qubits, statenew, QubitToAdress,q},
   Qubits = Log[2, Length[state]];
   statenew=state;
   For[q=0, q<Qubits-1, q++, 
@@ -139,6 +142,19 @@ If[IntegerQ[Qubits]==False,Print["Error: The state does not correspond to a inte
   statenew
   ];
 (* }}} *)
+(* {{{ *) ApplyInomogeneousChain[state_?VectorQ, J_, J10_, b_] := Module[{Qubits, statenew, QubitToAdress, q},
+  Qubits = Log[2, Length[state]];
+If[IntegerQ[Qubits]==False,Print["Error: The state does not correspond to a integer number of qubits"];Abort[]];
+  statenew=state;
+statenew=ApplyIsing[statenew, J10, 0, 1];
+  For[q=1, q<Qubits-1, q++, 
+	statenew = ApplyIsing[statenew, J, q , q + 1]; 
+	];
+  statenew = ApplyIsing[statenew, J, 0 , Qubits-1];
+	statenew = ApplyMagnetickKick[statenew, b];
+  statenew
+  ];
+(* }}} *)
 (* }}} *)
 (* {{{ Explicit Matrices *)
 IsingMatrix[{IsingPosition1_Integer, IsingPosition2_Integer}, Qubits_Integer] := Pauli[Table[ If[l == Qubits - IsingPosition1 || l == Qubits - IsingPosition2, 3, 0], {l, Qubits}]];
@@ -153,4 +169,3 @@ HamiltonianMagenitcGrid[MagneticField_, J_, {nx_, ny_}] := MatrixPauliMagneticFi
 (* }}} *)
 End[] 
 EndPackage[]
-
