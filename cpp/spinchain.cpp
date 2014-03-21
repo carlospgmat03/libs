@@ -324,7 +324,7 @@ void apply_ising_inhom(itpp::cvec& state, double Jhom, double J_inhom){//{{{
 }//}}}
 
 //Ising All versus All
-void apply_ising_allvsall(itpp::cvec& state, double J){
+void apply_ising_allvsall(itpp::cvec& state, double J){//{{{
 
     int qubits=cfpmath::log_base_2(state.size());
 
@@ -335,9 +335,7 @@ void apply_ising_allvsall(itpp::cvec& state, double J){
 	}
       
 	}
-}
-
-
+}//}}}
   void apply_ising_z(itpp::cvec& state, double J){// {{{
     int qubits=cfpmath::log_base_2(state.size());
     itpp::vec Jv(qubits);
