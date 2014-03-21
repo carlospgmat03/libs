@@ -451,6 +451,14 @@ template <class Num_T> itpp::Mat<Num_T> TensorProduct(const itpp::Array<itpp::Ma
   }
   return tmp;
 } // }}}
+itpp::cvec TensorPow(const itpp::cvec state, int qub){ //{{{
+itpp::cvec newstate;
+newstate=state;
+for(int i=0;i<qub-1;i++){
+newstate=TensorProduct(newstate,state);
+}
+return newstate;
+} //}}}
 // Exponentiation
 itpp::mat exponentiate_real_symmetric(const itpp::mat& Matrix){ // {{{
 // template <class Num_T> itpp::Mat<Num_T> exponentiate(itpp::Mat<Num_T> Matrix){
