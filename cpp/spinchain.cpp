@@ -296,6 +296,32 @@ void apply_ising_star_double(itpp::cvec& state, double J, double Jcoupling1,doub
 
  return;
   } // }}}
+ //Inhomogeneous magnetic kick
+void apply_magnetic_inhom(itpp::cvec& state, itpp::vec Bx_hom, itpp::vec Bx_inhom){//{{{
+
+    int qubits=cfpmath::log_base_2(state.size());
+
+	apply_magnetic_kick(state, Bx_inhom , 0);
+
+    for (int Position=1; Position<qubits; Position++){
+
+      apply_magnetic_kick(state, Bx_hom, Position);
+	}
+}//}}}
+
+//Inhomogeneous Ising interaction
+void apply_ising_inhom(itpp::cvec& state, double Jhom, double J_inhom){//{{{
+
+    int qubits=cfpmath::log_base_2(state.size());
+
+	apply_ising_z(state, J_inhom, 0, 1);
+
+    for (int Position=1; Position<qubits-1; Position++){
+
+      apply_ising_z(state, Jhom, Position, Position+1);
+	}
+	apply_ising_z(state, Jhom, 0, qubits-1);
+}//}}}
 
 
   void apply_ising_z(itpp::cvec& state, double J){// {{{
