@@ -26,6 +26,7 @@ SpinGridIsingMatrix::usage="The Ising matrix that has to come in the IsingMatrix
 MatrixPauliMagneticField::usage="Matrix corresponding to the hamiltonian b.sum sigma_j"
 HamiltonianMagenitcChain::usage="Matrix Corresponding to the continuous Periodic ising spin chain with magnetic field"
 HamiltonianMagenitcGrid::usage="Matrix Corresponding to the continuous toric ising grid chain with magnetic field"
+ApplyMagnetickKickInhom::usage="ApplyMagnetickKickInhom[state_, b_, binhom_], Se aplica el magnetick kick donde binhom es el campo del spin 0"
 (* }}} *)
 (* }}} *)
 Begin["Private`"] 
@@ -154,6 +155,13 @@ statenew=ApplyIsing[statenew, J10, 0, 1];
 	statenew = ApplyMagnetickKick[statenew, b];
   statenew
   ];
+(* }}} *)
+(* {{{ *) ApplyMagnetickKickInhom[state_, b_, binhom_] := Module[{finalstate, Qubits, i},
+ Qubits = Log[2, Length[state]];
+  finalstate = ApplyMagnetickKick[state, binhom, 0];
+  For[i = 1, i < Qubits, i++, 
+   finalstate = ApplyMagnetickKick[finalstate, b, i]];
+  finalstate]
 (* }}} *)
 (* }}} *)
 (* {{{ Explicit Matrices *)
