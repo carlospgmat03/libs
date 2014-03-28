@@ -417,6 +417,37 @@ int main(int argc, char* argv[]){
     cout << "Estado = " << BlochToQubit(theta,phi)<< endl; 
       
   // }}}
+  } else if (option == "test_simple_diagonalization_symmetric_complex") { // {{{
+    int n=2;
+    cmat A(n,n), eigenvectors;
+    cvec lambda;
+    std::complex<double> I=std::complex<double>(0,1);
+    A(0,0)=1;
+    A(0,1)=I;
+    A(1,0)=I;
+    A(1,1)=2;
+    eig(A,lambda, eigenvectors);
+    cout << "Eigenvalues " << lambda << endl;
+    cout << "Eigenvectors " << eigenvectors << endl;
+    for (int j=0; j<n; j++){
+    cout << "Test j=" << j << ", " << norm(A*eigenvectors.get_col(j)-
+        lambda(j)*eigenvectors.get_col(j))
+      << endl;
+    }
+//     rho_out = GetState(eigenvectors, lambda, state, t, da);
+//     for (int i=0; i<da; i++){
+//       for (int j=0; j<da; j++){
+//         cout << real(rho_out(i, j)) << " " << imag(rho_out(i,j)) <<endl;
+//       }
+//     }
+//     for (int i=0; i<rho.cols(); i++){
+//       for (int j=0; j<rho.cols(); j++){
+//         cout << real(rho(i,j)) << " " << imag(rho(i,j)) <<endl;
+//       }
+//     }
+
+//     all_bit_rotations(i1.getValue(), i2.getValue()) ;
+  // }}}
   } else if (option == "nichts") { // {{{
   // }}}
   } else { // {{{
