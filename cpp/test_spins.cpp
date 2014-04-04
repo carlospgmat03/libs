@@ -89,6 +89,20 @@ int main(int argc, char* argv[]) { //{{{
       cout << real(state(i)) << " " << real(-Im*state(i)) << endl;
     }
     // }}}
+  } else if(option=="test_timing") {// {{{
+    int dim=pow_2(qubits.getValue());
+    cvec state(dim);
+    state=RandomState(dim);
+    double x,y;
+        
+    vec b(3); b(0)=bx.getValue(); b(1)=by.getValue(); b(2)=bz.getValue();
+
+    for (int t=0; t<i1.getValue(); t++){
+    apply_chain(state,Ising.getValue(),b);
+    }
+//     for (int i=0; i<dim; i++){
+//       cout << real(state(i)) << " " << real(-Im*state(i)) << endl;
+//     }//}}}
   } else if(option=="test_apply_chain") {// {{{
     int dim=pow_2(qubits.getValue());
     cvec state(dim);
