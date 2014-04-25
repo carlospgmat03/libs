@@ -92,7 +92,7 @@ vonNeumannEntropy::usage = "von Neumann entropy of a density Matrix, or a list o
 Bell::usage = "Bell[n] state gives a maximally entangled state of the type 
 sum_i^n |ii\>. Bell[ ] gives |00> + |11>" 
 StateToBlochSphere::usage="Get the Bloch sphere point of a mixed state"
-BlochSphereToState::usage="BlochSphereToState[CartesianCoordinatesOfPoint_List] transforms the points in the Bloch Sphere to a mixed state"
+BlochSphereToState::usage="BlochSphereToState[CartesianCoordinatesOfPoint_List] transforms the points in the Bloch Sphere to a mixed state. Alternatively, one can give the angles, so BlochSphereToState[{\[Theta]_, \[Phi]_}]"
 QuantumMutualInformationReducedEntropies::usage="QuantumMutualInformationReducedEntropies[r_?MatrixQ] calcula la informacion mutia con entropias"
 QuantumMutualInformationMeasurements::usage="QuantumMutualInformationMeasurements[r_?MatrixQ] calcula la informacion mutua cuando 
 permitimos unla entropia condicional de una matriz de dos qubits cuando hacemos una medicion sobre un qubit. "
@@ -456,6 +456,7 @@ Proyector[psi_] := Proyector[psi, psi]
  Module[{r, \[Theta], \[Phi]}, 
   r = CoordinateTransform["Cartesian"->"Spherical", CartesianCoordinatesOfPoint]; 
 	\[Theta] = r[[2]]; \[Phi] = r[[3]]; {Cos[\[Theta]/2], Exp[I \[Phi]] Sin[\[Theta]/2]}]
+BlochSphereToState[{\[Theta]_, \[Phi]_}] :=  {Cos[\[Theta]/2], Exp[I \[Phi]] Sin[\[Theta]/2]}
 (* }}} *)
 (* {{{  *) QuantumMutualInformationReducedEntropies[r_?MatrixQ] := Module[{ra, rb},
   ra = PartialTrace[r, 1]; rb = PartialTrace[r, 2];
