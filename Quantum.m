@@ -111,7 +111,7 @@ AveragePurityChannelPauliBasis::usage = "Calculates the average final purity giv
 BlochEllipsoid::usage = "BlochEllipsoid[Cha_] Show the deformation of BlochSphere for a qubit channel in the pauli basis"
 EvolvGate::usage="EvolvGate[Gate_, steps_, env_, state_]... Evoluciona cualquier estado aplicando un numero steps_ de veces la compuerta Gate de  la forma Gate[#, otherparameters_] donde debe ponerse # en el lugar donde Gate toma el estado"
 MakeQuantumChannel::usage="MakeQuantumChannel[Gate_, steps_, env_] Donde Gate va de la forma Gate[#, otherparameters_]  donde debe ponerse # en el lugar donde Gate toma el estado"
-
+SumPositiveDerivatives::usage="SumPositiveDerivatives[list_] Suma todas las contribuciones list(max)-list(min) sucesivos cuando la derivada es positiva"
 (* }}} *)
 (* }}} *)
 Begin["Private`"] 
@@ -577,6 +577,15 @@ Show[ContourPlot3D[coord[[1]]^2+coord[[2]]^2+coord[[3]]^2==1,{x,-1,1},{y,-1,1},{
      3}, {j, 0, 3}];
   Chop[Table[
     Table[channel[i, j][[k]], {i, 0, 3}, {j, 0, 3}], {k, steps}]]]
+(* }}} *)
+(* {{{ *)SumPositiveDerivatives[list_]:=Module[{sum},
+sum=0;
+Table[
+If[list[[i+1]]>list[[i]],
+sum=sum+list[[i+1]]-list[[i]];
+],
+{i,1,Length[list]-1}];
+sum]
 (* }}} *)
 (* }}} *)
 End[] 
