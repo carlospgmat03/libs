@@ -83,7 +83,7 @@ namespace RMT{ // {{{ Implementation
   void FlatSpectrumGSE(itpp::Mat<std::complex<double> >& U, itpp::Vec<double>& eigenvalues){ // {{{
     int dim=eigenvalues.size();
     itpp::Mat<std::complex<double> > temp(dim,dim);
-    double pi=3.1415926535897932384626433832795;
+//     double pi=3.1415926535897932384626433832795;
     bool exito=false;
     for( ; !exito ; ){
       temp=RandomGSEDeltaOne(dim);

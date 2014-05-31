@@ -1403,10 +1403,10 @@ template <class Num_T> void apply_sigma_z(itpp::Vec<Num_T>& state, int target_bi
   }
 //   std::cout << "state" << state << "\n";
 }// }}}
-void apply_sigma(itpp::cvec state, itpp::vec b, int PositionQubit){ // {{{
-
- abort();
-} // }}}
+// void apply_sigma(itpp::cvec state, itpp::vec b, int PositionQubit){ // {{{
+// 
+//  abort();
+// } // }}}
 void apply_sigma(itpp::cvec& state, int Pauli_i, int PositionQubit){ // {{{
 //   std::cout << "Por entrar en el lio PositionQubit=" << PositionQubit << ", Pauli_i=" << Pauli_i <<  std::endl;
   if (Pauli_i==1){

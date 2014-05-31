@@ -59,7 +59,7 @@ namespace PurityRMT{
       + lambda*RMT::RandomGUE(dim_cen*dim_env,"sigma_offdiag=1");
     return tmp;
   } // }}}
-  itpp::Mat<std::complex<double> > TwoQubitCommonEnvironment(int dim_env, itpp::vec lambda){// {{{
+  itpp::Mat<std::complex<double> > TwoQubitCommonEnvironmentEQQ(int dim_env, itpp::vec lambda){// {{{
     // The structure of the Hilbert space is 
     // H=H_\env \otimes H_1 \otimes H_0
     //           ACA VOY
@@ -162,14 +162,14 @@ namespace PurityRMT{
       std::cout<<std::endl;
     }
   } // }}}
-  void TestTwoQubitSpectatorHamiltonian(const int dim_env, const double lambda, const int NumberHamiltonians, double const split_qubit=0.){ // {{{
-    itpp::ivec state;
-    std::ifstream seed_file2("/tmp/ss2.txt");seed_file2>>state;seed_file2.close();
-    itpp::vec eigen_env;
-    RNG_set_state (state);
-    std::cout <<"El malo!!"<<std::endl;
-    eigen_env=RMT::FlatSpectrumGUE(dim_env,0.2);
-  } // }}}
+//void TestTwoQubitSpectatorHamiltonian(const int dim_env, const double lambda, const int NumberHamiltonians, double const split_qubit=0.){ // {{{
+//     itpp::ivec state;
+//     std::ifstream seed_file2("/tmp/ss2.txt");seed_file2>>state;seed_file2.close();
+//     itpp::vec eigen_env;
+//     RNG_set_state (state);
+//     std::cout <<"El malo!!"<<std::endl;
+//     eigen_env=RMT::FlatSpectrumGUE(dim_env,0.2);
+//   } // }}}
   void EspectatorEigenvalues2QubitsArguments(const int dim_env, const double max_time, const double lambda, const int NumberHamiltonians, const int NumberInitialConditions, const int time_steps, const std::string state_type, double const split_qubit=0.){ // {{{
     QuantumStateITPP psi_0, psi;
     itpp::Mat<std::complex<double> > H,U,U_dagger,rho;

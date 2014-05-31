@@ -353,7 +353,7 @@ int reverse_bits(int number_in, int size_register){ // {{{
     }
     return power-1;
   }// }}}
-  bool is_integer_power(unsigned i, unsigned base){ // {{{
+  bool is_integer_power(unsigned i){ // {{{
     // http://www.cprogramming.com/snippets/show.php?tip=10&count=30&page=0
     return !((i-1) & i); 
   }// }}}
