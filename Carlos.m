@@ -131,7 +131,7 @@ Options[MyLegend] = {Alignment->{0,0}};
 
 MySymbol[Coordinate_,  OptionsPattern[]] :=
  {MyTriangle,MySquare,MyRhombous,MyInvertedTriangle,MyCircle,My5PointStar,
- 	My4PointStar1,My4PointStar2,MyInverted5PointStar, My4PointStar3}[[OptionValue[SymbolNumber]]][Coordinate, 
+ 	My4PointStar1,My4PointStar2,MyInverted5PointStar, My4PointStar3, MyEllipse1,MyEllipse2}[[OptionValue[SymbolNumber]]][Coordinate, 
   OptionValue[Color], OptionValue[Proportion], OptionValue[delta], OptionValue[ThicknessBorder]]
 Options[MySymbol] = {SymbolNumber -> 1, Color -> Hue[0],
 	Proportion -> GoldenRatio, delta -> 0.02,  ThicknessBorder -> 0.001};
@@ -235,6 +235,13 @@ MyInverted5PointStar[{x_, y_}, Color1_, Proportion_, delta_, th_] := Module[{Poi
 MyCircle[{x_, y_}, Color1_, Proportion_, delta_, th_] := 
   Graphics[{Color1, Disk[{x, y}, Scaled[delta{1/2, Proportion/2}]], 
       Thickness[th], GrayLevel[0], Circle[{x, y}, Scaled[delta{1/2, Proportion/2}]]}]
+
+MyEllipse1[{x_, y_}, Color1_, Proportion_, delta_, th_] := 
+  Graphics[{Color1, Disk[{x, y}, Scaled[delta{.5 1/2, Proportion/2 8/5}]], 
+      Thickness[th], GrayLevel[0], Circle[{x, y}, Scaled[delta{.5 1/2, Proportion/2 8/5}]]}]
+MyEllipse2[{x_, y_}, Color1_, Proportion_, delta_, th_] := 
+  Graphics[{Color1, Disk[{x, y}, Scaled[delta{.8, .5 Proportion/2}]], 
+      Thickness[th], GrayLevel[0], Circle[{x, y}, Scaled[delta{.8, .5 Proportion/2}]]}]
 
 My4PointStar3[{x_, y_}, Color1_, Proportion_, delta_, th_] := 
  Module[{PointSet, PointSetLine, theta, alpha}, alpha = .3;
