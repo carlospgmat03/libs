@@ -479,6 +479,14 @@ newstate=TensorProduct(newstate,state);
 }
 return newstate;
 } //}}}
+itpp::cmat TensorPow(const itpp::cmat Matrix, int qub){ //{{{
+itpp::cmat newMatrix;
+newMatrix=Matrix;
+for(int i=0;i<qub-1;i++){
+newMatrix=TensorProduct(newMatrix,Matrix);
+}
+return newMatrix;
+} //}}}
 // Exponentiation
 itpp::mat exponentiate_real_symmetric(const itpp::mat& Matrix){ // {{{
 // template <class Num_T> itpp::Mat<Num_T> exponentiate(itpp::Mat<Num_T> Matrix){
