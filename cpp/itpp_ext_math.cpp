@@ -143,24 +143,32 @@ template <class Num_T> double proportionality_test(const itpp::Vec<Num_T >& a1, 
 } //}}}
 // }}}
 // Reordering, replacing, inequalities {{{
-void ReorderLastTwoSubsystems(itpp::cvec& psi, int n_middle, int n_last){ // {{{
+itpp::cvec ReorderLastTwoSubsystems(itpp::cvec& psi, int n_middle, int n_last){ // {{{
   // the idea is to have a state psi_abc and to reorder it to get
   // the state psi_acb. n_middle is the dimension of the middle Hilbert space
   // and n_last the dimension of the last Hilbert space 
 
+  itpp::cvec psi_reorderd(psi.size());
   std::complex<double> tmp;
+//   std::cout << "en ReorderLastTwoSubsystems. n_middle="<<n_middle<<", n_last="<<n_last << std::endl;
   int nb=n_middle, nc=n_last;
   int na=psi.size()/(nb*nc);
+  int index_1, index_2;
   for (int ia=0; ia<na; ia++){ for (int ib=0; ib<nb; ib++){ for (int ic=0; ic<nc; ic++){ 
-    tmp  = psi(ia*nb*nc+ ib*nc+ ic); 
-    psi(ia*nb*nc+ib*nc+ ic)= psi(ia*nb*nc+ ic*nc+ ib);
-    psi(ia*nb*nc+ic*nc+ ib)= tmp; 
+    
+    index_1 = ia*nb*nc+ ib*nc+ ic;
+    index_2 = ia*nb*nc+ ic*nb+ ib;
+//     std::cout << "["<<ia<<ib<<ic<<"] Poniendo el original "
+//     << index_1<<" en la posicion "<<index_2 << std::endl;
+    psi_reorderd(index_2) = psi(index_1);
+//     psi(index_1)= psi(index_2);
+//     psi(index_2)= tmp; 
   } } }
-  return;
+  return psi_reorderd;
 } // }}}
 void ReorderTwoSubsystems(itpp::cvec& psi, int n_last){ // {{{
   int n_middle=psi.size()/n_last;
-  ReorderLastTwoSubsystems(psi, n_middle, n_last);
+  psi = ReorderLastTwoSubsystems(psi, n_middle, n_last);
   return;
 } // }}}
 bool vector_greater_than(const itpp::ivec& v, const itpp::ivec& w){ // {{{
