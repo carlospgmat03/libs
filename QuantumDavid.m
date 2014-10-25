@@ -132,12 +132,12 @@ IPRbyCohstateSym[\[Theta]_, \[Phi]_, bx_, {values_, vecs_},
 
 IPRbyCohstateSymbetter[\[Theta]_,\[Phi]_,list_,vecsk_]:=Module[{state},
 state=Table[Chop[QuantumDotProduct[vecsk[[i]],CoherentState[\[Theta],\[Phi],Log[2,Length[vecsk[[1]]]]]]],{i,Length[vecsk]}];
-1/Length[vecsk] Total[Table[Abs[QuantumDotProduct[list[[i]],state]]^4,{i,1,Length[vecsk]}]]
+Total[Table[Abs[QuantumDotProduct[list[[i]],state]]^4,{i,1,Length[vecsk]}]]
 ];
 
 IPRbyStatebetter[stateinput_,list_,vecsk_]:=Module[{state},
 state=Table[Chop[QuantumDotProduct[vecsk[[i]],stateinput]],{i,Length[vecsk]}];
-1/Length[vecsk] Total[Table[Abs[QuantumDotProduct[list[[i]],state]]^4,{i,1,Length[vecsk]}]]
+Total[Table[Abs[QuantumDotProduct[list[[i]],state]]^4,{i,1,Length[vecsk]}]]
 ];
 
 vecsk[qubits_,k_]:=Module[{values,vecs},
