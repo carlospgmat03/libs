@@ -24,6 +24,7 @@ ModifiedCoherentState::usage = "ModifiedCoherentState[\[Theta]_, \[Phi]_, qubits
 ModifiedCoherentState2::usage = "ModifiedCoherentState2[\[Theta]_, \[Phi]_, qubits_]"
 IPRbyStatebetter::usage = "IPRbyStatebetter[stateinput_,list_,vecsk_]"
 StateToDirac::usage = "VectorViewer[vec_] It shows the vector in Dirac notation in qubit representation."
+CharlieMeasure::usage = "CharlieMeasure[list_]"
 
 Begin["Private`"] 
 
@@ -167,6 +168,15 @@ vec[[i]]*"|"<>ToString[TableForm[{ToBinary[vec2]}, TableSpacing->{1.2,1.2}],Stan
 ]
 ]
 ]
+];
+
+CharlieMeasure[list_]:=Module[{l,listD,Criticallistmin,Criticallistmax,position},l=Length[list];
+listD=Table[list[[i+1]]-list[[i]],{i,l-1}];
+Criticallistmax=Table[If[(listD[[i]]>0&&listD[[i+1]]<=0)||(listD[[i]]>=0&&listD[[i+1]]<0),list[[i+1]],0],{i,l-2}];
+Criticallistmin=Table[If[(listD[[i]]<=0&&listD[[i+1]]>0)||(listD[[i]]<0&&listD[[i+1]]>=0),list[[i+1]],1],{i,l-2}];
+position=Flatten[Position[Criticallistmax,Max[Criticallistmax]]];
+If[Length[position]>1,Print["Dos revivals iguals, como alli que?"]];
+If[Max[Criticallistmax]==0,0,Max[Criticallistmax]-Min[Take[Criticallistmin,Last[position]]]]
 ];
 
 End[] 
