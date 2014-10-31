@@ -179,5 +179,17 @@ If[Length[position]>1,Print["Dos revivals iguals, como alli que?"]];
 If[Max[Criticallistmax]==0,0,Max[Criticallistmax]-Min[Take[Criticallistmin,Last[position]]]]
 ];
 
+(* :::::::::: Rutinas de Cristopher :::::::::::::: *)
+
+(*Nearest Neighbour Spacings (NNS) of a list. Preferably Apply after Unfold*)
+NNS[eigen_]:=Table[Abs[#[[i+1]]-#[[i]]],{i,Length[#]-1}]&[eigen];
+
+(*Unfolding of a list*)
+Unfold[list_]:=Module[{List0,Staircase,StairTable,FitStaircase,x},List0=Chop[Sort[#]]-Min[#]&[list];Staircase[x_]:=Length[Select[List0,#<x&]];StairTable=Table[{x,Staircase[x]},{x,Min[#],Max[#],Mean[NNS[#]]}]&[List0];FitStaircase = Fit[StairTable, {1,x,x^2,x^3,x^4,x^5,x^6,x^7,x^8,x^9},x];
+FitStaircase/.x->#&/@List0];
+
+(*Brody Distribution as function of s, q=0 is Poisson, q=1 is Wigner*)
+PBrody[s_,q_]:=Module[{B=Gamma[(2+q)/(1+q)]^(q+1)},B (1+q) s^q*Exp[-B s^(q+1)]];
+
 End[] 
 EndPackage[]
