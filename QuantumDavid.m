@@ -25,6 +25,11 @@ ModifiedCoherentState2::usage = "ModifiedCoherentState2[\[Theta]_, \[Phi]_, qubi
 IPRbyStatebetter::usage = "IPRbyStatebetter[stateinput_,list_,vecsk_]"
 StateToDirac::usage = "VectorViewer[vec_] It shows the vector in Dirac notation in qubit representation."
 CharlieMeasure::usage = "CharlieMeasure[list_]"
+StairCase::usage = "StairCase[x_,eigen_]"
+NNS::usage = "NNS[eigen_]"
+Unfold::usage = "Unfold[list_]"
+PBrody::usage = "PBrody[s_,q_]"
+
 
 Begin["Private`"] 
 
@@ -179,7 +184,9 @@ If[Length[position]>1,Print["Dos revivals iguals, como alli que?"]];
 If[Max[Criticallistmax]==0,0,Max[Criticallistmax]-Min[Take[Criticallistmin,Last[position]]]]
 ];
 
-(* :::::::::: Rutinas de Cristopher :::::::::::::: *)
+StairCase[x_,eigen_]:=Length[Select[eigen,#<x&]]
+
+(* Rutinas de Cristopher *)
 
 (*Nearest Neighbour Spacings (NNS) of a list. Preferably Apply after Unfold*)
 NNS[eigen_]:=Table[Abs[#[[i+1]]-#[[i]]],{i,Length[#]-1}]&[eigen];
