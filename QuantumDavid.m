@@ -191,7 +191,7 @@ StairCase[x_,eigen_]:=Length[Select[eigen,#<x&]]
 (* Rutinas de Cristopher *)
 
 (*Nearest Neighbour Spacings (NNS) of a list. Preferably Apply after Unfold*)
-NNS[eigen_]:=Table[Abs[#[[i+1]]-#[[i]]],{i,Length[#]-1}]&[eigen];
+NNS[eigen_]:=Table[Abs[#[[i+1]]-#[[i]]],{i,Length[#]-1}]&[Sort[eigen]];
 
 (*Unfolding of a list*)
 Unfold[list_]:=Module[{List0,Staircase,StairTable,FitStaircase,x},List0=Chop[Sort[#]]-Min[#]&[list];Staircase[x_]:=Length[Select[List0,#<x&]];StairTable=Table[{x,Staircase[x]},{x,Min[#],Max[#],Mean[NNS[#]]}]&[List0];FitStaircase = Fit[StairTable, {1,x,x^2,x^3,x^4,x^5,x^6,x^7,x^8,x^9},x];
