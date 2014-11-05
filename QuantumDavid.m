@@ -115,9 +115,10 @@ list=DeleteCases[list,0];
 If[Length[list]==0,Print["No hay pex"],Print["Preocupate mi cabron"]]
 ];
 
-Extractbyk[k_,{values_,vecs_}]:=Module[{pos,dim},
+Extractbyk[k_,{values_,vecs_}]:=Module[{pos,dim,logdim},
+logdim=Log[2,dim];
 dim=Length[vecs[[1]]];
-pos=Flatten[Position[Round[Chop[Log[values]*Log[2,dim]/(2*I Pi)]],k]];
+pos=Flatten[Position[Round[Chop[Arg[values]*logdim/(2 Pi)]],k]];
 Table[vecs[[i]],{i,pos}]
 ];
 
