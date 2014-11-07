@@ -119,7 +119,7 @@ Extractbyk[k_,{values_,vecs_}]:=Module[{pos,dim,logdim},
 logdim=Log[2,dim];
 dim=Length[vecs[[1]]];
 pos=Flatten[Position[Round[Chop[Arg[values]*logdim/(2 Pi)]],k]];
-Table[vecs[[i]],{i,pos}]
+Table[#[[i]],{i,pos}]&[vecs]
 ];
 
 IPRbyCohstateSym[\[Theta]_, \[Phi]_, bx_, {values_, vecs_}, 
