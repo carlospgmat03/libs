@@ -177,13 +177,11 @@ vec[[i]]*"|"<>ToString[TableForm[{ToBinary[vec2]}, TableSpacing->{1.2,1.2}],Stan
 ]
 ];
 
-CharlieMeasure[list_]:=Module[{l,listD,Criticallistmin,Criticallistmax,position,maxi},l=Length[list];
+CharlieMeasure[list_,deep_]:=Module[{l,listD,Criticallistmin,Criticallistmax,position,maxi},l=Length[list];
 listD=Table[list[[i+1]]-list[[i]],{i,l-1}];
-Criticallistmax=Table[If[(listD[[i]]>0&&listD[[i+1]]<=0)||(listD[[i]]>=0&&listD[[i+1]]<0),list[[i+1]],0],{i,l-2}];
-position=Flatten[Position[Criticallistmax,maxi=Max[Criticallistmax]]];
-If[Length[position]>1,Print["Dos revivals iguals, como alli que?"]];
-Criticallistmin=Table[If[(listD[[i]]<=0&&listD[[i+1]]>0)||(listD[[i]]<0&&listD[[i+1]]>=0),list[[i+1]],1],{i,Last[position]}];
-If[Max[Criticallistmax]==0,0,maxi-Min[Criticallistmin]]
+Criticallistmax=Sort[DeleteCases[Table[If[(listD[[i]]>0&&listD[[i+1]]<=0)||(listD[[i]]>=0&&listD[[i+1]]<0),{i,list[[i+1]]},0],{i,l-2}],0],#1[[2]]>#2[[2]]&];
+Criticallistmin=Table[If[(listD[[i]]<=0&&listD[[i+1]]>0)||(listD[[i]]<0&&listD[[i+1]]>=0),list[[i+1]],1],{i,l-2}];
+Max[Table[Criticallistmax[[i]][[2]]-Min[Take[Criticallistmin,Criticallistmax[[i]][[1]]]],{i,deep}]]
 ];
 
 StairCase[x_,eigen_]:=Length[Select[eigen,#<x&]]
