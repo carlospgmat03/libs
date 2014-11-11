@@ -24,7 +24,7 @@ ModifiedCoherentState::usage = "ModifiedCoherentState[\[Theta]_, \[Phi]_, qubits
 ModifiedCoherentState2::usage = "ModifiedCoherentState2[\[Theta]_, \[Phi]_, qubits_]"
 IPRbyStatebetter::usage = "IPRbyStatebetter[stateinput_,list_,vecsk_]"
 StateToDirac::usage = "VectorViewer[vec_] It shows the vector in Dirac notation in qubit representation."
-CharlieMeasure::usage = "CharlieMeasure[list_]"
+CharlieMeasure::usage = "CharlieMeasure[list_] or CharlieMeasure[list_,deep_], deep means how much yo search in to the list of maximums, if you put 0 ot just leave the space free, deep will be taken as the max value of maximums"
 StairCase::usage = "StairCase[x_,eigen_]"
 NNS::usage = "NNS[eigen_]"
 Unfold::usage = "Unfold[list_]"
@@ -185,6 +185,8 @@ len=Length[Criticallistmax];
 If[deep>len,Print["No hay tantos maximos"]; Abort[];];
 Max[Table[Criticallistmax[[i]][[2]]-Min[Take[Criticallistmin,Criticallistmax[[i]][[1]]]],{i,If[deep==0,len,deep]}]]
 ];
+
+CharlieMeasure[list_]:=CharlieMeasure[list,0];
 
 StairCase[x_,eigen_]:=Length[Select[eigen,#<x&]]
 
