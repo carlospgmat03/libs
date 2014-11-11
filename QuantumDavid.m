@@ -25,6 +25,7 @@ ModifiedCoherentState2::usage = "ModifiedCoherentState2[\[Theta]_, \[Phi]_, qubi
 IPRbyStatebetter::usage = "IPRbyStatebetter[stateinput_,list_,vecsk_]"
 StateToDirac::usage = "VectorViewer[vec_] It shows the vector in Dirac notation in qubit representation."
 CharlieMeasure::usage = "CharlieMeasure[list_] or CharlieMeasure[list_,deep_], deep means how much yo search in to the list of maximums, if you put 0 ot just leave the space free, deep will be taken as the max value of maximums"
+CharlieMeasureForShowThings::usage = "CharlieMeasureForShowThings[list_]"
 StairCase::usage = "StairCase[x_,eigen_]"
 NNS::usage = "NNS[eigen_]"
 Unfold::usage = "Unfold[list_]"
@@ -188,7 +189,24 @@ Max[Table[Criticallistmax[[i]][[2]]-Min[Take[Criticallistmin,Criticallistmax[[i]
 
 CharlieMeasure[list_]:=CharlieMeasure[list,0];
 
-StairCase[x_,eigen_]:=Length[Select[eigen,#<x&]]
+CharlieMeasureForShowThings[list_,deep_]:=Module[{l,listD,Criticallistmin,Criticallistmax,position,maxi,len,tab,positionmax,miningraph,maxingraph,minlist,positionmin},
+l=Length[list];
+listD=Table[list[[i+1]]-list[[i]],{i,l-1}];
+Criticallistmax=Sort[DeleteCases[Table[If[(listD[[i]]>0&&listD[[i+1]]<=0)||(listD[[i]]>=0&&listD[[i+1]]<0),{i,list[[i+1]]},0],{i,l-2}],0],#1[[2]]>#2[[2]]&];
+Criticallistmin=Table[If[(listD[[i]]<=0&&listD[[i+1]]>0)||(listD[[i]]<0&&listD[[i+1]]>=0),list[[i+1]],1],{i,l-2}];
+len=Length[Criticallistmax];
+If[deep>len,Print["No hay tantos maximos"]; Abort[];];
+tab=Table[Criticallistmax[[i]][[2]]-Min[Take[Criticallistmin,Criticallistmax[[i]][[1]]]],{i,If[deep==0,len,deep]}];
+positionmax=Flatten[Position[tab,maxi=Max[tab]]]//Last;
+maxingraph=Criticallistmax[[positionmax]][[1]];
+miningraph=Min[minlist=Take[Criticallistmin,maxingraph]];
+positionmin=Flatten[Position[minlist,miningraph]]//Last;
+Show[ListLinePlot[list,PlotRange->All,PlotStyle->Red,PlotLabel->Style[ToString[maxi]]],ListPlot[{{positionmin+1,list[[positionmin+1]]},{maxingraph+1,list[[maxingraph+1]]}},PlotStyle->{Blue,PointSize[0.015]}],ImageSize->Medium]
+];
+
+CharlieMeasureForShowThings[list_]:=CharlieMeasureForShowThings[list,0];
+
+StairCase[x_,eigen_]:=Length[Select[eigen,#<x&]];
 
 (* Rutinas de Cristopher *)
 
