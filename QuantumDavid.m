@@ -30,7 +30,7 @@ StairCase::usage = "StairCase[x_,eigen_]"
 NNS::usage = "NNS[eigen_]"
 Unfold::usage = "Unfold[list_]"
 PBrody::usage = "PBrody[s_,q_]"
-LSI::usage = "LSI[unfoldedlist_] Level Statistic Indicator or simply Gamma parameter"
+LSI::usage = "LSI[unfoldedlist_,bins_] Level Statistic Indicator or simply Gamma parameter"
 
 
 Begin["Private`"] 
@@ -223,6 +223,6 @@ PBrody[s_,q_]:=Module[{B=Gamma[(2+q)/(1+q)]^(q+1)},B (1+q) s^q*Exp[-B s^(q+1)]];
 (*Parametro de Caos LSI, se toma hasta la primera interseccion entre \
 Wigner y de Poisson, ya esta region contiene la informacion sobre la \
 degeneracion del sistema*)
-LSI[unfoldedlist_] := (4.63551) (Integrate[PDF[HistogramDistribution[unfoldedlist],s],{s,1.0*10^-16,0.472913}] - 0.16109);
+LSI[unfoldedlist_,bins_] := (4.63551) (Integrate[PDF[HistogramDistribution[unfoldedlist,bins],s],{s,1.0*10^-16,0.472913}] - 0.16109);
 End[] 
 EndPackage[]
