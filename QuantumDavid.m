@@ -184,7 +184,7 @@ Criticallistmax=Sort[DeleteCases[Table[If[(listD[[i]]>0&&listD[[i+1]]<=0)||(list
 Criticallistmin=Table[If[(listD[[i]]<=0&&listD[[i+1]]>0)||(listD[[i]]<0&&listD[[i+1]]>=0),list[[i+1]],1],{i,l-2}];
 len=Length[Criticallistmax];
 If[deep>len,Print["No hay tantos maximos"]; Abort[];];
-Max[Table[Criticallistmax[[i]][[2]]-Min[Take[Criticallistmin,Criticallistmax[[i]][[1]]]],{i,If[deep==0,len,deep]}]]
+Max[{0,Max[Table[Criticallistmax[[i]][[2]]-Min[Take[Criticallistmin,Criticallistmax[[i]][[1]]]],{i,If[deep==0,len,deep]}]]}]
 ];
 
 CharlieMeasure[list_]:=CharlieMeasure[list,0];
@@ -197,7 +197,7 @@ Criticallistmin=Table[If[(listD[[i]]<=0&&listD[[i+1]]>0)||(listD[[i]]<0&&listD[[
 len=Length[Criticallistmax];
 If[deep>len,Print["No hay tantos maximos"]; Abort[];];
 tab=Table[Criticallistmax[[i]][[2]]-Min[Take[Criticallistmin,Criticallistmax[[i]][[1]]]],{i,If[deep==0,len,deep]}];
-positionmax=Flatten[Position[tab,maxi=Max[tab]]]//Last;
+positionmax=Flatten[Position[tab,maxi=Max[{Max[tab],0}]]]//Last;
 maxingraph=Criticallistmax[[positionmax]][[1]];
 miningraph=Min[minlist=Take[Criticallistmin,maxingraph]];
 positionmin=Flatten[Position[minlist,miningraph]]//Last;
