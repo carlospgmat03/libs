@@ -178,13 +178,15 @@ vec[[i]]*"|"<>ToString[TableForm[{ToBinary[vec2]}, TableSpacing->{1.2,1.2}],Stan
 ]
 ];
 
-CharlieMeasure[list_,deep_]:=Module[{l,listD,Criticallistmin,Criticallistmax,position,maxi,len},l=Length[list];
+CharlieMeasure[list2_,deep_]:=Module[{l,listD,Criticallistmin,Criticallistmax,position,maxi,len,list},
+list=list2/Max[list2];
+l=Length[list];
 listD=Table[list[[i+1]]-list[[i]],{i,l-1}];
 Criticallistmax=Sort[DeleteCases[Table[If[(listD[[i]]>0&&listD[[i+1]]<=0)||(listD[[i]]>=0&&listD[[i+1]]<0),{i,list[[i+1]]},0],{i,l-2}],0],#1[[2]]>#2[[2]]&];
 Criticallistmin=Table[If[(listD[[i]]<=0&&listD[[i+1]]>0)||(listD[[i]]<0&&listD[[i+1]]>=0),list[[i+1]],1],{i,l-2}];
 len=Length[Criticallistmax];
 If[deep>len,Print["No hay tantos maximos"]; Abort[];];
-Max[{0,Max[Table[Criticallistmax[[i]][[2]]-Min[Take[Criticallistmin,Criticallistmax[[i]][[1]]]],{i,If[deep==0,len,deep]}]]}]
+Max[{0,Max[Table[Criticallistmax[[i]][[2]]-Min[Take[Criticallistmin,Criticallistmax[[i]][[1]]]],{i,If[deep==0,len,deep]}]]}]*Max[list2]
 ];
 
 CharlieMeasure[list_]:=CharlieMeasure[list,0];
