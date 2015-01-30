@@ -24,7 +24,8 @@ ModifiedCoherentState::usage = "ModifiedCoherentState[\[Theta]_, \[Phi]_, qubits
 ModifiedCoherentState2::usage = "ModifiedCoherentState2[\[Theta]_, \[Phi]_, qubits_]"
 IPRbyStatebetter::usage = "IPRbyStatebetter[stateinput_,list_,vecsk_]"
 StateToDirac::usage = "VectorViewer[vec_] It shows the vector in Dirac notation in qubit representation."
-CharlieMeasure::usage = "CharlieMeasure[list_] or CharlieMeasure[list_,deep_], deep means how much yo search in to the list of maximums, if you put 0 ot just leave the space free, deep will be taken as the max value of maximums"
+CharlieMeasure::usage = "CharlieMeasure[list_] or CharlieMeasure[list_]"
+CharlieMeasureAve::usage = "CharlieMeasureAve[list_]"
 CharlieMeasureForShowThings::usage = "CharlieMeasureForShowThings[list_]"
 StairCase::usage = "StairCase[x_,eigen_]"
 NNS::usage = "NNS[eigen_]"
@@ -178,18 +179,47 @@ vec[[i]]*"|"<>ToString[TableForm[{ToBinary[vec2]}, TableSpacing->{1.2,1.2}],Stan
 ]
 ];
 
-CharlieMeasure[list2_,deep_]:=Module[{l,listD,Criticallistmin,Criticallistmax,position,maxi,len,list},
-list=list2/Max[list2];
-l=Length[list];
-listD=Table[list[[i+1]]-list[[i]],{i,l-1}];
-Criticallistmax=Sort[DeleteCases[Table[If[(listD[[i]]>0&&listD[[i+1]]<=0)||(listD[[i]]>=0&&listD[[i+1]]<0),{i,list[[i+1]]},0],{i,l-2}],0],#1[[2]]>#2[[2]]&];
-Criticallistmin=Table[If[(listD[[i]]<=0&&listD[[i+1]]>0)||(listD[[i]]<0&&listD[[i+1]]>=0),list[[i+1]],1],{i,l-2}];
-len=Length[Criticallistmax];
-If[deep>len,Print["No hay tantos maximos"]; Abort[];];
-Max[{0,Max[Table[Criticallistmax[[i]][[2]]-Min[Take[Criticallistmin,Criticallistmax[[i]][[1]]]],{i,If[deep==0,len,deep]}]]}]*Max[list2]
-];
+CharlieMeasure[list2_] := 
+  Module[{l, listD, Criticallistmin, Criticallistmax, position, maxi, 
+    len, list},
+   list = list2/Max[list2];
+   l = Length[list];
+   listD = Table[list[[i + 1]] - list[[i]], {i, l - 1}];
+   Criticallistmax = 
+    Sort[DeleteCases[
+      Table[If[(listD[[i]] > 0 && 
+           listD[[i + 1]] <= 0) || (listD[[i]] >= 0 && 
+           listD[[i + 1]] < 0), {i, list[[i + 1]]}, 0], {i, l - 2}], 
+      0], #1[[2]] > #2[[2]] &];
+   len = Length[Criticallistmax];
+   Max[{0, 
+      Max[Table[
+        Criticallistmax[[i]][[2]] - 
+         Min[Take[list, Criticallistmax[[i]][[1]]]], {i, len}]]}]*
+    Max[list2]];
 
-CharlieMeasure[list_]:=CharlieMeasure[list,0];
+CharlieMeasureAve[list2_] := 
+  Module[{l, listD, Criticallistmin, Criticallistmax, position, maxi, 
+    len, list},
+   list = list2/Max[list2];
+   l = Length[list];
+   listD = Table[list[[i + 1]] - list[[i]], {i, l - 1}];
+   Criticallistmax = 
+    Sort[DeleteCases[
+      Table[If[(listD[[i]] > 0 && 
+           listD[[i + 1]] <= 0) || (listD[[i]] >= 0 && 
+           listD[[i + 1]] < 0), {i, list[[i + 1]]}, 0], {i, l - 2}], 
+      0], #1[[2]] > #2[[2]] &];
+   Criticallistmin = 
+    Table[If[(listD[[i]] <= 0 && 
+         listD[[i + 1]] > 0) || (listD[[i]] < 0 && 
+         listD[[i + 1]] >= 0), list[[i + 1]], 1], {i, l - 2}];
+   len = Length[Criticallistmax];
+   Max[{0, 
+      Max[Table[
+        Criticallistmax[[i]][[2]] - 
+         Mean[Take[list, Criticallistmax[[i]][[1]]]], {i, len}]]}]*
+    Max[list2]];
 
 CharlieMeasureForShowThings[list_,deep_]:=Module[{l,listD,Criticallistmin,Criticallistmax,position,maxi,len,tab,positionmax,miningraph,maxingraph,minlist,positionmin},
 l=Length[list];
