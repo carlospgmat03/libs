@@ -210,10 +210,6 @@ CharlieMeasureAve[list2_] :=
            listD[[i + 1]] <= 0) || (listD[[i]] >= 0 && 
            listD[[i + 1]] < 0), {i, list[[i + 1]]}, 0], {i, l - 2}], 
       0], #1[[2]] > #2[[2]] &];
-   Criticallistmin = 
-    Table[If[(listD[[i]] <= 0 && 
-         listD[[i + 1]] > 0) || (listD[[i]] < 0 && 
-         listD[[i + 1]] >= 0), list[[i + 1]], 1], {i, l - 2}];
    len = Length[Criticallistmax];
    Max[{0, 
       Max[Table[
