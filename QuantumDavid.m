@@ -191,11 +191,9 @@ CharlieMeasure[list2_] :=
            listD[[i + 1]] <= 0) || (listD[[i]] >= 0 && 
            listD[[i + 1]] < 0), {i, list[[i + 1]]}, 0], {i, l - 2}], 
       0], #1[[2]] > #2[[2]] &];
-   len = Length[Criticallistmax];
    Max[{0, 
-      Max[Table[
-        Criticallistmax[[i]][[2]] - 
-         Min[Take[list, Criticallistmax[[i]][[1]]]], {i, len}]]}]*
+        Criticallistmax[[1]][[2]] - 
+         Min[Take[list, Criticallistmax[[1]][[1]]]]}]*
     Max[list2]];
 
 CharlieMeasureAve[list2_] := 
@@ -210,7 +208,6 @@ CharlieMeasureAve[list2_] :=
            listD[[i + 1]] <= 0) || (listD[[i]] >= 0 && 
            listD[[i + 1]] < 0), {i, list[[i + 1]]}, 0], {i, l - 2}], 
       0], #1[[2]] > #2[[2]] &];
-   len = Length[Criticallistmax];
    Max[{0, 
       Criticallistmax[[1]][[2]] - 
          Mean[Take[list, Criticallistmax[[1]][[1]]]]}]*
