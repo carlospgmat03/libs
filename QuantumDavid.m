@@ -212,9 +212,8 @@ CharlieMeasureAve[list2_] :=
       0], #1[[2]] > #2[[2]] &];
    len = Length[Criticallistmax];
    Max[{0, 
-      Max[Table[
-        Criticallistmax[[i]][[2]] - 
-         Mean[Take[list, Criticallistmax[[i]][[1]]]], {i, len}]]}]*
+      Criticallistmax[[1]][[2]] - 
+         Mean[Take[list, Criticallistmax[[1]][[1]]]]}]*
     Max[list2]];
 
 CharlieMeasureForShowThings[list_,deep_]:=Module[{l,listD,Criticallistmin,Criticallistmax,position,maxi,len,tab,positionmax,miningraph,maxingraph,minlist,positionmin},
