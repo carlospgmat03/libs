@@ -252,11 +252,12 @@ PBrody[s_,q_]:=Module[{B=Gamma[(2+q)/(1+q)]^(q+1)},B (1+q) s^q*Exp[-B s^(q+1)]];
 Wigner y de Poisson, ya esta region contiene la informacion sobre la \
 degeneracion del sistema*)
 LSI[unfoldedlist_,bins_] := (4.63551) (Integrate[PDF[HistogramDistribution[unfoldedlist,bins],s],{s,1.0*10^-16,0.472913}] - 0.16109);
+End[] 
 (*Amplitude Damping Channel*)
 G[t_,\[Lambda]_,\[Omega]0_,\[Gamma]_]:=1/Sqrt[-2 \[Gamma] \[Lambda]+(\[Lambda]+I \[Omega]0)^2] E^(-(1/2) t (\[Lambda]+I \[Omega]0)) (Sqrt[-2 \[Gamma] \[Lambda]+(\[Lambda]+I \[Omega]0)^2] Cosh[1/2 t Sqrt[-2 \[Gamma] \[Lambda]+(\[Lambda]+I \[Omega]0)^2]]+(\[Lambda]+I \[Omega]0) Sinh[1/2 t Sqrt[-2 \[Gamma] \[Lambda]+(\[Lambda]+I \[Omega]0)^2]]);
 H[p_]:=N[-p Log[2,p]-(1-p)Log[2,1-p],10];
 QuantumCapacityDamping[t_]:=If[Abs[G[t,\[Lambda],\[Omega]0,\[Gamma]]]^2>0.5,FindMaximum[H[Abs[G[t,\[Lambda],\[Omega]0,\[Gamma]]]^2 p]-H[(1-Abs[G[t,\[Lambda],\[Omega]0,\[Gamma]]]^2)p],{p,$MinMachineNumber}]//First,0];
 ClassicalCapacityDamping[t_]:=FindMaximum[H[p]+H[Abs[G[t,\[Lambda],\[Omega]0,\[Gamma]]]^2 p]-H[(1-Abs[G[t,\[Lambda],\[Omega]0,\[Gamma]]]^2)p],{p,$MinMachineNumber},MaxIterations->Infinity]//First;
 (*AveK[list_]:=(Last[list][[1]]-First[list][[1]])^(-1)(list[[2]][[1]]-list[[1]][[1]])Sum[list[[All,2]][[i]],{i,Length[list]}];*)
-End[] 
+
 EndPackage[]
