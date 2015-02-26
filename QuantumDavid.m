@@ -35,7 +35,7 @@ LSI::usage = "LSI[unfoldedlist_,bins_] Level Statistic Indicator or simply Gamma
 G::usage = "Amplitude Damping Quantum Channel G[t_,\[Lambda]_,\[Omega]0_,\[Gamma]_]"
 H::usage = "Binary Shannon Entropy H[p_]"
 QuantumCapacityDamping::usage = "Quantum Capacity of the quantum damping, It must be specified the parameters of G, QuantumCapacityDamping[t_]"
-ClassicalCapacityDamping[t_]::usage = "EA Classical Capacity of the quantum damping, It must be specified the parameters of G, QuantumCapacityDamping[t_]"
+ClassicalCapacityDamping::usage = "EA Classical Capacity of the quantum damping, It must be specified the parameters of G, QuantumCapacityDamping[t_]"
 
 
 Begin["Private`"] 
