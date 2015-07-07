@@ -401,7 +401,7 @@ Pauli[Indices_List] := KroneckerProduct @@ (Pauli /@ Indices)
 (* }}} *)
 (* {{{ *) Concurrence[rho_]:=Module[{lambda}, 
 	lambda=Sqrt[Abs[Eigenvalues[rho.sigmaysigmay.Conjugate[rho].sigmaysigmay]]]; 
-	2*Max[lambda]-Plus@@lambda]
+	Max[{2*Max[lambda]-Plus@@lambda,0}]]
 (* {{{ *) sigmaysigmay={{0, 0, 0, -1}, {0, 0, 1, 0}, {0, 1, 0, 0}, {-1, 0, 0, 0}}; (* }}} *)
 
 (* }}} *)
