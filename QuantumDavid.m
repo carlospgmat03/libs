@@ -78,12 +78,6 @@ Switch[topology,1,HI=IsingChain[1.0,qubits],2,HI=Hallvsall[1.0,qubits],3,HI=Isin
 MatrixExp[-1.0*I HKi].MatrixExp[-1.0*I HI]
 ];
 
-matrixU[bx_,bz_,qubits_,topology_,\[Delta]_]:=Module[{HKi,HI},
-If[topology==4,HKi=HK[qubits,bx,bz]+sigma[1,0,qubits]\[Delta],HKi=HK[qubits,bx,bz]];
-Switch[topology,1,HI=IsingChain[1.0,qubits],2,HI=Hallvsall[1.0,qubits],3,HI=IsingChainInhom[1.0,1.0+\[Delta],qubits],4,HI=IsingChain[1.0,qubits]];
-MatrixExp[-1.0*I HKi].MatrixExp[-1.0*I HI]
-];
-
 IPRSym[bx_,wk_,topology_,\[Delta]_]:=Module[{U,list,qubits,U0},
 qubits=Log[2,Length[Transpose[wk][[1]]]];
 U=matrixU[bx,qubits,topology,\[Delta]];
