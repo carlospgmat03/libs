@@ -409,7 +409,7 @@ Abs[QuantumDotProduct[sigmaysigmay.Conjugate[\[Psi]], \[Psi]]]]
 (* {{{ *) sigmaysigmay={{0, 0, 0, -1}, {0, 0, 1, 0}, {0, 1, 0, 0}, {-1, 0, 0, 0}}; (* }}} *)
 
 (* {{{ *) MultipartiteConcurrence[\[Psi]_?VectorQ] := Module[{M},M=Length[\[Psi]]-2;
-Sqrt[M-Sum[Purity[PartialTrace[\[Psi],i]],{i,0,M-1}]]/(Sqrt[M]-1)](* }}} *)
+Sqrt[M-Sum[Purity[PartialTrace[\[Psi],i]],{i,1,M}]]*(2/Sqrt[M+2])](* }}} *)
 (* }}} *)
 (* {{{ *) Purity[rho_]:= Tr[rho.rho]
 
