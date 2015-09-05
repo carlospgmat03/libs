@@ -66,17 +66,23 @@ Apply[KroneckerProduct,list]
 
 HK[N_,bx_,bz_]:=bx Sum[sigma[1,qubit,N],{qubit,0,N-1}]+bz Sum[sigma[3,qubit,N],{qubit,0,N-1}];
 
-matrixU[bx_,qubits_,topology_]:=Module[{HKi,HI},
+(*matrixU[bx_,qubits_,topology_]:=Module[{HKi,HI},
 If[topology==4,HKi=HK[qubits,bx,1.4]+sigma[1,0,qubits]\[Delta]bx,HKi=HK[qubits,bx,1.4]];
+Switch[topology,1,HI=IsingChain[1.0,qubits],2,HI=Hallvsall[1.0,qubits],3,HI=IsingChainInhom[1.0,1.0+\[Delta]J,qubits],4,HI=IsingChain[1.0,qubits]];
+MatrixExp[-1.0*I HKi].MatrixExp[-1.0*I HI]
+];*)
+
+matrixU[bx_,bz_,qubits_,topology_]:=Module[{HKi,HI},
+If[topology==4,HKi=HK[qubits,bx,bz]+sigma[1,0,qubits]\[Delta]bx,HKi=HK[qubits,bx,bz]];
 Switch[topology,1,HI=IsingChain[1.0,qubits],2,HI=Hallvsall[1.0,qubits],3,HI=IsingChainInhom[1.0,1.0+\[Delta]J,qubits],4,HI=IsingChain[1.0,qubits]];
 MatrixExp[-1.0*I HKi].MatrixExp[-1.0*I HI]
 ];
 
-matrixU[bx_,qubits_,topology_,\[Delta]_]:=Module[{HKi,HI},
+(*matrixU[bx_,qubits_,topology_,\[Delta]_]:=Module[{HKi,HI},
 If[topology==4,HKi=HK[qubits,bx,1.4]+sigma[1,0,qubits]\[Delta],HKi=HK[qubits,bx,1.4]];
 Switch[topology,1,HI=IsingChain[1.0,qubits],2,HI=Hallvsall[1.0,qubits],3,HI=IsingChainInhom[1.0,1.0+\[Delta],qubits],4,HI=IsingChain[1.0,qubits]];
 MatrixExp[-1.0*I HKi].MatrixExp[-1.0*I HI]
-];
+];*)
 
 IPRSym[bx_,wk_,topology_,\[Delta]_]:=Module[{U,list,qubits,U0},
 qubits=Log[2,Length[Transpose[wk][[1]]]];
@@ -195,10 +201,9 @@ CharlieMeasure[list2_] :=
            listD[[i + 1]] <= 0) || (listD[[i]] >= 0 && 
            listD[[i + 1]] < 0), {i, list[[i + 1]]}, 0], {i, l - 2}], 
       0], #1[[2]] > #2[[2]] &];
-   Max[{0, 
-        If[Length[Criticallistmax]==0,0,Criticallistmax[[1]][[2]] - 
-         Min[Take[list, Criticallistmax[[1]][[1]]]]]}]*
-    Max[list2]];
+len=Length[Criticallistmax];
+If[len==0,0,Max[{0,Max[Table[Criticallistmax[[i]][[2]]-Min[Take[list,Criticallistmax[[i]][[1]]]],{i,1,len}]]}]*Max[list2]]
+];
 
 CharlieMeasureAve[list2_] := 
   Module[{l, listD, Criticallistmin, Criticallistmax, position, maxi, 
@@ -212,10 +217,9 @@ CharlieMeasureAve[list2_] :=
            listD[[i + 1]] <= 0) || (listD[[i]] >= 0 && 
            listD[[i + 1]] < 0), {i, list[[i + 1]]}, 0], {i, l - 2}], 
       0], #1[[2]] > #2[[2]] &];
-  Max[{0, 
-        If[Length[Criticallistmax]==0,0,Criticallistmax[[1]][[2]] - 
-         Mean[Take[list, Criticallistmax[[1]][[1]]]]]}]*
-    Max[list2]];
+len=Length[Criticallistmax];
+If[len==0,0,Max[{0,Max[Table[Criticallistmax[[i]][[2]]-Mean[Take[list,Criticallistmax[[i]][[1]]]],{i,1,len}]]}]*Max[list2]]
+]
 
 CharlieMeasureForShowThings[list_,deep_]:=Module[{l,listD,Criticallistmin,Criticallistmax,position,maxi,len,tab,positionmax,miningraph,maxingraph,minlist,positionmin},
 l=Length[list];

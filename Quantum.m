@@ -84,6 +84,7 @@ SumSigmaZ::usage = "Matrix correspoding to sum_j Pauli[3]_j"
 ValidDensityMatrix::usage = "Test whether a given density matrix is valid"
 Dagger::usage = "Hermitian Conjugate"
 Concurrence::usage = "Concurrence of a 2 qubit density matrix density matrix"
+MultipartiteConcurrence::usage = "Concurrence of multipartite entanglement for pure states"
 Purity::usage = "Purity of a 2 qubit density matrix density matrix"
 Proyector::usage = "Gives the density matrix rho=|Psi><Psi| corresponging to |Psi>, or rho=|Phi><Psi| se se le dan dos argumentos: Proyector[Phi, Psi]"
 KrausOperatorsForSuperUnitaryEvolution::usage = "Gives the Kraus Operators for a given unitary and a given state of the environement"
@@ -399,11 +400,16 @@ Pauli[Indices_List] := KroneckerProduct @@ (Pauli /@ Indices)
 (* {{{ *) Dagger[H_]:=Conjugate[Transpose[H]]
 
 (* }}} *)
-(* {{{ *) Concurrence[rho_]:=Module[{lambda}, 
+(* {{{ *) Concurrence[rho_?MatrixQ]:=Module[{lambda}, 
 	lambda=Sqrt[Abs[Eigenvalues[rho.sigmaysigmay.Conjugate[rho].sigmaysigmay]]]; 
-	2*Max[lambda]-Plus@@lambda]
+	Max[{2*Max[lambda]-Plus@@lambda,0}]]
+Concurrence[\[Psi]_?VectorQ]:=Module[{}, 
+Abs[QuantumDotProduct[sigmaysigmay.Conjugate[\[Psi]], \[Psi]]]]
+
 (* {{{ *) sigmaysigmay={{0, 0, 0, -1}, {0, 0, 1, 0}, {0, 1, 0, 0}, {-1, 0, 0, 0}}; (* }}} *)
 
+(* {{{ *) MultipartiteConcurrence[\[Psi]_?VectorQ] := Module[{M},M=Length[\[Psi]]-2;
+Sqrt[M-Sum[Purity[PartialTrace[\[Psi],i]],{i,1,M}]]*(2/Sqrt[M+2])](* }}} *)
 (* }}} *)
 (* {{{ *) Purity[rho_]:= Tr[rho.rho]
 
