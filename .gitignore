@@ -14,6 +14,7 @@ phasespace/wigner
 phasespace/test
 
 
+semiclassical/test
 test_spins2d
 external
 CustomTicks.m

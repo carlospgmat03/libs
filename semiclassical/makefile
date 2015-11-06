@@ -21,7 +21,7 @@ test.o :: test.cpp
 	$(CXX) -c -I$(MYCPP) -I$(MYCPP)/semiclassical  -I$(MYCPP)/cpp  -I$(PHASESPACE) $<  -litpp
 
 test :: test.o torus_mac.o
-	$(CXX) -I$(MYCPP) -I$(MYCPP)/semiclassical $^ -o $@ -litpp  -llapack -lm -lfftw3
+	$(CXX) -I$(MYCPP) -I$(MYCPP)/semiclassical $^ -o $@ -litpp  -llapack -lm -lfftw3 -lgfortran
 
 
 CFLAGS=-O3 -lm -lfftw3
