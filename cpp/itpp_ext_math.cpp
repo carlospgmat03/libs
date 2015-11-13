@@ -1933,6 +1933,21 @@ void test_trAB(){ // {{{
 } // }}}
 //  }}}
 // Not yet ordered {{{
+
+template <class Num_T> itpp::Vec<Num_T > my_mod(const itpp::Vec<Num_T >& v){ // {{{
+itpp::Vec<Num_T > tmp(v.size());
+  for (int i=0; i<v.size(); i++){ 
+    tmp(i) = cfpmath::my_mod(v(i));
+  }
+  return tmp;
+} //}}}
+template <class Num_T> itpp::Array<Num_T > my_mod(const itpp::Array<Num_T >& v){ // {{{
+itpp::Array<Num_T > tmp(v.size());
+  for (int i=0; i<v.size(); i++){ 
+    tmp(i) = cfpmath::my_mod(v(i));
+  }
+  return tmp;
+} //}}}
 itpp::cvec read_state(int d){ // {{{
   itpp::cvec psi(d);
   double x,y;

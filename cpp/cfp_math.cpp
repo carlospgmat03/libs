@@ -345,6 +345,9 @@ int reverse_bits(int number_in, int size_register){ // {{{
 } // }}}
 //// }}}
 // Number theoretical// {{{
+int factorial(int n) { // {{{
+  return (n == 1 || n == 0) ? 1 : factorial(n - 1) * n;
+} // }}}
   int maximum_prime_power_divisor(const int number, const int base){// {{{
     int power=0;
     while (number%integer_pow(base,power)==0){
@@ -445,5 +448,21 @@ int reverse_bits(int number_in, int size_register){ // {{{
 
     return root;
   }// }}}
+// double mod_1(double x){
+//  return x - floor(x);
+// }
+double my_mod(double x, double y){ // El modulo de x/y, con el numero en  [0, y)
+ double r = x - y*floor(x/y);
+ double epsilon  =0.0000000000001;
+ if (r< -epsilon || r>y+epsilon){
+   std::cerr << "error en la funcion modulo" << std::endl;
+   abort();
+  }
+ return r;
+}
+double my_mod(double x){ // La parte fraccional de x  [0, y)
+ return my_mod(x,1.);
+}
+// }}}
 }// }}}
 #endif // CFP_MATH_VARIOUS
