@@ -1934,6 +1934,14 @@ void test_trAB(){ // {{{
 //  }}}
 // Not yet ordered {{{
 
+template <class Num_T> itpp::Mat<Num_T > Array_to_Matrix(const itpp::Array<itpp::Vec<Num_T > >& v){ // {{{
+  int n = v.size();
+  itpp::Mat<Num_T > tmp(n, v(0).size());
+  for (int i=0; i<n; i++){ 
+    tmp.set_row(i,v(i));
+  }
+  return tmp;
+} //}}}
 template <class Num_T> itpp::Vec<Num_T > my_mod(const itpp::Vec<Num_T >& v){ // {{{
 itpp::Vec<Num_T > tmp(v.size());
   for (int i=0; i<v.size(); i++){ 
