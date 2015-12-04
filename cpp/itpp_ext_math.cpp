@@ -1935,10 +1935,19 @@ void test_trAB(){ // {{{
 // Not yet ordered {{{
 
 template <class Num_T> itpp::Mat<Num_T > Array_to_Matrix(const itpp::Array<itpp::Vec<Num_T > >& v){ // {{{
-  int n = v.size();
+//   std::cout << "Lo que entra:" << v << std::endl;
+  int n = v.length();
   itpp::Mat<Num_T > tmp(n, v(0).size());
   for (int i=0; i<n; i++){ 
     tmp.set_row(i,v(i));
+  }
+  return tmp;
+} //}}}
+template <class Num_T> itpp::Array<itpp::Vec<Num_T> > Matrix_to_Array(const itpp::Mat<Num_T >& v){ // {{{
+  int n = v.rows();
+  itpp::Array<itpp::Vec<Num_T> > tmp(n);
+  for (int i=0; i<n; i++){ 
+    tmp(i) = v.get_row(i);
   }
   return tmp;
 } //}}}
