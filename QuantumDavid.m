@@ -7,7 +7,7 @@ Hallvsall::usage = "Hallvsall[J_,N_]"
 IsingChainInhom::usage = "IsingChainInhom[J_,Jinhom_,N_]"
 sigma::usage = "sigma[i_,qubit_,N_] Operador de Pauli i aplicado al qubit con etiqueta qubit, para un sistema con un total de N qubits"
 HK::usage = "HK[N_,bx_,bz_]"
-matrixU::usage = "matrixU[bx_,qubits_,topology_]"
+matrixU::usage = "matrixU[bx_,bz_,qubits_,topology_]"
 IPRSym::usage = "IPRSym[bx_,wk_,topology_]"
 PRSym::usage = "PRSym[bx_,wk_,topology_]"
 NumberToBinary::usage = "NumberToBinary[u_,bits_]"
@@ -36,6 +36,7 @@ G::usage = "Amplitude Damping Quantum Channel G[t_,\[Lambda]_,\[Omega]0_,\[Gamma
 H::usage = "Binary Shannon Entropy H[p_]"
 QuantumCapacityDamping::usage = "Quantum Capacity of the quantum damping, It must be specified the parameters of G, QuantumCapacityDamping[t_]"
 ClassicalCapacityDamping::usage = "EA Classical Capacity of the quantum damping, It must be specified the parameters of G, QuantumCapacityDamping[t_]"
+StepDecomposition::usage = "StepDecomposition[list_,\[Epsilon]_,elemnts_]"
 
 
 Begin["Private`"] 
@@ -239,6 +240,8 @@ Show[ListLinePlot[list,PlotRange->All,PlotStyle->Red,PlotLabel->Style[ToString[m
 CharlieMeasureForShowThings[list_]:=CharlieMeasureForShowThings[list,0];
 
 StairCase[x_,eigen_]:=Length[Select[eigen,#<x&]];
+
+StepDecomposition[list_,\[Epsilon]_,elemnts_]:=Select[Flatten[Split[Sort[#],Abs[#1-#2]<\[Epsilon]&]&/@list,1],Length[#]>elemnts&];
 
 (* Rutinas de Cristopher *)
 
