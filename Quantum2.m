@@ -1,6 +1,6 @@
 (* ::Package:: *)
 
-(* {{{ *) BeginPackage["QuantumDavid`",{"Carlos`", "Quantum`"}]
+(* {{{ *) BeginPackage["Quantum2`",{"Carlos`", "Quantum`"}]
 Isingterm::usage = "Isingterm[i_,j_,N_]"
 IsingChain::usage = "IsingChain[J_,N_]"
 Hallvsall::usage = "Hallvsall[J_,N_]"
@@ -37,6 +37,11 @@ H::usage = "Binary Shannon Entropy H[p_]"
 QuantumCapacityDamping::usage = "Quantum Capacity of the quantum damping, It must be specified the parameters of G, QuantumCapacityDamping[t_]"
 ClassicalCapacityDamping::usage = "EA Classical Capacity of the quantum damping, It must be specified the parameters of G, QuantumCapacityDamping[t_]"
 StepDecomposition::usage = "StepDecomposition[list_,\[Epsilon]_,elemnts_]"
+BasisElement::usage = "BasisElement[i_,j_] Dont worry about this, not yet"
+BasisElementOneIndex::usage = "BasisElementOneIndex[i_] Dont worry about this, not yet"
+DivisivilityKindOf::usage = "DivisivilityKindOf[\[Lambda]1_,\[Lambda]2_,\[Lambda]3_] The lambdas state for the singular values of the unital channel
+up rotations), then this function gives 0 when the channel is not CPTP, 1 if the channel is CPTP, 2 if it is p-divisible, 3 if it is compatible
+with CP-divisible dynamics and 4 if the channel can be written as exp(L) with L Lindblad."
 
 
 Begin["Private`"] 
@@ -259,7 +264,8 @@ PBrody[s_,q_]:=Module[{B=Gamma[(2+q)/(1+q)]^(q+1)},B (1+q) s^q*Exp[-B s^(q+1)]];
 Wigner y de Poisson, ya esta region contiene la informacion sobre la \
 degeneracion del sistema*)
 LSI[unfoldedlist_,bins_] := (4.63551) (Integrate[PDF[HistogramDistribution[unfoldedlist,bins],s],{s,1.0*10^-16,0.472913}] - 0.16109);
-End[] 
+(*End of Rutinas de Cristopher*)
+
 (*Amplitude Damping Channel*)
 G[t_,\[Lambda]_,\[Omega]0_,\[Gamma]_]:=1/Sqrt[-2 \[Gamma] \[Lambda]+(\[Lambda]+I \[Omega]0)^2] E^(-(1/2) t (\[Lambda]+I \[Omega]0)) (Sqrt[-2 \[Gamma] \[Lambda]+(\[Lambda]+I \[Omega]0)^2] Cosh[1/2 t Sqrt[-2 \[Gamma] \[Lambda]+(\[Lambda]+I \[Omega]0)^2]]+(\[Lambda]+I \[Omega]0) Sinh[1/2 t Sqrt[-2 \[Gamma] \[Lambda]+(\[Lambda]+I \[Omega]0)^2]]);
 H[p_]:=-p Log[2,p]-(1-p)Log[2,1-p];
@@ -267,4 +273,25 @@ QuantumCapacityDamping[t_]:=If[Abs[G[t,\[Lambda],\[Omega]0,\[Gamma]]]^2>0.5,Find
 ClassicalCapacityDamping[t_]:=FindMaximum[H[p]+H[Abs[G[t,\[Lambda],\[Omega]0,\[Gamma]]]^2 p]-H[(1-Abs[G[t,\[Lambda],\[Omega]0,\[Gamma]]]^2)p],{p,$MinMachineNumber},MaxIterations->Infinity]//First;
 (*AveK[list_]:=(Last[list][[1]]-First[list][[1]])^(-1)(list[[2]][[1]]-list[[1]][[1]])Sum[list[[All,2]][[i]],{i,Length[list]}];*)
 
+(*Routines for check divisibility properties*)
+BasisElement[i_,j_]:=Table[If[k==i&&l==j,1,0],{k,2},{l,2}];
+BasisElementOneIndex[i_]:=Switch[i,1,BasisElement[1,1],2,BasisElement[1,2],3,BasisElement[2,1],4,BasisElement[2,2]];
+w=Table[Tr[BasisElementOneIndex[i+1].PauliMatrix[j]/Sqrt[2]],{i,0,3},{j,0,3}];\[Omega]=Proyector[Bell[2]];\[Omega]ort=IdentityMatrix[4]-\[Omega];
+
+DivisivilityKindOf[\[Lambda]1_,\[Lambda]2_,\[Lambda]3_]:=Module[{eigen,list,L},
+list=Sqrt[Sort[{1,\[Lambda]1^2,\[Lambda]2^2,\[Lambda]3^2}]];
+L=MatrixLog[Chop[w.{{1,0,0,0},{0,\[Lambda]1,0,0},{0,0,\[Lambda]2,0},{0,0,0,\[Lambda]3}}.Dagger[w]]];
+If[
+(*Checking Complete Positivity*)
+1+\[Lambda]1+\[Lambda]2+\[Lambda]3>=0&&1-\[Lambda]1-\[Lambda]2+\[Lambda]3>=0&&1-\[Lambda]1+\[Lambda]2-\[Lambda]3>=0&&1+\[Lambda]1-\[Lambda]2-\[Lambda]3>=0,
+If[
+(*Evaluating CP-divisibility and p-divisibility*)
+(*Evaluating for p-divsibility*)\[Lambda]1 \[Lambda]2 \[Lambda]3>0,
+If[ (*Evaluating for CP-div*)
+list[[1]]^2*list[[4]]^2>=Product[list[[i]],{i,1,4}],
+(*Evaluating for markov type evolution*)
+If[
+PositiveSemidefiniteMatrixQ[\[Omega]ort.Reshuffle[L].\[Omega]ort]&&HermitianMatrixQ[L],4,3
+],2],1],0]]
+End[] 
 EndPackage[]
