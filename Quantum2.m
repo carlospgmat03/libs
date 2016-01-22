@@ -39,9 +39,11 @@ ClassicalCapacityDamping::usage = "EA Classical Capacity of the quantum damping,
 StepDecomposition::usage = "StepDecomposition[list_,\[Epsilon]_,elemnts_]"
 BasisElement::usage = "BasisElement[i_,j_] Dont worry about this, not yet"
 BasisElementOneIndex::usage = "BasisElementOneIndex[i_] Dont worry about this, not yet"
-DivisivilityKindOf::usage = "DivisivilityKindOf[\[Lambda]1_,\[Lambda]2_,\[Lambda]3_] The lambdas state for the singular values of the unital channel
+DivisibilityKindOf::usage = "DivisivilityKindOf[\[Lambda]1_,\[Lambda]2_,\[Lambda]3_] The lambdas state for the singular values of the unital channel
 up rotations), then this function gives 0 when the channel is not CPTP, 1 if the channel is CPTP, 2 if it is p-divisible, 3 if it is compatible
 with CP-divisible dynamics and 4 if the channel can be written as exp(L) with L Lindblad."
+EntanglementBreakingQ::usage = "EntanglementBreakingQ[x_,y_,z_] this function checks if the channel is entanglement-breaking 
+in the sense of a separable Jamilokowski state."
 
 
 Begin["Private`"] 
@@ -278,7 +280,7 @@ BasisElement[i_,j_]:=Table[If[k==i&&l==j,1,0],{k,2},{l,2}];
 BasisElementOneIndex[i_]:=Switch[i,1,BasisElement[1,1],2,BasisElement[1,2],3,BasisElement[2,1],4,BasisElement[2,2]];
 w=Table[Tr[BasisElementOneIndex[i+1].PauliMatrix[j]/Sqrt[2]],{i,0,3},{j,0,3}];\[Omega]=Proyector[Bell[2]];\[Omega]ort=IdentityMatrix[4]-\[Omega];
 
-DivisivilityKindOf[\[Lambda]1_,\[Lambda]2_,\[Lambda]3_]:=Module[{eigen,list,L},
+DivisibilityKindOf[\[Lambda]1_,\[Lambda]2_,\[Lambda]3_]:=Module[{eigen,list,L},
 list=Sqrt[Sort[{1,\[Lambda]1^2,\[Lambda]2^2,\[Lambda]3^2}]];
 L=MatrixLog[Chop[w.{{1,0,0,0},{0,\[Lambda]1,0,0},{0,0,\[Lambda]2,0},{0,0,0,\[Lambda]3}}.Dagger[w]]];
 If[
@@ -292,6 +294,9 @@ list[[1]]^2*list[[4]]^2>=Product[list[[i]],{i,1,4}],
 (*Evaluating for markov type evolution*)
 If[
 PositiveSemidefiniteMatrixQ[\[Omega]ort.Reshuffle[L].\[Omega]ort]&&HermitianMatrixQ[L],4,3
-],2],1],0]]
+],2],1],0]];
+
+EntanglementBreakingQ[x_,y_,z_]:=If[DivisivilityKindOf[x,y,z]>0,If[Max[0,1/4 (-Abs[-1+x+y-z]-Abs[-1+x-y+z]-Abs[-1-x+y+z]-Abs[1+x+y+z]+8 Max[1/4 Abs[-1+x+y-z],1/4 Abs[-1+x-y+z],1/4 Abs[-1-x+y+z],1/4 Abs[1+x+y+z]])]<=0,2,1],0]
+
 End[] 
 EndPackage[]
