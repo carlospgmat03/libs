@@ -296,7 +296,7 @@ If[
 PositiveSemidefiniteMatrixQ[\[Omega]ort.Reshuffle[L].\[Omega]ort]&&HermitianMatrixQ[L],4,3
 ],2],1],0]];
 
-EntanglementBreakingQ[x_,y_,z_]:=If[DivisivilityKindOf[x,y,z]>0,If[Max[0,1/4 (-Abs[-1+x+y-z]-Abs[-1+x-y+z]-Abs[-1-x+y+z]-Abs[1+x+y+z]+8 Max[1/4 Abs[-1+x+y-z],1/4 Abs[-1+x-y+z],1/4 Abs[-1-x+y+z],1/4 Abs[1+x+y+z]])]<=0,2,1],0]
+EntanglementBreakingQ[x_,y_,z_]:=If[DivisibilityKindOf[x,y,z]>0,If[Max[0,1/4 (-Abs[-1+x+y-z]-Abs[-1+x-y+z]-Abs[-1-x+y+z]-Abs[1+x+y+z]+8 Max[1/4 Abs[-1+x+y-z],1/4 Abs[-1+x-y+z],1/4 Abs[-1-x+y+z],1/4 Abs[1+x+y+z]])]<=0,2,1],0]
 
 End[] 
 EndPackage[]
