@@ -281,7 +281,7 @@ BasisElementOneIndex[i_]:=Switch[i,1,BasisElement[1,1],2,BasisElement[1,2],3,Bas
 w=Table[Tr[BasisElementOneIndex[i+1].PauliMatrix[j]/Sqrt[2]],{i,0,3},{j,0,3}];\[Omega]=Proyector[Bell[2]];\[Omega]ort=IdentityMatrix[4]-\[Omega];
 
 DivisibilityKindOf[\[Lambda]1_,\[Lambda]2_,\[Lambda]3_]:=Module[{eigen,list,L},
-list=Sqrt[Sort[{1,\[Lambda]1^2,\[Lambda]2^2,\[Lambda]3^2}]];
+list=Sort[Sqrt[{1,\[Lambda]1^2,\[Lambda]2^2,\[Lambda]3^2}]];
 L=MatrixLog[Chop[w.{{1,0,0,0},{0,\[Lambda]1,0,0},{0,0,\[Lambda]2,0},{0,0,0,\[Lambda]3}}.Dagger[w]]];
 If[
 (*Checking Complete Positivity*)
