@@ -44,6 +44,7 @@ up rotations), then this function gives 0 when the channel is not CPTP, 1 if the
 with CP-divisible dynamics and 4 if the channel can be written as exp(L) with L Lindblad."
 EntanglementBreakingQ::usage = "EntanglementBreakingQ[x_,y_,z_] this function checks if the channel is entanglement-breaking 
 in the sense of a separable Jamilokowski state."
+DivisibilityKindOfGeneral::usage = "DivisibilityKindOfGeneral[channel_]"
 
 
 Begin["Private`"] 
@@ -295,6 +296,26 @@ list[[1]]^2*list[[4]]^2>=Product[list[[i]],{i,1,4}],
 If[
 PositiveSemidefiniteMatrixQ[\[Omega]ort.Reshuffle[L].\[Omega]ort]&&HermitianMatrixQ[L],4,3
 ],2],1],0]];
+
+DivisibilityKindOf[\[Lambda]_VectorQ]:=DivisibilityKindOf[\[Lambda][[1]],\[Lambda][[2]],\[Lambda][[3]]];
+
+g=DiagonalMatrix[{1,-1,-1,-1}];
+DivisibilityKindOfGeneral[channel_]:=Module[{tocp,eigen,list,L},
+tocp=channel.g.channel.g;
+list=Sort[Sqrt[Eigenvalues[tocp]]];
+L=MatrixLog[Chop[w.channel.Dagger[w]]];
+If[
+(*Checking Complete Positivity*)
+PositiveSemidefiniteMatrixQ[Reshuffle[Chop[w.channel.Dagger[w]]]],
+If[
+(*Evaluating CP-divisibility and p-divisibility*)
+(*Evaluating for p-divsibility*)Det[channel]>0,
+If[ (*Evaluating for CP-div*)
+Abs[list[[1]]]^2*Abs[list[[4]]]^2>=Chop[Product[list[[i]],{i,1,4}]],
+(*Evaluating for markov type evolution*)
+If[
+PositiveSemidefiniteMatrixQ[\[Omega]ort.Reshuffle[L].\[Omega]ort]&&HermitianMatrixQ[L],4,3
+],2],1],0]]
 
 EntanglementBreakingQ[x_,y_,z_]:=If[DivisibilityKindOf[x,y,z]>0,If[Max[0,1/4 (-Abs[-1+x+y-z]-Abs[-1+x-y+z]-Abs[-1-x+y+z]-Abs[1+x+y+z]+8 Max[1/4 Abs[-1+x+y-z],1/4 Abs[-1+x-y+z],1/4 Abs[-1-x+y+z],1/4 Abs[1+x+y+z]])]<=0,2,1],0]
 
