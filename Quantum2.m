@@ -45,6 +45,7 @@ with CP-divisible dynamics and 4 if the channel can be written as exp(L) with L 
 EntanglementBreakingQ::usage = "EntanglementBreakingQ[x_,y_,z_] this function checks if the channel is entanglement-breaking 
 in the sense of a separable Jamilokowski state."
 DivisibilityKindOfGeneral::usage = "DivisibilityKindOfGeneral[channel_]"
+gRHP::usage = "gRHP[list_] Calculation of the Rivas g(t) from fidelity, i. e. from D(t) for dephasing channels."
 
 
 Begin["Private`"] 
@@ -315,9 +316,10 @@ Abs[list[[1]]]^2*Abs[list[[4]]]^2>=Chop[Product[list[[i]],{i,1,4}]],
 (*Evaluating for markov type evolution*)
 If[
 PositiveSemidefiniteMatrixQ[Chop[\[Omega]ort.Reshuffle[L].\[Omega]ort]]&&HermitianMatrixQ[L,Tolerance->10^-10],4,3
-],2],1],0]]
+],2],1],0]];
 
-EntanglementBreakingQ[x_,y_,z_]:=If[DivisibilityKindOf[x,y,z]>0,If[Max[0,1/4 (-Abs[-1+x+y-z]-Abs[-1+x-y+z]-Abs[-1-x+y+z]-Abs[1+x+y+z]+8 Max[1/4 Abs[-1+x+y-z],1/4 Abs[-1+x-y+z],1/4 Abs[-1-x+y+z],1/4 Abs[1+x+y+z]])]<=0,2,1],0]
+EntanglementBreakingQ[x_,y_,z_]:=If[DivisibilityKindOf[x,y,z]>0,If[Max[0,1/4 (-Abs[-1+x+y-z]-Abs[-1+x-y+z]-Abs[-1-x+y+z]-Abs[1+x+y+z]+8 Max[1/4 Abs[-1+x+y-z],1/4 Abs[-1+x-y+z],1/4 Abs[-1-x+y+z],1/4 Abs[1+x+y+z]])]<=0,2,1],0];
 
+gRHP[list_]:=Map[If[#<0,0,#]&,Table[list[[i+1]]/list[[i]]-1,{i,Length[list]-1}]];
 End[] 
 EndPackage[]
