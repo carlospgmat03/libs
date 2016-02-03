@@ -46,6 +46,7 @@ EntanglementBreakingQ::usage = "EntanglementBreakingQ[x_,y_,z_] this function ch
 in the sense of a separable Jamilokowski state."
 DivisibilityKindOfGeneral::usage = "DivisibilityKindOfGeneral[channel_]"
 gRHP::usage = "gRHP[list_] Calculation of the Rivas g(t) from fidelity, i. e. from D(t) for dephasing channels."
+PositiveDerivatives::usage = "PositiveDerivatives[list_] etc."
 
 
 Begin["Private`"] 
@@ -321,5 +322,6 @@ PositiveSemidefiniteMatrixQ[Chop[\[Omega]ort.Reshuffle[L].\[Omega]ort]]&&Hermiti
 EntanglementBreakingQ[x_,y_,z_]:=If[DivisibilityKindOf[x,y,z]>0,If[Max[0,1/4 (-Abs[-1+x+y-z]-Abs[-1+x-y+z]-Abs[-1-x+y+z]-Abs[1+x+y+z]+8 Max[1/4 Abs[-1+x+y-z],1/4 Abs[-1+x-y+z],1/4 Abs[-1-x+y+z],1/4 Abs[1+x+y+z]])]<=0,2,1],0];
 
 gRHP[list_]:=Map[If[#<0,0,#]&,Table[list[[i+1]]/list[[i]]-1,{i,Length[list]-1}]];
+PositiveDerivatives[list_]:=Map[If[#<0,0,#]&,Table[list[[i+1]]-list[[i]],{i,Length[list]-1}]];
 End[] 
 EndPackage[]
