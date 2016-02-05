@@ -296,7 +296,7 @@ If[ (*Evaluating for CP-div*)
 list[[1]]^2*list[[4]]^2>=Product[list[[i]],{i,1,4}],
 (*Evaluating for markov type evolution*)
 If[
-PositiveSemidefiniteMatrixQ[Chop[\[Omega]ort.Reshuffle[L].\[Omega]ort]]&&HermitianMatrixQ[L,Tolerance->10^-10],4,3
+PositiveSemidefiniteMatrixQ[Chop[DiagonalMatrix[Eigenvalues[Chop[\[Omega]ort.Reshuffle[L].\[Omega]ort]]]]]&&HermitianMatrixQ[L,Tolerance->10^-10],4,3
 ],2],1],0]];
 
 DivisibilityKindOf[\[Lambda]_VectorQ]:=DivisibilityKindOf[\[Lambda][[1]],\[Lambda][[2]],\[Lambda][[3]]];
@@ -316,7 +316,7 @@ If[ (*Evaluating for CP-div*)
 Abs[list[[1]]]^2*Abs[list[[4]]]^2>=Chop[Product[list[[i]],{i,1,4}]],
 (*Evaluating for markov type evolution*)
 If[
-PositiveSemidefiniteMatrixQ[Chop[\[Omega]ort.Reshuffle[L].\[Omega]ort]]&&HermitianMatrixQ[L,Tolerance->10^-10],4,3
+PositiveSemidefiniteMatrixQ[Chop[DiagonalMatrix[Eigenvalues[Chop[\[Omega]ort.Reshuffle[L].\[Omega]ort]]]]]&&PositiveSemidefiniteMatrixQ[Chop[DiagonalMatrix[Eigenvalues[channel]]]],4,3
 ],2],1],0]];
 
 EntanglementBreakingQ[x_,y_,z_]:=If[DivisibilityKindOf[x,y,z]>0,If[Max[0,1/4 (-Abs[-1+x+y-z]-Abs[-1+x-y+z]-Abs[-1-x+y+z]-Abs[1+x+y+z]+8 Max[1/4 Abs[-1+x+y-z],1/4 Abs[-1+x-y+z],1/4 Abs[-1-x+y+z],1/4 Abs[1+x+y+z]])]<=0,2,1],0];
