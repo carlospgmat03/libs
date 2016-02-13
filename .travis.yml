@@ -1,0 +1,10 @@
+language: cpp
+sudo: required
+before_install:
+        - sudo apt-get update -qq
+        - sudo apt-get install -qq liblapack*
+        - sudo apt-get install -qq libblas*
+        - sudo apt-get install -qq libitpp*
+        - sudo apt-get install -qq libfftw3*
+#script: ./descargador.sh && make vecs && ./vecs
+script: cd cpp/ && make test_spins2d && ./test_spins2d
