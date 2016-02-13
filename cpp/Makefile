@@ -27,7 +27,7 @@ test_spins2d:: test_spins2d.cpp
 	$(CXX) -I../  $(CXXFLAGS) $< -Wall -o $@ $(LIBS)
 
 test_spins:: test_spins.cpp
-	$(CXX)  -Wall -I../ -I . $(INCLUDETCLAP) $(CXXFLAGS) -o $@ $@.cpp
+	$(CXX)  -Wall -I../ -I . $(INCLUDETCLAP) $(CXXFLAGS) -o $@ $@.cpp $(LIBS)
 
 test_dev_random_kanbalam :: test_dev_random
 	bsub  -oo salida -eo error -q pruebas -n 5 srun ./test_dev_random
