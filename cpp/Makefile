@@ -38,7 +38,8 @@ testing :: testing.cpp ../cpp/cfp_math.cpp $(MYCPP)/cpp/itpp_ext_math.cpp
 % :: %.cpp
 	$(CXX) $< -Wall -o $@ -I $(MYCPP) -litpp
 
-test_rmt:: test_rmt.cpp RMT.cpp
+test_rmt:: test_rmt.cpp
+	$(CXX)  -I../ -Wall $(PATHTLCLAP)  $(CXXFLAGS) -o $@ $@.cpp $(LIBS)
 
 basic_libs.tgz :: cfp_math.cpp cfp_math.h dev_random.cpp itpp_ext_math.cpp itpp_ext_math.h purity_RMT.cpp purity_RMT.h RMT.cpp RMT.h spinchain.cpp
 	tar -cvzf $@ $^
