@@ -14,7 +14,7 @@ register :: register.cpp quantum_state.hpp my_random.hpp
 	$(CXX) $(CXXFLAGS) -o $@ $@.cpp
 
 test_memory_time:: test_memory_time.cpp
-	$(CXX)  -Wall $(PATHTLCLAP)  $(CXXFLAGS) -o $@ $@.cpp $(LIBS)
+	$(CXX)  -I../ -Wall $(PATHTLCLAP)  $(CXXFLAGS) -o $@ $@.cpp $(LIBS)
 
 # test_rmt:: test_rmt.cpp
 # 	$(CXX)  -Wall $(INCLUDETCLAP) $(CXXFLAGS) -o $@ $@.cpp -litpp
