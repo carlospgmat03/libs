@@ -10,4 +10,4 @@ before_install:
 #script: ./descargador.sh && make vecs && ./vecs
 #script: cd cpp/ && make test_spins && ./test_spins
 #script: cd cpp/ && make test_memory_time && ./test_memory_time
-script: cd cpp/ && make register && ./register
+script: cd cpp/ && make test_rmt && ./test_rmt
