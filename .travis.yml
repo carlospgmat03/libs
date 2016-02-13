@@ -6,5 +6,6 @@ before_install:
         - sudo apt-get install -qq libblas*
         - sudo apt-get install -qq libitpp*
         - sudo apt-get install -qq libfftw3*
+        - sudo apt-get install -qq libtclap-dev
 #script: ./descargador.sh && make vecs && ./vecs
 script: cd cpp/ && make test_spins2d && ./test_spins2d
