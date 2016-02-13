@@ -10,7 +10,7 @@ INCLUDES := -I. -I ../
 
 documentation ::
 	doxygen
-register :: register.cpp
+register:: register.cpp
 	$(CXX) -I../ $(CXXFLAGS) -o $@ $@.cpp $(LIBS)
 
 test_memory_time:: test_memory_time.cpp
