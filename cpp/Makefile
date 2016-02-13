@@ -11,7 +11,7 @@ INCLUDES := -I. -I ../
 documentation ::
 	doxygen
 register :: register.cpp quantum_state.hpp my_random.hpp
-	$(CXX) $(CXXFLAGS) -o $@ $@.cpp
+	$(CXX) -I../ $(CXXFLAGS) -o $@ $@.cpp $(LIBS)
 
 test_memory_time:: test_memory_time.cpp
 	$(CXX)  -I../ -Wall $(PATHTLCLAP)  $(CXXFLAGS) -o $@ $@.cpp $(LIBS)
