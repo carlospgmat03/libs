@@ -299,7 +299,7 @@ If[
 PositiveSemidefiniteMatrixQ[Chop[DiagonalMatrix[Eigenvalues[Chop[\[Omega]ort.Reshuffle[L].\[Omega]ort]]]]]&&HermitianMatrixQ[L,Tolerance->10^-10],4,3
 ],2],1],0]];
 
-DivisibilityKindOf[\[Lambda]_VectorQ]:=DivisibilityKindOf[\[Lambda][[1]],\[Lambda][[2]],\[Lambda][[3]]];
+DivisibilityKindOf[\[Lambda]_]:=DivisibilityKindOf[\[Lambda][[1]],\[Lambda][[2]],\[Lambda][[3]]];
 
 g=DiagonalMatrix[{1,-1,-1,-1}];
 DivisibilityKindOfGeneral[channel_]:=Module[{tocp,eigen,list,L},
