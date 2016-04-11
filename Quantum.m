@@ -550,13 +550,14 @@ AveragePurityChannelPauliBasis[Lambda_] := Total[Power[Lambda[[All, 1]], 2]]/2 +
 
 
 
-BlochEllipsoid[Cha_]:=Module[{center,T,coord,vecs,x,y,z},
+BlochEllipsoid[Cha_]:=Module[{center,T,coord,vecs,x,y,z,vecs0},
 T=Cha[[{2,3,4},{2,3,4}]];
 center={Cha[[2,1]],Cha[[3,1]],Cha[[4,1]]};
-vecs=Graphics3D[{{Red,Arrow[{center,Normalize[T.{1,0,0}]}],{Blue,Arrow[{center,Normalize[T.{0,1,0}]}]},{Green,Arrow[{center,Normalize[T.{0,0,1}]}]} } }];
+vecs0=Graphics3D[{{Dashing[0.01],Opacity[0.5],Red,Arrow[{center,1.3*Normalize[{1,0,0}]}],{Dashing[0.01],Opacity[0.5],Blue,Arrow[{center,1.3*Normalize[{0,1,0}]}]},{Dashing[0.01],Opacity[0.5],Green,Arrow[{center,1.3*Normalize[{0,0,1}]}]} } }];
+vecs=Graphics3D[{{Red,Arrow[{center,1.3*Normalize[T.{1,0,0}]}],{Blue,Arrow[{center,1.3*Normalize[T.{0,1,0}]}]},{Green,Arrow[{center,1.3*Normalize[T.{0,0,1}]}]} }}];
 coord={x,y,z}-center;
 coord=Inverse[T].coord;
-Show[ContourPlot3D[coord[[1]]^2+coord[[2]]^2+coord[[3]]^2==1,{x,-1,1},{y,-1,1},{z,-1,1},AxesLabel->{"X","Y","Z"}],vecs]
+Show[ContourPlot3D[{coord[[1]]^2+coord[[2]]^2+coord[[3]]^2==1,x^2+y^2+z^2==1},{x,-1,1},{y,-1,1},{z,-1,1},AxesLabel->{"X","Y","Z"},ContourStyle->{Automatic,Opacity[0.3]},Mesh->None],vecs,vecs0,PlotRange->1.6]
 ]
 (* {{{ *) EvolvGate[Gate_, steps_, env_, state_]:=
  Module[{statefinal, list, gate, j},
