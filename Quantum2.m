@@ -283,9 +283,8 @@ BasisElement[i_,j_]:=Table[If[k==i&&l==j,1,0],{k,2},{l,2}];
 BasisElementOneIndex[i_]:=Switch[i,1,BasisElement[1,1],2,BasisElement[1,2],3,BasisElement[2,1],4,BasisElement[2,2]];
 w=Table[Tr[BasisElementOneIndex[i+1].PauliMatrix[j]/Sqrt[2]],{i,0,3},{j,0,3}];\[Omega]=Proyector[Bell[2]];\[Omega]ort=IdentityMatrix[4]-\[Omega];
 
-DivisibilityKindOf[\[Lambda]1_,\[Lambda]2_,\[Lambda]3_]:=Module[{eigen,list,L},
+DivisibilityKindOf[\[Lambda]1_,\[Lambda]2_,\[Lambda]3_]:=Module[{eigen,list},
 list=Sort[Sqrt[{1,\[Lambda]1^2,\[Lambda]2^2,\[Lambda]3^2}]];
-L=MatrixLog[Chop[w.{{1,0,0,0},{0,\[Lambda]1,0,0},{0,0,\[Lambda]2,0},{0,0,0,\[Lambda]3}}.Dagger[w]]]//Chop;
 If[
 (*Checking Complete Positivity*)
 1+\[Lambda]1+\[Lambda]2+\[Lambda]3>=0&&1-\[Lambda]1-\[Lambda]2+\[Lambda]3>=0&&1-\[Lambda]1+\[Lambda]2-\[Lambda]3>=0&&1+\[Lambda]1-\[Lambda]2-\[Lambda]3>=0,
@@ -296,12 +295,18 @@ If[ (*Evaluating for CP-div*)
 list[[1]]^2*list[[4]]^2>=Product[list[[i]],{i,1,4}],
 (*Evaluating for markov type evolution*)
 If[
-PositiveSemidefiniteMatrixQ[Chop[DiagonalMatrix[Eigenvalues[Chop[\[Omega]ort.Reshuffle[L].\[Omega]ort]]]]]&&HermitianMatrixQ[L,Tolerance->10^-10],4,3
+-Log[\[Lambda]1]-Log[\[Lambda]2]+Log[\[Lambda]3]>=0&&
+-Log[\[Lambda]1]+Log[\[Lambda]2]-Log[\[Lambda]3]>=0&&
+Log[\[Lambda]1]-Log[\[Lambda]2]-Log[\[Lambda]3]>=0&&
+(*checking hermiticity*)
+\[Lambda]1>=0&&\[Lambda]2>=0&&\[Lambda]3>=0
+,4,3
 ],2],1],0]];
 
 DivisibilityKindOf[\[Lambda]_]:=DivisibilityKindOf[\[Lambda][[1]],\[Lambda][[2]],\[Lambda][[3]]];
 
 g=DiagonalMatrix[{1,-1,-1,-1}];
+
 DivisibilityKindOfGeneral[channel_]:=Module[{tocp,eigen,list,L},
 tocp=channel.g.channel.g;
 list=Sort[Sqrt[Eigenvalues[tocp]]];
