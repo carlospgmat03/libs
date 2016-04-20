@@ -287,7 +287,7 @@ DivisibilityKindOf[\[Lambda]1_,\[Lambda]2_,\[Lambda]3_]:=Module[{eigen,list},
 list=Sort[Sqrt[{1,\[Lambda]1^2,\[Lambda]2^2,\[Lambda]3^2}]];
 If[
 (*Checking Complete Positivity*)
-1+\[Lambda]1+\[Lambda]2+\[Lambda]3>=0&&1-\[Lambda]1-\[Lambda]2+\[Lambda]3>=0&&1-\[Lambda]1+\[Lambda]2-\[Lambda]3>=0&&1+\[Lambda]1-\[Lambda]2-\[Lambda]3>=0,
+Chop[1+\[Lambda]1+\[Lambda]2+\[Lambda]3]>=0&&Chop[1-\[Lambda]1-\[Lambda]2+\[Lambda]3]>=0&&Chop[1-\[Lambda]1+\[Lambda]2-\[Lambda]3]>=0&&Chop[1+\[Lambda]1-\[Lambda]2-\[Lambda]3]>=0,
 If[
 (*Evaluating CP-divisibility and p-divisibility*)
 (*Evaluating for p-divsibility*)\[Lambda]1 \[Lambda]2 \[Lambda]3>0,
@@ -295,9 +295,9 @@ If[ (*Evaluating for CP-div*)
 list[[1]]^2*list[[4]]^2>=Product[list[[i]],{i,1,4}],
 (*Evaluating for markov type evolution*)
 If[
--Log[\[Lambda]1]-Log[\[Lambda]2]+Log[\[Lambda]3]>=0&&
--Log[\[Lambda]1]+Log[\[Lambda]2]-Log[\[Lambda]3]>=0&&
-Log[\[Lambda]1]-Log[\[Lambda]2]-Log[\[Lambda]3]>=0&&
+Chop[-Log[\[Lambda]1]-Log[\[Lambda]2]+Log[\[Lambda]3]]>=0&&
+Chop[-Log[\[Lambda]1]+Log[\[Lambda]2]-Log[\[Lambda]3]]>=0&&
+Chop[Log[\[Lambda]1]-Log[\[Lambda]2]-Log[\[Lambda]3]]>=0&&
 (*checking hermiticity*)
 \[Lambda]1>=0&&\[Lambda]2>=0&&\[Lambda]3>=0
 ,4,3
