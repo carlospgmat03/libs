@@ -259,7 +259,7 @@ tab=Table[Criticallistmax[[i]][[2]]-Mean[Take[list,Criticallistmax[[i]][[1]]-1]]
 positionmax=Flatten[Position[tab,maxi=Max[{Max[tab],0}]]]//Last;
 maxingraph=Criticallistmax[[positionmax]][[1]];
 mean=Mean[Take[list,Criticallistmax[[positionmax]][[1]]-1]];
-Show[ListLinePlot[list,PlotRange->All,PlotStyle->Red,PlotLabel->Style[ToString[maxi]]],ListPlot[{{maxingraph+1,list[[maxingraph+1]]}},PlotStyle->{Blue,PointSize[0.015]}],Plot[mean,{x,0,l}],ImageSize->Medium]
+Show[ListLinePlot[list,PlotRange->All,PlotStyle->Red,PlotLabel->Style[ToString[maxi]]],ListPlot[{{maxingraph+1,list[[maxingraph+1]]}},PlotStyle->{Blue,PointSize[0.015]}],Plot[mean,{x,0,maxingraph},PlotStyle->Directive[Black,Thick]],ImageSize->Medium]
 ];
 
 CharlieMeasureAveForShowThings[list_]:=CharlieMeasureAveForShowThings[list,0];
