@@ -27,6 +27,7 @@ StateToDirac::usage = "VectorViewer[vec_] It shows the vector in Dirac notation 
 CharlieMeasure::usage = "CharlieMeasure[list_] or CharlieMeasure[list_]"
 CharlieMeasureAve::usage = "CharlieMeasureAve[list_]"
 CharlieMeasureForShowThings::usage = "CharlieMeasureForShowThings[list_]"
+CharlieMeasureAveForShowThings::usage = "CharlieMeasureAveForShowThings[list_,deep_]"
 StairCase::usage = "StairCase[x_,eigen_]"
 NNS::usage = "NNS[eigen_]"
 Unfold::usage = "Unfold[list_]"
@@ -229,7 +230,7 @@ CharlieMeasureAve[list2_] :=
            listD[[i + 1]] < 0), {i, list[[i + 1]]}, 0], {i, l - 2}], 
       0], #1[[2]] > #2[[2]] &];
 len=Length[Criticallistmax];
-If[len==0,0,Max[{0,Max[Table[Criticallistmax[[i]][[2]]-Mean[Take[list,Criticallistmax[[i]][[1]]]],{i,1,len}]]}]*Max[list2]]
+If[len==0,0,Max[{0,Max[Table[Criticallistmax[[i]][[2]]-Mean[Take[list,Criticallistmax[[i]][[1]]-1]],{i,1,len}]]}]*Max[list2]]
 ]
 
 CharlieMeasureForShowThings[list_,deep_]:=Module[{l,listD,Criticallistmin,Criticallistmax,position,maxi,len,tab,positionmax,miningraph,maxingraph,minlist,positionmin},
@@ -246,6 +247,22 @@ miningraph=Min[minlist=Take[Criticallistmin,maxingraph]];
 positionmin=Flatten[Position[minlist,miningraph]]//Last;
 Show[ListLinePlot[list,PlotRange->All,PlotStyle->Red,PlotLabel->Style[ToString[maxi]]],ListPlot[{{positionmin+1,list[[positionmin+1]]},{maxingraph+1,list[[maxingraph+1]]}},PlotStyle->{Blue,PointSize[0.015]}],ImageSize->Medium]
 ];
+
+CharlieMeasureAveForShowThings[list_,deep_]:=Module[{mean,l,listD,Criticallistmin,Criticallistmax,position,maxi,len,tab,positionmax,miningraph,maxingraph,minlist,positionmin},
+l=Length[list];
+listD=Table[list[[i+1]]-list[[i]],{i,l-1}];
+Criticallistmax=Sort[DeleteCases[Table[If[(listD[[i]]>0&&listD[[i+1]]<=0)||(listD[[i]]>=0&&listD[[i+1]]<0),{i,list[[i+1]]},0],{i,l-2}],0],#1[[2]]>#2[[2]]&];
+Criticallistmin=Table[If[(listD[[i]]<=0&&listD[[i+1]]>0)||(listD[[i]]<0&&listD[[i+1]]>=0),list[[i+1]],1],{i,l-2}];
+len=Length[Criticallistmax];
+If[deep>len,Print["No hay tantos maximos"]; Abort[];];
+tab=Table[Criticallistmax[[i]][[2]]-Mean[Take[list,Criticallistmax[[i]][[1]]-1]],{i,If[deep==0,len,deep]}];
+positionmax=Flatten[Position[tab,maxi=Max[{Max[tab],0}]]]//Last;
+maxingraph=Criticallistmax[[positionmax]][[1]];
+mean=Mean[Take[list,Criticallistmax[[positionmax]][[1]]-1]];
+Show[ListLinePlot[list,PlotRange->All,PlotStyle->Red,PlotLabel->Style[ToString[maxi]]],ListPlot[{{maxingraph+1,list[[maxingraph+1]]}},PlotStyle->{Blue,PointSize[0.015]}],Plot[mean,{x,0,l}],ImageSize->Medium]
+];
+
+CharlieMeasureAveForShowThings[list_]:=CharlieMeasureAveForShowThings[list,0];
 
 CharlieMeasureForShowThings[list_]:=CharlieMeasureForShowThings[list,0];
 
