@@ -48,6 +48,7 @@ in the sense of a separable Jamilokowski state."
 DivisibilityKindOfGeneral::usage = "DivisibilityKindOfGeneral[channel_]"
 gRHP::usage = "gRHP[list_] Calculation of the Rivas g(t) from fidelity, i. e. from D(t) for dephasing channels."
 PositiveDerivatives::usage = "PositiveDerivatives[list_] etc."
+maximizer::usage = "maximizer[list_] divides the second column of the list by the maximum value of the original list."
 
 
 Begin["Private`"] 
@@ -345,5 +346,12 @@ EntanglementBreakingQ[x_,y_,z_]:=If[DivisibilityKindOf[x,y,z]>0,If[Max[0,1/4 (-A
 
 gRHP[list_]:=Map[If[#<0,0,#]&,Table[list[[i+1]]/list[[i]]-1,{i,Length[list]-1}]];
 PositiveDerivatives[list_]:=Map[If[#<0,0,#]&,Table[list[[i+1]]-list[[i]],{i,Length[list]-1}]];
+(*Misc*)
+
+maximizer[list_]:=Module[{max},
+max=Max[list[[All,2]]];
+Map[{#[[1]],#[[2]]/max}&,list]
+];
+
 End[] 
 EndPackage[]
