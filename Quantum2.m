@@ -316,7 +316,7 @@ If[
 Chop[-Log[\[Lambda]1]-Log[\[Lambda]2]+Log[\[Lambda]3]]>=0&&
 Chop[-Log[\[Lambda]1]+Log[\[Lambda]2]-Log[\[Lambda]3]]>=0&&
 Chop[Log[\[Lambda]1]-Log[\[Lambda]2]-Log[\[Lambda]3]]>=0&&
-(*checking hermiticity*)
+(*checking hermiticity preserving*)
 \[Lambda]1>=0&&\[Lambda]2>=0&&\[Lambda]3>=0
 ,4,3
 ],2],1],0]];
