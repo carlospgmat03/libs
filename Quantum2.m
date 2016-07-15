@@ -50,7 +50,7 @@ gRHP::usage = "gRHP[list_] Calculation of the Rivas g(t) from fidelity, i. e. fr
 PositiveDerivatives::usage = "PositiveDerivatives[list_] etc."
 maximizer::usage = "maximizer[list_] divides the second column of the list by the maximum value of the original list."
 ChannelInPauliBasis::usage = "ChannelInPauliBasis[channel_] This function constructs the Pauli basis channel representation of one qubit"
-ChannelUnitBasis::usage = "ChannelInUnitBasis[channel_] This function constructs the Pauli basis channel representation of one qubit"
+ChannelInUnitBasis::usage = "ChannelInUnitBasis[channel_] This function constructs the Pauli basis channel representation of one qubit"
 
 
 Begin["Private`"] 
@@ -301,7 +301,7 @@ ClassicalCapacityDamping[t_,\[Lambda]_,\[Gamma]_,\[Omega]0_]:=FindMaximum[H[p]+H
 (*Routines for check divisibility properties*)
 BasisElement[i_,j_]:=Table[If[k==i&&l==j,1,0],{k,2},{l,2}];
 BasisElementOneIndex[i_]:=Switch[i,1,BasisElement[1,1],2,BasisElement[1,2],3,BasisElement[2,1],4,BasisElement[2,2]];
-w=Table[Tr[BasisElementOneIndex[i+1].PauliMatrix[j]/Sqrt[2]],{i,0,3},{j,0,3}];\[Omega]=Proyector[Bell[2]];\[Omega]ort=IdentityMatrix[4]-\[Omega];
+w=Table[Tr[Dagger[BasisElementOneIndex[i+1]].PauliMatrix[j]/Sqrt[2]],{i,0,3},{j,0,3}];\[Omega]=Proyector[Bell[2]];\[Omega]ort=IdentityMatrix[4]-\[Omega];
 
 DivisibilityKindOf[\[Lambda]1_,\[Lambda]2_,\[Lambda]3_]:=Module[{eigen,list},
 list=Sort[Sqrt[{1,\[Lambda]1^2,\[Lambda]2^2,\[Lambda]3^2}]];
@@ -357,6 +357,6 @@ Map[{#[[1]],#[[2]]/max}&,list]
 
 ChannelInPauliBasis[channel_]:=1/2Table[Tr[PauliMatrix[i].channel[PauliMatrix[j]]],{i,0,3},{j,0,3}];
 
-ChannelUnitBasis[channel_]:=Table[Tr[BasisElementOneIndex[i].channel[BasisElementOneIndex[j]]],{i,1,4},{j,1,4}];
+ChannelInUnitBasis[channel_]:=Table[Tr[Dagger[BasisElementOneIndex[i]].channel[BasisElementOneIndex[j]]],{i,1,4},{j,1,4}];
 End[] 
 EndPackage[]
