@@ -49,6 +49,8 @@ DivisibilityKindOfGeneral::usage = "DivisibilityKindOfGeneral[channel_]"
 gRHP::usage = "gRHP[list_] Calculation of the Rivas g(t) from fidelity, i. e. from D(t) for dephasing channels."
 PositiveDerivatives::usage = "PositiveDerivatives[list_] etc."
 maximizer::usage = "maximizer[list_] divides the second column of the list by the maximum value of the original list."
+ChannelInPauliBasis::usage = "ChannelInPauliBasis[channel_] This function constructs the Pauli basis channel representation of one qubit"
+ChannelUnitBasis::usage = "ChannelInUnitBasis[channel_] This function constructs the Pauli basis channel representation of one qubit"
 
 
 Begin["Private`"] 
@@ -353,5 +355,8 @@ max=Max[list[[All,2]]];
 Map[{#[[1]],#[[2]]/max}&,list]
 ];
 
+ChannelInPauliBasis[channel_]:=1/2Table[Tr[PauliMatrix[i].channel[PauliMatrix[j]]],{i,0,3},{j,0,3}];
+
+ChannelUnitBasis[channel_]:=Table[Tr[BasisElementOneIndex[i].channel[BasisElementOneIndex[j]]],{i,1,4},{j,1,4}];
 End[] 
 EndPackage[]
