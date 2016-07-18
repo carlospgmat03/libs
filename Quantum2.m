@@ -312,7 +312,7 @@ If[
 (*Evaluating CP-divisibility and p-divisibility*)
 (*Evaluating for p-divsibility*)\[Lambda]1 \[Lambda]2 \[Lambda]3>0,
 If[ (*Evaluating for CP-div*)
-list[[1]]^2*list[[4]]^2>=Product[list[[i]],{i,1,4}],
+list[[1]]^2>=\[Lambda]1*\[Lambda]2*\[Lambda]3&&\[Lambda]1>=0,
 (*Evaluating for markov type evolution*)
 If[
 Chop[-Log[\[Lambda]1]-Log[\[Lambda]2]+Log[\[Lambda]3]]>=0&&
@@ -338,7 +338,7 @@ If[
 (*Evaluating CP-divisibility and p-divisibility*)
 (*Evaluating for p-divsibility*)Det[channel]>0,
 If[ (*Evaluating for CP-div*)
-Abs[list[[1]]]^2*Abs[list[[4]]]^2>=Chop[Product[list[[i]],{i,1,4}]],
+Abs[list[[1]]]^2>=Det[channel],
 (*Evaluating for markov type evolution*)
 If[
 PositiveSemidefiniteMatrixQ[Chop[DiagonalMatrix[Eigenvalues[Chop[\[Omega]ort.Reshuffle[L].\[Omega]ort]]]]]&&PositiveSemidefiniteMatrixQ[Chop[DiagonalMatrix[Eigenvalues[channel]]]],4,3
