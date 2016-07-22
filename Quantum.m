@@ -113,6 +113,7 @@ BlochEllipsoid::usage = "BlochEllipsoid[Cha_] Show the deformation of BlochSpher
 EvolvGate::usage="EvolvGate[Gate_, steps_, env_, state_]... Evoluciona cualquier estado aplicando un numero steps_ de veces la compuerta Gate de  la forma Gate[#, otherparameters_] donde debe ponerse # en el lugar donde Gate toma el estado"
 MakeQuantumChannel::usage="MakeQuantumChannel[Gate_, steps_, env_] Donde Gate va de la forma Gate[#, otherparameters_]  donde debe ponerse # en el lugar donde Gate toma el estado"
 SumPositiveDerivatives::usage="SumPositiveDerivatives[list_] Suma todas las contribuciones list(max)-list(min) sucesivos cuando la derivada es positiva"
+GHZ::usage="GHZ[qu_] Creates a GHZ state, |000000\[RightAngleBracket]+|111111\[RightAngleBracket]"
 (* }}} *)
 (* }}} *)
 Begin["Private`"] 
@@ -593,6 +594,9 @@ sum=sum+list[[i+1]]-list[[i]];
 ],
 {i,1,Length[list]-1}];
 sum]
+(* }}} *)
+(* {{{ *)
+GHZ[qu_]:=1/Sqrt[2]Table[If[i==0||i==2^qu-1,1,0],{i,0,2^qu-1}]
 (* }}} *)
 (* }}} *)
 End[] 
