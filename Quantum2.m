@@ -314,12 +314,8 @@ If[
 If[ (*Evaluating for CP-div*)
 list[[1]]^2>=\[Lambda]1*\[Lambda]2*\[Lambda]3&&\[Lambda]1>=0,
 (*Evaluating for markov type evolution*)
-If[
-Chop[-Log[\[Lambda]1]-Log[\[Lambda]2]+Log[\[Lambda]3]]>=0&&
-Chop[-Log[\[Lambda]1]+Log[\[Lambda]2]-Log[\[Lambda]3]]>=0&&
-Chop[Log[\[Lambda]1]-Log[\[Lambda]2]-Log[\[Lambda]3]]>=0&&
-(*checking hermiticity preserving*)
-\[Lambda]1>=0&&\[Lambda]2>=0&&\[Lambda]3>=0
+If[(*checking hermiticity preserving*)
+\[Lambda]1/(\[Lambda]2*\[Lambda]3)>=0&&\[Lambda]2/(\[Lambda]1*\[Lambda]3)>=0&&\[Lambda]3/(\[Lambda]2*\[Lambda]1)>=0
 ,4,3
 ],2],1],0]];
 
@@ -327,9 +323,9 @@ DivisibilityKindOf[\[Lambda]_]:=DivisibilityKindOf[\[Lambda][[1]],\[Lambda][[2]]
 
 g=DiagonalMatrix[{1,-1,-1,-1}];
 
-DivisibilityKindOfGeneral[channel_]:=Module[{tocp,eigen,list,L},
-tocp=channel.g.channel.g;
-list=Sort[Sqrt[Eigenvalues[tocp]]];
+DivisibilityKindOfGeneral[channel_]:=Module[{tocp,eigen,list,L,ReshufledL},
+list=Sort[SingularValueList[channel]];
+ReshufledL=Reshuffle[L];
 L=MatrixLog[Chop[w.channel.Dagger[w]]]//Chop;
 If[
 (*Checking Complete Positivity*)
@@ -341,7 +337,7 @@ If[ (*Evaluating for CP-div*)
 Abs[list[[1]]]^2>=Det[channel],
 (*Evaluating for markov type evolution*)
 If[
-PositiveSemidefiniteMatrixQ[Chop[DiagonalMatrix[Eigenvalues[Chop[\[Omega]ort.Reshuffle[L].\[Omega]ort]]]]]&&PositiveSemidefiniteMatrixQ[Chop[DiagonalMatrix[Eigenvalues[channel]]]],4,3
+PositiveSemidefiniteMatrixQ[Chop[\[Omega]ort.ReshufledL.\[Omega]ort]]&&HermitianMatrixQ[ReshufledL],4,3
 ],2],1],0]];
 
 EntanglementBreakingQ[x_,y_,z_]:=If[DivisibilityKindOf[x,y,z]>0,If[Max[0,1/4 (-Abs[-1+x+y-z]-Abs[-1+x-y+z]-Abs[-1-x+y+z]-Abs[1+x+y+z]+8 Max[1/4 Abs[-1+x+y-z],1/4 Abs[-1+x-y+z],1/4 Abs[-1-x+y+z],1/4 Abs[1+x+y+z]])]<=0,2,1],0];
