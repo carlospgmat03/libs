@@ -49,8 +49,10 @@ DivisibilityKindOfGeneral::usage = "DivisibilityKindOfGeneral[channel_]"
 gRHP::usage = "gRHP[list_] Calculation of the Rivas g(t) from fidelity, i. e. from D(t) for dephasing channels."
 PositiveDerivatives::usage = "PositiveDerivatives[list_] etc."
 maximizer::usage = "maximizer[list_] divides the second column of the list by the maximum value of the original list."
-ChannelInPauliBasis::usage = "ChannelInPauliBasis[channel_] This function constructs the Pauli basis channel representation of one qubit"
-ChannelInUnitBasis::usage = "ChannelInUnitBasis[channel_] This function constructs the Pauli basis channel representation of one qubit"
+QuantumMapInPauliBasis::usage = "QuantumMapInPauliBasis[channel_] This function constructs the Pauli basis channel representation of one qubit"
+QuantumMapInUnitBasis::usage = "QuantumMapInInUnitBasis[channel_] This function constructs the Pauli basis channel representation of one qubit"
+FromPauliToUnit::usage = " etc."
+FromUnitToPauli::usage = " etc."
 
 
 Begin["Private`"] 
@@ -351,8 +353,11 @@ max=Max[list[[All,2]]];
 Map[{#[[1]],#[[2]]/max}&,list]
 ];
 
-ChannelInPauliBasis[channel_]:=1/2Table[Tr[PauliMatrix[i].channel[PauliMatrix[j]]],{i,0,3},{j,0,3}];
+QuantumMapInPauliBasis[channel_]:=1/2Table[Tr[PauliMatrix[i].channel[PauliMatrix[j]]],{i,0,3},{j,0,3}];
 
-ChannelInUnitBasis[channel_]:=Table[Tr[Dagger[BasisElementOneIndex[i]].channel[BasisElementOneIndex[j]]],{i,1,4},{j,1,4}];
+QuantumMapInUnitBasis[channel_]:=Table[Tr[Dagger[BasisElementOneIndex[i]].channel[BasisElementOneIndex[j]]],{i,1,4},{j,1,4}];
+
+FromPauliToUnit[channel_]:=w.channel.Dagger[w];
+FromUnitToPauli[channel_]:=Dagger[w].channel.w
 End[] 
 EndPackage[]
