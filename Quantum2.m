@@ -314,10 +314,10 @@ If[
 (*Evaluating CP-divisibility and p-divisibility*)
 (*Evaluating for p-divsibility*)\[Lambda]1 \[Lambda]2 \[Lambda]3>0,
 If[ (*Evaluating for CP-div*)
-list[[1]]^2>=\[Lambda]1*\[Lambda]2*\[Lambda]3&&\[Lambda]1>=0,
+list[[1]]^2>=\[Lambda]1*\[Lambda]2*\[Lambda]3,
 (*Evaluating for markov type evolution*)
 If[(*checking hermiticity preserving*)
-\[Lambda]1/(\[Lambda]2*\[Lambda]3)>=0&&\[Lambda]2/(\[Lambda]1*\[Lambda]3)>=0&&\[Lambda]3/(\[Lambda]2*\[Lambda]1)>=0
+\[Lambda]1>=0&&\[Lambda]2>=0&&\[Lambda]3>=0
 ,4,3
 ],2],1],0]];
 
@@ -327,8 +327,8 @@ g=DiagonalMatrix[{1,-1,-1,-1}];
 
 DivisibilityKindOfGeneral[channel_]:=Module[{tocp,eigen,list,L,ReshufledL},
 list=Sort[SingularValueList[channel]];
-ReshufledL=Reshuffle[L];
 L=MatrixLog[Chop[w.channel.Dagger[w]]]//Chop;
+ReshufledL=Reshuffle[L];
 If[
 (*Checking Complete Positivity*)
 PositiveSemidefiniteMatrixQ[Reshuffle[Chop[w.channel.Dagger[w]]]],
@@ -353,11 +353,11 @@ max=Max[list[[All,2]]];
 Map[{#[[1]],#[[2]]/max}&,list]
 ];
 
-QuantumMapInPauliBasis[channel_]:=1/2Table[Tr[PauliMatrix[i].channel[PauliMatrix[j]]],{i,0,3},{j,0,3}];
+QuantumMapInPauliBasis[channel_]:=1/2Table[Tr[Dagger[PauliMatrix[i]].channel[PauliMatrix[j]]],{i,0,3},{j,0,3}];
 
 QuantumMapInUnitBasis[channel_]:=Table[Tr[Dagger[BasisElementOneIndex[i]].channel[BasisElementOneIndex[j]]],{i,1,4},{j,1,4}];
 
 FromPauliToUnit[channel_]:=w.channel.Dagger[w];
-FromUnitToPauli[channel_]:=Dagger[w].channel.w
+FromUnitToPauli[channel_]:=Dagger[w].channel.w;
 End[] 
 EndPackage[]
