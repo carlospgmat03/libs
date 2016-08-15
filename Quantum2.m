@@ -353,7 +353,7 @@ max=Max[list[[All,2]]];
 Map[{#[[1]],#[[2]]/max}&,list]
 ];
 
-QuantumMapInPauliBasis[channel_]:=1/2Table[Tr[Dagger[PauliMatrix[i]].channel[PauliMatrix[j]]],{i,0,3},{j,0,3}];
+QuantumMapInPauliBasis[channel_]:=1/2Table[Tr[PauliMatrix[i].channel[PauliMatrix[j]]],{i,0,3},{j,0,3}];
 
 QuantumMapInUnitBasis[channel_]:=Table[Tr[Dagger[BasisElementOneIndex[i]].channel[BasisElementOneIndex[j]]],{i,1,4},{j,1,4}];
 
