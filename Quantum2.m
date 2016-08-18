@@ -45,7 +45,7 @@ up rotations), then this function gives 0 when the channel is not CPTP, 1 if the
 with CP-divisible dynamics and 4 if the channel can be written as exp(L) with L Lindblad."
 EntanglementBreakingQ::usage = "EntanglementBreakingQ[x_,y_,z_] this function checks if the channel is entanglement-breaking 
 in the sense of a separable Jamilokowski state."
-DivisibilityKindOfGeneral::usage = "DivisibilityKindOfGeneral[channel_]"
+DivisibilityKindOfGeneral::usage = "DivisibilityKindOfGeneral[channel_], Sure it works at least for channels with diagonal lorentz form in the case of CP-divisibility"
 gRHP::usage = "gRHP[list_] Calculation of the Rivas g(t) from fidelity, i. e. from D(t) for dephasing channels."
 PositiveDerivatives::usage = "PositiveDerivatives[list_] etc."
 maximizer::usage = "maximizer[list_] divides the second column of the list by the maximum value of the original list."
@@ -326,7 +326,7 @@ DivisibilityKindOf[\[Lambda]_]:=DivisibilityKindOf[\[Lambda][[1]],\[Lambda][[2]]
 
 g=DiagonalMatrix[{1,-1,-1,-1}];
 
-DivisibilityKindOfGeneral[channel_]:=Module[{tocp,eigen,list,channelinunit},
+DivisibilityKindOfGeneral[channel_,upto_]:=Module[{tocp,eigen,list,channelinunit},
 list=Sort[SingularValueList[channel]];
 channelinunit=Chop[FromPauliToUnit[channel]];
 If[
@@ -339,8 +339,10 @@ If[ (*Evaluating for CP-div*)
 Abs[list[[1]]]^2>=Det[channel],
 (*Evaluating for markov type evolution*)
 If[
-HermiticityPreservingAndCCPOFTheGeneratorQ[channelinunit,5],4,3
+HermiticityPreservingAndCCPOFTheGeneratorQ[channelinunit,upto],4,3
 ],2],1],0]];
+
+DivisibilityKindOfGeneral[channel_]:=DivisibilityKindOfGeneral[channel,5];
 
 EntanglementBreakingQ[x_,y_,z_]:=If[DivisibilityKindOf[x,y,z]>0,If[Max[0,1/4 (-Abs[-1+x+y-z]-Abs[-1+x-y+z]-Abs[-1-x+y+z]-Abs[1+x+y+z]+8 Max[1/4 Abs[-1+x+y-z],1/4 Abs[-1+x-y+z],1/4 Abs[-1-x+y+z],1/4 Abs[1+x+y+z]])]<=0,2,1],0];
 
