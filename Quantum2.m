@@ -326,13 +326,12 @@ DivisibilityKindOf[\[Lambda]_]:=DivisibilityKindOf[\[Lambda][[1]],\[Lambda][[2]]
 
 g=DiagonalMatrix[{1,-1,-1,-1}];
 
-DivisibilityKindOfGeneral[channel_]:=Module[{tocp,eigen,list,L,ReshufledL},
+DivisibilityKindOfGeneral[channel_]:=Module[{tocp,eigen,list,channelinunit},
 list=Sort[SingularValueList[channel]];
-L=MatrixLog[Chop[w.channel.Dagger[w]]]//Chop;
-ReshufledL=Reshuffle[L];
+channelinunit=Chop[FromPauliToUnit[channel]];
 If[
 (*Checking Complete Positivity*)
-PositiveSemidefiniteMatrixQ[Reshuffle[Chop[w.channel.Dagger[w]]]],
+PositiveSemidefiniteMatrixQ[Reshuffle[channelinunit]],
 If[
 (*Evaluating CP-divisibility and p-divisibility*)
 (*Evaluating for p-divsibility*)Det[channel]>0,
@@ -340,7 +339,7 @@ If[ (*Evaluating for CP-div*)
 Abs[list[[1]]]^2>=Det[channel],
 (*Evaluating for markov type evolution*)
 If[
-PositiveSemidefiniteMatrixQ[Chop[\[Omega]ort.ReshufledL.\[Omega]ort]]&&HermitianMatrixQ[ReshufledL],4,3
+CheckHermiticityPreservingAndCCPOFTheGenerator[channelinunit,5],4,3
 ],2],1],0]];
 
 EntanglementBreakingQ[x_,y_,z_]:=If[DivisibilityKindOf[x,y,z]>0,If[Max[0,1/4 (-Abs[-1+x+y-z]-Abs[-1+x-y+z]-Abs[-1-x+y+z]-Abs[1+x+y+z]+8 Max[1/4 Abs[-1+x+y-z],1/4 Abs[-1+x-y+z],1/4 Abs[-1-x+y+z],1/4 Abs[1+x+y+z]])]<=0,2,1],0];
@@ -361,20 +360,13 @@ QuantumMapInUnitBasis[channel_]:=Table[Tr[Dagger[BasisElementOneIndex[i]].channe
 FromPauliToUnit[channel_]:=w.channel.Dagger[w];
 FromUnitToPauli[channel_]:=Dagger[w].channel.w;
 
-DivisibilityKindOfGeneral[channel_]:=Module[{tocp,eigen,list,channelinunit},
-list=Sort[SingularValueList[channel]];
-channelinunit=Chop[FromPauliToUnit[channel]];
-If[
-(*Checking Complete Positivity*)
-PositiveSemidefiniteMatrixQ[Reshuffle[channelinunit]],
-If[
-(*Evaluating CP-divisibility and p-divisibility*)
-(*Evaluating for p-divsibility*)Det[channel]>0,
-If[ (*Evaluating for CP-div*)
-Abs[list[[1]]]^2>=Det[channel],
-(*Evaluating for markov type evolution*)
-If[
-CheckHermiticityPreservingAndCCPOFTheGenerator[channelinunit,5],4,3
-],2],1],0]];
+CheckHermiticityPreservingAndCCPOFTheGenerator[matrix_,upto_]:=Module[{logdiag,w,d,is,mat},
+{w,d}=JordanDecomposition[matrix];
+logdiag=Log[Diagonal[d]];
+is=False;
+Table[mat=Chop[Reshuffle[w.DiagonalMatrix[logdiag+2 Pi I {n,m,k,l}].Inverse[w]]];If[HermitianMatrixQ[mat]&&PositiveSemidefiniteMatrixQ[\[Omega]ort.mat.\[Omega]ort],is=True;Return[Null,Table]],{n,-upto,upto},{m,-upto,upto},{k,-upto,upto},{l,-upto,upto}];
+is
+];
+
 End[] 
 EndPackage[]
