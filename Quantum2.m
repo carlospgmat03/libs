@@ -342,7 +342,7 @@ If[
 HermiticityPreservingAndCCPOFTheGeneratorQ[channelinunit,upto],4,3
 ],2],1],0]];
 
-DivisibilityKindOfGeneral[channel_]:=DivisibilityKindOfGeneral[channel,5];
+DivisibilityKindOfGeneral[channel_]:=DivisibilityKindOfGeneral[channel,1];
 
 EntanglementBreakingQ[x_,y_,z_]:=If[DivisibilityKindOf[x,y,z]>0,If[Max[0,1/4 (-Abs[-1+x+y-z]-Abs[-1+x-y+z]-Abs[-1-x+y+z]-Abs[1+x+y+z]+8 Max[1/4 Abs[-1+x+y-z],1/4 Abs[-1+x-y+z],1/4 Abs[-1-x+y+z],1/4 Abs[1+x+y+z]])]<=0,2,1],0];
 
