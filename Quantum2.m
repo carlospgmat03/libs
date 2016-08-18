@@ -53,6 +53,7 @@ QuantumMapInPauliBasis::usage = "QuantumMapInPauliBasis[channel_] This function 
 QuantumMapInUnitBasis::usage = "QuantumMapInInUnitBasis[channel_] This function constructs the Pauli basis channel representation of one qubit"
 FromPauliToUnit::usage = " etc."
 FromUnitToPauli::usage = " etc."
+CheckHermiticityPreservingAndCCPOFTheGenerator::usage = "CheckHermiticityPreservingAndCCPOFTheGenerator[matrix_,upto_] etc"
 
 
 Begin["Private`"] 
@@ -359,5 +360,21 @@ QuantumMapInUnitBasis[channel_]:=Table[Tr[Dagger[BasisElementOneIndex[i]].channe
 
 FromPauliToUnit[channel_]:=w.channel.Dagger[w];
 FromUnitToPauli[channel_]:=Dagger[w].channel.w;
+
+DivisibilityKindOfGeneral[channel_]:=Module[{tocp,eigen,list,channelinunit},
+list=Sort[SingularValueList[channel]];
+channelinunit=Chop[FromPauliToUnit[channel]];
+If[
+(*Checking Complete Positivity*)
+PositiveSemidefiniteMatrixQ[Reshuffle[channelinunit]],
+If[
+(*Evaluating CP-divisibility and p-divisibility*)
+(*Evaluating for p-divsibility*)Det[channel]>0,
+If[ (*Evaluating for CP-div*)
+Abs[list[[1]]]^2>=Det[channel],
+(*Evaluating for markov type evolution*)
+If[
+CheckHermiticityPreservingAndCCPOFTheGenerator[channelinunit,5],4,3
+],2],1],0]];
 End[] 
 EndPackage[]
