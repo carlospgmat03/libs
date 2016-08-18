@@ -350,10 +350,12 @@ gRHP[list_]:=Map[If[#<0,0,#]&,Table[list[[i+1]]/list[[i]]-1,{i,Length[list]-1}]]
 PositiveDerivatives[list_]:=Map[If[#<0,0,#]&,Table[list[[i+1]]-list[[i]],{i,Length[list]-1}]];
 (*Misc*)
 
-maximizer[list_]:=Module[{max},
+maximizer[list_,factor_]:=Module[{max},
 max=Max[list[[All,2]]];
-Map[{#[[1]],#[[2]]/max}&,list]
+Map[{#[[1]],#[[2]]/(factor*max)}&,list]
 ];
+
+maximizer[list_]:=maximizer[list,1];
 
 QuantumMapInPauliBasis[channel_]:=1/2Table[Tr[PauliMatrix[i].channel[PauliMatrix[j]]],{i,0,3},{j,0,3}];
 
