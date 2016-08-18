@@ -53,7 +53,7 @@ QuantumMapInPauliBasis::usage = "QuantumMapInPauliBasis[channel_] This function 
 QuantumMapInUnitBasis::usage = "QuantumMapInInUnitBasis[channel_] This function constructs the Pauli basis channel representation of one qubit"
 FromPauliToUnit::usage = " etc."
 FromUnitToPauli::usage = " etc."
-CheckHermiticityPreservingAndCCPOFTheGenerator::usage = "CheckHermiticityPreservingAndCCPOFTheGenerator[matrix_,upto_] etc"
+HermiticityPreservingAndCCPOFTheGeneratorQ::usage = "CheckHermiticityPreservingAndCCPOFTheGenerator[matrix_,upto_] etc"
 
 
 Begin["Private`"] 
@@ -339,7 +339,7 @@ If[ (*Evaluating for CP-div*)
 Abs[list[[1]]]^2>=Det[channel],
 (*Evaluating for markov type evolution*)
 If[
-CheckHermiticityPreservingAndCCPOFTheGenerator[channelinunit,5],4,3
+HermiticityPreservingAndCCPOFTheGeneratorQ[channelinunit,5],4,3
 ],2],1],0]];
 
 EntanglementBreakingQ[x_,y_,z_]:=If[DivisibilityKindOf[x,y,z]>0,If[Max[0,1/4 (-Abs[-1+x+y-z]-Abs[-1+x-y+z]-Abs[-1-x+y+z]-Abs[1+x+y+z]+8 Max[1/4 Abs[-1+x+y-z],1/4 Abs[-1+x-y+z],1/4 Abs[-1-x+y+z],1/4 Abs[1+x+y+z]])]<=0,2,1],0];
@@ -360,7 +360,7 @@ QuantumMapInUnitBasis[channel_]:=Table[Tr[Dagger[BasisElementOneIndex[i]].channe
 FromPauliToUnit[channel_]:=w.channel.Dagger[w];
 FromUnitToPauli[channel_]:=Dagger[w].channel.w;
 
-CheckHermiticityPreservingAndCCPOFTheGenerator[matrix_,upto_]:=Module[{logdiag,w,d,is,mat},
+HermiticityPreservingAndCCPOFTheGeneratorQ[matrix_,upto_]:=Module[{logdiag,w,d,is,mat},
 {w,d}=JordanDecomposition[matrix];
 logdiag=Log[Diagonal[d]];
 is=False;
