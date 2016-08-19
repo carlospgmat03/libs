@@ -45,12 +45,15 @@ up rotations), then this function gives 0 when the channel is not CPTP, 1 if the
 with CP-divisible dynamics and 4 if the channel can be written as exp(L) with L Lindblad."
 EntanglementBreakingQ::usage = "EntanglementBreakingQ[x_,y_,z_] this function checks if the channel is entanglement-breaking 
 in the sense of a separable Jamilokowski state."
-DivisibilityKindOfGeneral::usage = "DivisibilityKindOfGeneral[channel_]"
+DivisibilityKindOfGeneral::usage = "DivisibilityKindOfGeneral[channel_], Sure it works at least for channels with diagonal lorentz form in the case of CP-divisibility"
 gRHP::usage = "gRHP[list_] Calculation of the Rivas g(t) from fidelity, i. e. from D(t) for dephasing channels."
 PositiveDerivatives::usage = "PositiveDerivatives[list_] etc."
 maximizer::usage = "maximizer[list_] divides the second column of the list by the maximum value of the original list."
-ChannelInPauliBasis::usage = "ChannelInPauliBasis[channel_] This function constructs the Pauli basis channel representation of one qubit"
-ChannelInUnitBasis::usage = "ChannelInUnitBasis[channel_] This function constructs the Pauli basis channel representation of one qubit"
+QuantumMapInPauliBasis::usage = "QuantumMapInPauliBasis[channel_] This function constructs the Pauli basis channel representation of one qubit"
+QuantumMapInUnitBasis::usage = "QuantumMapInInUnitBasis[channel_] This function constructs the Pauli basis channel representation of one qubit"
+FromPauliToUnit::usage = " etc."
+FromUnitToPauli::usage = " etc."
+HermiticityPreservingAndCCPOFTheGeneratorQ::usage = "CheckHermiticityPreservingAndCCPOFTheGenerator[matrix_,upto_] etc"
 
 
 Begin["Private`"] 
@@ -312,13 +315,9 @@ If[
 (*Evaluating CP-divisibility and p-divisibility*)
 (*Evaluating for p-divsibility*)\[Lambda]1 \[Lambda]2 \[Lambda]3>0,
 If[ (*Evaluating for CP-div*)
-list[[1]]^2>=\[Lambda]1*\[Lambda]2*\[Lambda]3&&\[Lambda]1>=0,
+list[[1]]^2>=\[Lambda]1*\[Lambda]2*\[Lambda]3,
 (*Evaluating for markov type evolution*)
-If[
-Chop[-Log[\[Lambda]1]-Log[\[Lambda]2]+Log[\[Lambda]3]]>=0&&
-Chop[-Log[\[Lambda]1]+Log[\[Lambda]2]-Log[\[Lambda]3]]>=0&&
-Chop[Log[\[Lambda]1]-Log[\[Lambda]2]-Log[\[Lambda]3]]>=0&&
-(*checking hermiticity preserving*)
+If[(*checking hermiticity preserving*)
 \[Lambda]1>=0&&\[Lambda]2>=0&&\[Lambda]3>=0
 ,4,3
 ],2],1],0]];
@@ -327,13 +326,12 @@ DivisibilityKindOf[\[Lambda]_]:=DivisibilityKindOf[\[Lambda][[1]],\[Lambda][[2]]
 
 g=DiagonalMatrix[{1,-1,-1,-1}];
 
-DivisibilityKindOfGeneral[channel_]:=Module[{tocp,eigen,list,L},
-tocp=channel.g.channel.g;
-list=Sort[Sqrt[Eigenvalues[tocp]]];
-L=MatrixLog[Chop[w.channel.Dagger[w]]]//Chop;
+DivisibilityKindOfGeneral[channel_,upto_]:=Module[{tocp,eigen,list,channelinunit},
+list=Sort[SingularValueList[channel]];
+channelinunit=Chop[FromPauliToUnit[channel]];
 If[
 (*Checking Complete Positivity*)
-PositiveSemidefiniteMatrixQ[Reshuffle[Chop[w.channel.Dagger[w]]]],
+PositiveSemidefiniteMatrixQ[Reshuffle[channelinunit]],
 If[
 (*Evaluating CP-divisibility and p-divisibility*)
 (*Evaluating for p-divsibility*)Det[channel]>0,
@@ -341,8 +339,10 @@ If[ (*Evaluating for CP-div*)
 Abs[list[[1]]]^2>=Det[channel],
 (*Evaluating for markov type evolution*)
 If[
-PositiveSemidefiniteMatrixQ[Chop[DiagonalMatrix[Eigenvalues[Chop[\[Omega]ort.Reshuffle[L].\[Omega]ort]]]]]&&PositiveSemidefiniteMatrixQ[Chop[DiagonalMatrix[Eigenvalues[channel]]]],4,3
+HermiticityPreservingAndCCPOFTheGeneratorQ[channelinunit,upto],4,3
 ],2],1],0]];
+
+DivisibilityKindOfGeneral[channel_]:=DivisibilityKindOfGeneral[channel,1];
 
 EntanglementBreakingQ[x_,y_,z_]:=If[DivisibilityKindOf[x,y,z]>0,If[Max[0,1/4 (-Abs[-1+x+y-z]-Abs[-1+x-y+z]-Abs[-1-x+y+z]-Abs[1+x+y+z]+8 Max[1/4 Abs[-1+x+y-z],1/4 Abs[-1+x-y+z],1/4 Abs[-1-x+y+z],1/4 Abs[1+x+y+z]])]<=0,2,1],0];
 
@@ -350,13 +350,27 @@ gRHP[list_]:=Map[If[#<0,0,#]&,Table[list[[i+1]]/list[[i]]-1,{i,Length[list]-1}]]
 PositiveDerivatives[list_]:=Map[If[#<0,0,#]&,Table[list[[i+1]]-list[[i]],{i,Length[list]-1}]];
 (*Misc*)
 
-maximizer[list_]:=Module[{max},
+maximizer[list_,factor_]:=Module[{max},
 max=Max[list[[All,2]]];
-Map[{#[[1]],#[[2]]/max}&,list]
+Map[{#[[1]],#[[2]]/(factor*max)}&,list]
 ];
 
-ChannelInPauliBasis[channel_]:=1/2Table[Tr[PauliMatrix[i].channel[PauliMatrix[j]]],{i,0,3},{j,0,3}];
+maximizer[list_]:=maximizer[list,1];
 
-ChannelInUnitBasis[channel_]:=Table[Tr[Dagger[BasisElementOneIndex[i]].channel[BasisElementOneIndex[j]]],{i,1,4},{j,1,4}];
+QuantumMapInPauliBasis[channel_]:=1/2Table[Tr[PauliMatrix[i].channel[PauliMatrix[j]]],{i,0,3},{j,0,3}];
+
+QuantumMapInUnitBasis[channel_]:=Table[Tr[Dagger[BasisElementOneIndex[i]].channel[BasisElementOneIndex[j]]],{i,1,4},{j,1,4}];
+
+FromPauliToUnit[channel_]:=w.channel.Dagger[w];
+FromUnitToPauli[channel_]:=Dagger[w].channel.w;
+
+HermiticityPreservingAndCCPOFTheGeneratorQ[matrix_,upto_]:=Module[{logdiag,w,d,is,mat},
+{w,d}=JordanDecomposition[matrix];
+logdiag=Log[Diagonal[d]];
+is=False;
+Table[mat=Chop[Reshuffle[w.DiagonalMatrix[logdiag+2 Pi I {n,m,k,l}].Inverse[w]]];If[HermitianMatrixQ[mat]&&PositiveSemidefiniteMatrixQ[\[Omega]ort.mat.\[Omega]ort],is=True;Return[Null,Table]],{n,-upto,upto},{m,-upto,upto},{k,-upto,upto},{l,-upto,upto}];
+is
+];
+
 End[] 
 EndPackage[]
