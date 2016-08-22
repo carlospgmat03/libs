@@ -54,6 +54,7 @@ QuantumMapInUnitBasis::usage = "QuantumMapInInUnitBasis[channel_] This function 
 FromPauliToUnit::usage = " etc."
 FromUnitToPauli::usage = " etc."
 HermiticityPreservingAndCCPOFTheGeneratorQ::usage = "CheckHermiticityPreservingAndCCPOFTheGenerator[matrix_,upto_] etc"
+UnitalChannelInPauliBasis::usage = "UnitalChannelInPauliBasis[x_,y_,z_], where x,y and z are the weights of the corresponding unitaries, by convexity teh weight of the identity operation is automatically determined "
 
 
 Begin["Private`"] 
@@ -371,6 +372,9 @@ is=False;
 Table[mat=Chop[Reshuffle[w.DiagonalMatrix[logdiag+2 Pi I {n,m,k,l}].Inverse[w]]];If[HermitianMatrixQ[mat]&&PositiveSemidefiniteMatrixQ[\[Omega]ort.mat.\[Omega]ort],is=True;Return[Null,Table]],{n,-upto,upto},{m,-upto,upto},{k,-upto,upto},{l,-upto,upto}];
 is
 ];
+
+UnitalChannelInPauliBasis[x_,y_,z_]:=DiagonalMatrix[(1-x-y-z){1,1,1,1}+x{1,1,-1,-1}+y{1,-1,1,-1}+z{1,-1,-1,1}];
+UnitalChannelInPauliBasis[vec_]:=UnitalChannelInPauliBasis[vec[[1]],vec[[2]],vec[[3]]]
 
 End[] 
 EndPackage[]
