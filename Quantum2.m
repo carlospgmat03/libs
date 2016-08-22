@@ -53,7 +53,9 @@ QuantumMapInPauliBasis::usage = "QuantumMapInPauliBasis[channel_] This function 
 QuantumMapInUnitBasis::usage = "QuantumMapInInUnitBasis[channel_] This function constructs the Pauli basis channel representation of one qubit"
 FromPauliToUnit::usage = " etc."
 FromUnitToPauli::usage = " etc."
-HermiticityPreservingAndCCPOFTheGeneratorQ::usage = "CheckHermiticityPreservingAndCCPOFTheGenerator[matrix_,upto_] etc"
+HermiticityPreservingAndCCPOfTheGeneratorQ::usage = "CheckHermiticityPreservingAndCCPOFTheGenerator[matrix_,upto_] etc"
+HermiticityPreservingOfTheGeneratorQ::usage = "Pending of explanation"
+ConditionalCompletePositivityOfTheGeneratorQ::usage = "Pending of explanation"
 UnitalChannelInPauliBasis::usage = "UnitalChannelInPauliBasis[x_,y_,z_], where x,y and z are the weights of the corresponding unitaries, by convexity teh weight of the identity operation is automatically determined "
 
 
@@ -327,12 +329,11 @@ DivisibilityKindOf[\[Lambda]_]:=DivisibilityKindOf[\[Lambda][[1]],\[Lambda][[2]]
 
 g=DiagonalMatrix[{1,-1,-1,-1}];
 
-DivisibilityKindOfGeneral[channel_,upto_]:=Module[{tocp,eigen,list,channelinunit},
-list=Sort[SingularValueList[channel]];
-channelinunit=Chop[FromPauliToUnit[channel]];
+DivisibilityKindOfGeneral[channel_,upto_]:=Module[{tocp,eigen,list},
+list=Sort[Chop[SingularValueList[channel]]];
 If[
 (*Checking Complete Positivity*)
-PositiveSemidefiniteMatrixQ[Reshuffle[channelinunit]],
+PositiveSemidefiniteMatrixQ[Reshuffle[FromPaulitoUnit[Chop[channel]]]],
 If[
 (*Evaluating CP-divisibility and p-divisibility*)
 (*Evaluating for p-divsibility*)Det[channel]>0,
@@ -340,7 +341,7 @@ If[ (*Evaluating for CP-div*)
 Abs[list[[1]]]^2>=Det[channel],
 (*Evaluating for markov type evolution*)
 If[
-HermiticityPreservingAndCCPOFTheGeneratorQ[channelinunit,upto],4,3
+HermiticityPreservingAndCCPOFTheGeneratorQ[Chop[channel],upto],4,3
 ],2],1],0]];
 
 DivisibilityKindOfGeneral[channel_]:=DivisibilityKindOfGeneral[channel,1];
@@ -365,11 +366,30 @@ QuantumMapInUnitBasis[channel_]:=Table[Tr[Dagger[BasisElementOneIndex[i]].channe
 FromPauliToUnit[channel_]:=w.channel.Dagger[w];
 FromUnitToPauli[channel_]:=Dagger[w].channel.w;
 
-HermiticityPreservingAndCCPOFTheGeneratorQ[matrix_,upto_]:=Module[{logdiag,w,d,is,mat},
+HermiticityPreservingAndCCPOfTheGeneratorQ[matrixx_,upto_]:=Module[{logdiag,w,d,is,mat,matrix},
+matrix=FromPauliToUnit[matrixx];
 {w,d}=JordanDecomposition[matrix];
 logdiag=Log[Diagonal[d]];
 is=False;
 Table[mat=Chop[Reshuffle[w.DiagonalMatrix[logdiag+2 Pi I {n,m,k,l}].Inverse[w]]];If[HermitianMatrixQ[mat]&&PositiveSemidefiniteMatrixQ[\[Omega]ort.mat.\[Omega]ort],is=True;Return[Null,Table]],{n,-upto,upto},{m,-upto,upto},{k,-upto,upto},{l,-upto,upto}];
+is
+];
+
+HermiticityPreservingOfTheGeneratorQ[matrixx_,upto_]:=Module[{logdiag,w,d,is,mat,matrix},
+matrix=FromPauliToUnit[matrixx];
+{w,d}=JordanDecomposition[matrix];
+logdiag=Log[Diagonal[d]];
+is=False;
+Table[mat=Chop[Reshuffle[w.DiagonalMatrix[logdiag+2 Pi I {n,m,k,l}].Inverse[w]]];If[HermitianMatrixQ[mat],is=True;Return[Null,Table]],{n,-upto,upto},{m,-upto,upto},{k,-upto,upto},{l,-upto,upto}];
+is
+];
+
+ConditionalCompletePositivityOfTheGeneratorQ[matrixx_,upto_]:=Module[{logdiag,w,d,is,mat,matrix},
+matrix=FromPauliToUnit[matrixx];
+{w,d}=JordanDecomposition[matrix];
+logdiag=Log[Diagonal[d]];
+is=False;
+Table[mat=Chop[Reshuffle[w.DiagonalMatrix[logdiag+2 Pi I {n,m,k,l}].Inverse[w]]];If[PositiveSemidefiniteMatrixQ[\[Omega]ort.mat.\[Omega]ort],is=True;Return[Null,Table]],{n,-upto,upto},{m,-upto,upto},{k,-upto,upto},{l,-upto,upto}];
 is
 ];
 
