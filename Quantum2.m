@@ -379,8 +379,7 @@ L[[pos[[2]],pos[[1]]]]=-(2 k+1)Pi;
 V.L.Inverse[V]
 ,False]]
 ];
-HermiticityPreservingAndCCPOfGenerator[matrix_]:=Module[{eig,eigneg,vectors,V,L,pos,\[Omega]ort,k,is},
-\[Omega]ort=IdentityMatrix[4]-Proyector[Bell[2]];
+HermiticityPreservingAndCCPOfGenerator[matrix_]:=Module[{eig,eigneg,vectors,V,L,pos,k,is},
 {eig,vectors}=Eigensystem[matrix];
 V=Transpose[vectors];
 eigneg=Select[eig,#<0&];
