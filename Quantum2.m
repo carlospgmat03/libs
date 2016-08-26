@@ -53,11 +53,9 @@ QuantumMapInPauliBasis::usage = "QuantumMapInPauliBasis[channel_] This function 
 QuantumMapInUnitBasis::usage = "QuantumMapInInUnitBasis[channel_] This function constructs the Pauli basis channel representation of one qubit"
 FromPauliToUnit::usage = " etc."
 FromUnitToPauli::usage = " etc."
-HermiticityPreservingAndCCPOfTheGeneratorQ::usage = "CheckHermiticityPreservingAndCCPOFTheGenerator[matrix_,upto_] etc"
-HermiticityPreservingOfTheGeneratorQ::usage = "Pending of explanation"
-ConditionalCompletePositivityOfTheGeneratorQ::usage = "Pending of explanation"
+HasHermitianPreservingGenerator::usage = "This deserves explanation soon...hard work "
+HermiticityPreservingAndCCPOfGenerator::usage = "This deserves explanation soon...hard work "
 DecompositionOfUnitalChannelsInSO::usage = "to test yet"
-HermiticityPreservingAndCCPOfTheGeneratorQForDiagonal::usage = "Fundamental part for DivisibilityKindOf"
 UnitalChannelInPauliBasis::usage = "UnitalChannelInPauliBasis[x_,y_,z_], where x,y and z are the weights of the corresponding unitaries, by convexity teh weight of the identity operation is automatically determined "
 
 
@@ -323,17 +321,9 @@ If[ (*Evaluating for CP-div*)
 list[[1]]^2>=\[Lambda]1*\[Lambda]2*\[Lambda]3,
 (*Evaluating for markov type evolution*)
 If[(*checking hermiticity preserving and CCP*)
-HermiticityPreservingAndCCPOfTheGeneratorQForDiagonal[\[Lambda]1,\[Lambda]2,\[Lambda]3,1]
+HermiticityPreservingAndCCPOfTheGeneratorQForDiagonal[\[Lambda]1,\[Lambda]2,\[Lambda]3,2]
 ,4,3
 ],2],1],0]];
-
-HermiticityPreservingAndCCPOfTheGeneratorQForDiagonal[\[Lambda]1_,\[Lambda]2_,\[Lambda]3_,upto_]:=Module[{logdiag,V,d,is,mat,vecs,values,tolerance},
-logdiag=Chop[Log[Diagonal[matrix]]];
-is=False;
-tolerance=10^(-5);
-Table[If[ (k+l+m+n) \[Pi]+Arg[\[Lambda]1]+Arg[\[Lambda]2]+Arg[\[Lambda]3]==0&&(-k+l-m+n) \[Pi]-Arg[\[Lambda]1]-Arg[\[Lambda]2]+Arg[\[Lambda]3]==0&&(k-l-m+n) \[Pi]-Arg[\[Lambda]1]+Arg[\[Lambda]2]-Arg[\[Lambda]3]==0&&(-k-l+m+n) \[Pi]+Arg[\[Lambda]1]-Arg[\[Lambda]2]-Arg[\[Lambda]3]==0&&Abs[\[Lambda]1/(\[Lambda]2* \[Lambda]3)]>= 1&&Abs[\[Lambda]1/(\[Lambda]2* \[Lambda]3)]>= 1&&Abs[\[Lambda]1/(\[Lambda]2* \[Lambda]3)]>= 1,is=True;Return[Null,Table]],{n,-upto,upto},{m,-upto,upto},{k,-upto,upto},{l,-upto,upto}];
-is
-];
 
 DivisibilityKindOf[\[Lambda]_]:=DivisibilityKindOf[\[Lambda][[1]],\[Lambda][[2]],\[Lambda][[3]]];
 
@@ -376,30 +366,35 @@ QuantumMapInUnitBasis[channel_]:=Table[Tr[Dagger[BasisElementOneIndex[i]].channe
 FromPauliToUnit[channel_]:=w.channel.Dagger[w];
 FromUnitToPauli[channel_]:=Dagger[w].channel.w;
 
-HermiticityPreservingAndCCPOfTheGeneratorQ[matrixx_,upto_]:=Module[{logdiag,V,d,is,mat,matrix},
-matrix=FromPauliToUnit[matrixx];
-{V,d}=Chop[JordanDecomposition[matrix]];
-logdiag=Chop[Log[Diagonal[d]]];
-is=False;
-Table[mat=Chop[Reshuffle[V.DiagonalMatrix[logdiag+2 Pi I {n,m,k,l}].Inverse[V]]];If[HermitianMatrixQ[mat,Tolerance->10^(-10)]&&PositiveSemidefiniteMatrixQ[\[Omega]ort.mat.\[Omega]ort,Tolerance->10^(-10)],is=True;Return[Null,Table]],{n,-upto,upto},{m,-upto,upto},{k,-upto,upto},{l,-upto,upto}];
-is
+HasHermitianPreservingGenerator[matrix_,k_:0]:=Module[{eig,eigneg,vectors,V,L,pos},
+{eig,vectors}=Eigensystem[matrix];
+V=Transpose[vectors];
+eigneg=Select[eig,#<0&];
+L=DiagonalMatrix[Log[Abs[eig]]];
+If[Length[eigneg]==0,L,
+If[Length[eigneg]==2&&Chop[eigneg[[1]]-eigneg[[2]],10^(-8)]==0,
+pos=Position[eig,eigneg[[1]]][[{1,2},1]];
+L[[pos[[1]],pos[[2]]]]=(2 k+1)Pi;
+L[[pos[[2]],pos[[1]]]]=-(2 k+1)Pi;
+V.L.Inverse[V]
+,False]]
 ];
-
-HermiticityPreservingOfTheGeneratorQ[matrixx_,upto_]:=Module[{logdiag,V,d,is,mat,matrix},
-matrix=FromPauliToUnit[matrixx];
-{V,d}=JordanDecomposition[matrix];
-logdiag=Log[Diagonal[d]];
-is=False;
-Table[mat=Chop[Reshuffle[V.DiagonalMatrix[logdiag+2 Pi I {n,m,k,l}].Inverse[V]]];If[HermitianMatrixQ[mat,Tolerance->10^(-10)],is=True;Return[Null,Table]],{n,-upto,upto},{m,-upto,upto},{k,-upto,upto},{l,-upto,upto}];
-is
-];
-
-ConditionalCompletePositivityOfTheGeneratorQ[matrixx_,upto_]:=Module[{logdiag,V,d,is,mat,matrix},
-matrix=FromPauliToUnit[matrixx];
-{V,d}=JordanDecomposition[matrix];
-logdiag=Log[Diagonal[d]];
-is=False;
-Table[mat=Chop[Reshuffle[V.DiagonalMatrix[logdiag+2 Pi I {n,m,k,l}].Inverse[V]]];If[PositiveSemidefiniteMatrixQ[\[Omega]ort.mat.\[Omega]ort,Tolerance->10^(-10)],is=True;Return[Null,Table]],{n,-upto,upto},{m,-upto,upto},{k,-upto,upto},{l,-upto,upto}];
+HermiticityPreservingAndCCPOfGenerator[matrix_]:=Module[{eig,eigneg,vectors,V,L,pos,\[Omega]ort,k,is},
+\[Omega]ort=IdentityMatrix[4]-Proyector[Bell[2]];
+{eig,vectors}=Eigensystem[matrix];
+V=Transpose[vectors];
+eigneg=Select[eig,#<0&];
+L=DiagonalMatrix[Log[Abs[eig]]];
+If[Length[eigneg]==0,
+If[PositiveSemidefiniteMatrixQ[\[Omega]ort.FullSimplify[Reshuffle[FromPauliToUnit[L]],Assumptions->Element[k,Integers]].\[Omega]ort],
+is=True,is=False],
+If[Length[eigneg]==2&&Chop[eigneg[[1]]-eigneg[[2]],10^(-8)]==0,
+pos=Position[eig,eigneg[[1]]][[{1,2},1]];
+L[[pos[[1]],pos[[2]]]]=(2 k+1)Pi;
+L[[pos[[2]],pos[[1]]]]=-(2 k+1)Pi;
+L=V.L.Inverse[V];
+L=\[Omega]ort.FullSimplify[Reshuffle[FromPauliToUnit[L]],Assumptions->Element[k,Integers]].\[Omega]ort;
+Table[If[PositiveSemidefiniteMatrixQ[Chop[L]],is=True;Return[Null,Table],is=False;],{k,-1,1}],is=False]];
 is
 ];
 
