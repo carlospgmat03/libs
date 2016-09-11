@@ -329,7 +329,7 @@ DivisibilityKindOf[\[Lambda]_]:=DivisibilityKindOf[\[Lambda][[1]],\[Lambda][[2]]
 
 g=DiagonalMatrix[{1,-1,-1,-1}];
 
-DivisibilityKindOfGeneral[channel_,upto_]:=Module[{eigen,list},
+DivisibilityKindOfGeneral[channel_]:=Module[{eigen,list},
 list=Sort[Sqrt[Chop[Eigenvalues[channel.g.channel.g]]]];
 (*list=Sort[Chop[SingularValueList[channel]]];*)
 If[
@@ -339,13 +339,11 @@ If[
 (*Evaluating CP-divisibility and p-divisibility*)
 (*Evaluating for p-divsibility*)Chop[Det[channel]]>0,
 If[ (*Evaluating for CP-div*)
-list[[1]]^2>=Chop[Det[channel]],
+list[[1]]^2list[[4]]^2>=Chop[Det[channel]],
 (*Evaluating for markov type evolution*)
 If[
-HermiticityPreservingAndCCPOfGenerator[Chop[channel],upto],4,3
+HermiticityPreservingAndCCPOfGenerator[Chop[channel]],4,3
 ],2],1],0]];
-
-DivisibilityKindOfGeneral[channel_]:=DivisibilityKindOfGeneral[channel,1];
 
 EntanglementBreakingQ[x_,y_,z_]:=If[DivisibilityKindOf[x,y,z]>0,If[Max[0,1/4 (-Abs[-1+x+y-z]-Abs[-1+x-y+z]-Abs[-1-x+y+z]-Abs[1+x+y+z]+8 Max[1/4 Abs[-1+x+y-z],1/4 Abs[-1+x-y+z],1/4 Abs[-1-x+y+z],1/4 Abs[1+x+y+z]])]<=0,2,1],0];
 
