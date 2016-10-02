@@ -210,10 +210,9 @@ vec[[i]]*"|"<>ToString[TableForm[{ToBinary[vec2]}, TableSpacing->{1.2,1.2}],Stan
 ]
 ];
 
-CharlieMeasure[list2_] := 
+CharlieMeasure[list_] := 
   Module[{l, listD, Criticallistmin, Criticallistmax, position, maxi, 
-    len, list},
-   list = list2/Max[list2];
+    len},
    l = Length[list];
    listD = Table[list[[i + 1]] - list[[i]], {i, l - 1}];
    Criticallistmax = 
@@ -223,13 +222,12 @@ CharlieMeasure[list2_] :=
            listD[[i + 1]] < 0), {i, list[[i + 1]]}, 0], {i, l - 2}], 
       0], #1[[2]] > #2[[2]] &];
 len=Length[Criticallistmax];
-If[len==0,0,Max[{0,Max[Table[Criticallistmax[[i]][[2]]-Min[Take[list,Criticallistmax[[i]][[1]]]],{i,1,len}]]}]*Max[list2]]
+If[len==0,0,Max[{0,Max[Table[Criticallistmax[[i]][[2]]-Min[Take[list,Criticallistmax[[i]][[1]]]],{i,1,len}]]}]]
 ];
 
-CharlieMeasureAve[list2_] := 
+CharlieMeasureAve[list_] := 
   Module[{l, listD, Criticallistmin, Criticallistmax, position, maxi, 
-    len, list},
-   list = list2/Max[list2];
+    len},
    l = Length[list];
    listD = Table[list[[i + 1]] - list[[i]], {i, l - 1}];
    Criticallistmax = 
@@ -239,7 +237,7 @@ CharlieMeasureAve[list2_] :=
            listD[[i + 1]] < 0), {i, list[[i + 1]]}, 0], {i, l - 2}], 
       0], #1[[2]] > #2[[2]] &];
 len=Length[Criticallistmax];
-If[len==0,0,Max[{0,Max[Table[Criticallistmax[[i]][[2]]-Mean[Take[list,Criticallistmax[[i]][[1]]-1]],{i,1,len}]]}]*Max[list2]]
+If[len==0,0,Max[{0,Max[Table[Criticallistmax[[i]][[2]]-Mean[Take[list,Criticallistmax[[i]][[1]]-1]],{i,1,len}]]}]]
 ]
 
 CharlieMeasureForShowThings[list_,deep_]:=Module[{l,listD,Criticallistmin,Criticallistmax,position,maxi,len,tab,positionmax,miningraph,maxingraph,minlist,positionmin},
