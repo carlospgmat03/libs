@@ -354,7 +354,17 @@ max=Max[list[[All,2]]];
 Map[{#[[1]],#[[2]]/(factor*max)}&,list]
 ];
 
-maximizer[list_]:=maximizer[list,1];
+maximizer[list_,factor_,deep_]:=Module[{max,maxlist,pos,listnew},
+maxlist=Sort[list[[All,2]],Greater];
+pos=Table[Position[list[[All,2]],maxlist[[i]]],{i,deep}]//Transpose//First;
+listnew=Delete[list,pos];
+max=Max[listnew[[All,2]]];
+Map[{#[[1]],#[[2]]/(factor*max)}&,listnew]
+]
+
+maximizer[list_,factor_,0]:=maximizer[list,factor];
+
+maximizer[list_]:=maximizer[list,1,0];
 
 QuantumMapInPauliBasis[channel_]:=1/2Table[Tr[PauliMatrix[i].channel[PauliMatrix[j]]],{i,0,3},{j,0,3}];
 
