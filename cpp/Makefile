@@ -26,6 +26,9 @@ test_spins2d:: test_spins2d.cpp
 # 	$(CXX) -I . $(INCLUDETCLAP) $(CXXFLAGS)
 	$(CXX) -I../  $(CXXFLAGS) $< -Wall -o $@ $(LIBS)
 
+test_spins_fast :: test_spins.cpp
+	$(CXX) -O3  -march=corei7-avx -mtune=corei7-avx -fomit-frame-pointer -I../ -I . $(INCLUDETCLAP) $(CXXFLAGS) -o $@ test_spins.cpp $(LIBS)
+
 test_spins:: test_spins.cpp
 	$(CXX)  -Wall -I../ -I . $(INCLUDETCLAP) $(CXXFLAGS) -o $@ $@.cpp $(LIBS)
 

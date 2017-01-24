@@ -6,7 +6,7 @@ qubits-CUDA
 modules/*.o 
 
 cuda
-
+test_spins_fast
 cpp/testing
 cpp/test_rmt
 cpp/test_spins

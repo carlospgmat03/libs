@@ -17,6 +17,7 @@ using namespace spinchain;
   TCLAP::ValueArg<string> optionArg("o","option", "Option" ,false,"nichts", "string",cmd);
   TCLAP::ValueArg<int> qubits("q","qubits", "Number of qubits",false, 4,"int",cmd);
   TCLAP::ValueArg<int> i1("","i1", "Integer parameter",false, 4,"int",cmd);
+  TCLAP::ValueArg<int> k_sector("k","k-sector", "Integer parameter",false, 0,"int",cmd);
   TCLAP::ValueArg<int> i2("","i2", "Integer parameter",false, 4,"int",cmd);
   TCLAP::ValueArg<int> i3("","i3", "Integer parameter",false, 4,"int",cmd);
   TCLAP::ValueArg<int> position("","position", "The position of something",false, 1,"int",cmd);
@@ -30,6 +31,17 @@ using namespace spinchain;
 // }}}
 std::complex<double> Im(0,1);
 
+const std::string currentDateTime() {
+    time_t     now = time(0);
+    struct tm  tstruct;
+    char       buf[80];
+    tstruct = *localtime(&now);
+    // Visit http://en.cppreference.com/w/cpp/chrono/c/strftime
+    // for more information about date/time format
+    strftime(buf, sizeof(buf), "%Y-%m-%d.%X", &tstruct);
+
+    return buf;
+}
 int main(int argc, char* argv[]) { //{{{
 // 	Random semilla_uran;
 // 	itpp::RNG_reset(semilla_uran.strong());
@@ -93,8 +105,6 @@ int main(int argc, char* argv[]) { //{{{
     int dim=pow_2(qubits.getValue());
     cvec state(dim);
     state=RandomState(dim);
-    double x,y;
-        
     vec b(3); b(0)=bx.getValue(); b(1)=by.getValue(); b(2)=bz.getValue();
 
     for (int t=0; t<i1.getValue(); t++){
@@ -407,6 +417,30 @@ cout <<norm(state-state_out_eduardo) << endl;
     // }}}
     std::cout << "error total=" << error << std::endl;
     //}}}
+  } else if(option=="test_spectrum") {// {{{
+    Array<CompactSymmetricBaseMember> basis_states, tmp_basis;
+    cvec state_l, state_r, state;
+    int q=qubits.getValue(), k=k_sector.getValue();
+    vec b(3); b(0)=bx.getValue(); b(1)=by.getValue(); b(2)=bz.getValue();
+    basis_states=build_rotationally_symmetric_base_states_compact(q, k);
+    int size_space=basis_states.size();
+    cmat U(size_space, size_space);
+    cvec eigenvalues(size_space);
+    std::cout << "Starting: currentDateTime()=" << currentDateTime() << std::endl;
+    for (int i=0; i<size_space; i++){
+      state_r=DecodeCompactRotationallySymetricBasisState(basis_states(i));
+//       apply_chain(state_r,Ising.getValue(),b);
+      for (int j=0; j<size_space; j++){
+        state_l=DecodeCompactRotationallySymetricBasisState(basis_states(j));
+        U(i,j) =  dot(conj(state_l),state_r) ;
+      }
+    }
+    std::cout << "Matrix built: currentDateTime()=" << currentDateTime() << std::endl;
+    itpp::eig(U,eigenvalues);
+    std::cout << "eigenvalues calculated: currentDateTime()=" << currentDateTime() << std::endl;
+//     cout << eigenvalues << endl;
+    //     cout << "ortonormalidad del sector k=" << k << endl;
+    // }}}
   } else if(option=="test_horizontal_proyector") {// {{{
     cvec Ppsi, state;
     double error=0.;
