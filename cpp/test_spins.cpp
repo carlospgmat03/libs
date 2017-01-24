@@ -429,7 +429,7 @@ cout <<norm(state-state_out_eduardo) << endl;
     std::cout << "Starting: currentDateTime()=" << currentDateTime() << std::endl;
     for (int i=0; i<size_space; i++){
       state_r=DecodeCompactRotationallySymetricBasisState(basis_states(i));
-//       apply_chain(state_r,Ising.getValue(),b);
+      apply_chain(state_r,Ising.getValue(),b);
       for (int j=0; j<size_space; j++){
         state_l=DecodeCompactRotationallySymetricBasisState(basis_states(j));
         U(i,j) =  dot(conj(state_l),state_r) ;
