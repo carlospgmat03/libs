@@ -389,7 +389,7 @@ V.L.Inverse[V]
 HermiticityPreservingAndCCPOfGenerator[matrix_]:=Module[{eig,eigneg,vectors,V,L,pos,k,is},
 is=False;
 {eig,vectors}=Chop[Eigensystem[matrix],10^(-10)];
-If[Element[eig,Reals]==False,Return["Complex eigenvalues"]];
+If[Element[eig,Reals]==False||DiagonalizableMatrixQ[matrix],Return["Complex eigenvalues or non diagonalizable"]];
 V=Transpose[vectors];
 eigneg=Select[eig,#<0&&Element[#,Reals]&];
 L=DiagonalMatrix[Log[Abs[eig]]];
