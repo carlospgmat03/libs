@@ -678,6 +678,11 @@ template <class Num_T> itpp::Mat<Num_T> AtimesDiagB(const itpp::Mat<Num_T>& A, c
   }
   return tmp;
 } // }}}
+void DiagonalTimesVector(const itpp::Vec<Num_T>& DiagMatrix, const itpp::Vec<Num_T>& Psi){ // {{{
+//   itpp::Mat<Num_T> tmp(A.cols(),A.rows());
+  Psi = DiagMatrix* Psi
+  return;
+} // }}}
 // }}}
 // Reporting {{{
 void PrintCompactHermitian(itpp::Mat<std::complex<double> >& rho){

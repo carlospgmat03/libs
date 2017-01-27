@@ -170,6 +170,7 @@ namespace RMT{ // {{{ Implementation
   }
   // }}}
   // }}}
+// }}}
 // GUE, CUE Collection {{{
   itpp::Mat<std::complex<double> > RandomGUEDeltaOne(int const dim){ //{{{
     itpp::Mat<std::complex<double> > temp(dim, dim);
@@ -259,6 +260,15 @@ namespace RMT{ // {{{ Implementation
 //     FlatSpectrumGUE(U, eigenvalues);
     //     return exp( 2*itpp::pi*std::complex<double>(0.,1.)*  itpp:randu())*U;
     return exp(2.*itpp::pi*std::complex<double>(0.,1.) *itpp::randu() )*U;
+  }
+  // }}}
+  itpp::Mat<std::complex<double> > RandomCUEphases(int const dim){ //{{{
+    itpp::Mat<std::complex<double> > U=RandomCUE(dim);
+    itpp::Vec<double> eigenvalues(dim);
+    eig_sym(U, eigenvalues);
+//     FlatSpectrumGUE(U, eigenvalues);
+    //     return exp( 2*itpp::pi*std::complex<double>(0.,1.)*  itpp:randu())*U;
+    return itpp::arg(eigenvalues);
   }
   // }}}
   // }}}
