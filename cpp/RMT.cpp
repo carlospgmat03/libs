@@ -262,10 +262,10 @@ namespace RMT{ // {{{ Implementation
     return exp(2.*itpp::pi*std::complex<double>(0.,1.) *itpp::randu() )*U;
   }
   // }}}
-  itpp::Mat<std::complex<double> > RandomCUEphases(int const dim){ //{{{
+  itpp::Vec<double> RandomCUEphases(int const dim){ //{{{
     itpp::Mat<std::complex<double> > U=RandomCUE(dim);
-    itpp::Vec<double> eigenvalues(dim);
-    eig_sym(U, eigenvalues);
+    itpp::Vec<std::complex<double> > eigenvalues(dim);
+    eig(U, eigenvalues);
 //     FlatSpectrumGUE(U, eigenvalues);
     //     return exp( 2*itpp::pi*std::complex<double>(0.,1.)*  itpp:randu())*U;
     return itpp::arg(eigenvalues);

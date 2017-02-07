@@ -16,6 +16,7 @@ void apply_ising_z_vinayak(itpp::cvec&, double, double);
 void apply_ising_z_common_environment_chain(itpp::cvec&, double, double);
 void apply_common_environment_chain(itpp::cvec&, double, double, itpp::vec);
 void apply_chain(itpp::cvec& state, double J, itpp::vec magnetic_field);
+void apply_chain(itpp::cvec& state, double J, itpp::vec magnetic_field, int t);
 void apply_ising_star(itpp::cvec& , double , double );
 void apply_ising_star_double(itpp::cvec& , double , double, double, int);
 void apply_ising_star_double_closed(itpp::cvec& , double , double, double, int);
@@ -82,6 +83,23 @@ namespace spinchain{ // {{{
     bz=0.;
     bz(2)=Delta/2;
     apply_star(state, Jenv, magnetic_field_env, J_interaction_qubit_env, bz);
+    return;
+  } //}}}
+  void apply_chain_backwards(itpp::cvec& state, double J, itpp::vec magnetic_field){// {{{
+    apply_magnetic_kick(state, -magnetic_field);
+    apply_ising_z(state, -J);
+    return;
+  } //}}}
+  void apply_chain(itpp::cvec& state, double J, itpp::vec magnetic_field, int t){// {{{
+    for (int i=0; i<t; i++){
+      apply_chain(state, J, magnetic_field);
+    }
+    return;
+  } //}}}
+  void apply_chain_backwards(itpp::cvec& state, double J, itpp::vec magnetic_field, int t){// {{{
+    for (int i=0; i<t; i++){
+      apply_chain_backwards(state, J, magnetic_field);
+    }
     return;
   } //}}}
   void apply_chain(itpp::cvec& state, double J, itpp::vec magnetic_field){// {{{
@@ -198,7 +216,6 @@ itpp::vec magnetic_field_env2, int qubits_env1){// {{{
 
     return;
   } // }}}
-
   void apply_magnetic_kick(itpp::cvec& state, itpp::vec magnetic_field){// {{{
     int qubits=cfpmath::log_base_2(state.size());
     for (int Position=0; Position<qubits; Position++){
@@ -239,10 +256,7 @@ itpp::vec magnetic_field_env2, int qubits_env1){// {{{
 //     std::cout << "Step 4 " << state << std::endl;
     return;
   } // }}}
-
-
-
-void apply_ising_star_double(itpp::cvec& state, double J, double Jcoupling1,double Jcoupling2, int qubits_env1){// {{{
+  void apply_ising_star_double(itpp::cvec& state, double J, double Jcoupling1,double Jcoupling2, int qubits_env1){// {{{
    
     int qubits=cfpmath::log_base_2(state.size());
     
@@ -258,7 +272,6 @@ void apply_ising_star_double(itpp::cvec& state, double J, double Jcoupling1,doub
     apply_ising_z(state, Jcoupling2, qubits-1, 1);
     return;
   } // }}}
-
  void apply_ising_star_double_closed(itpp::cvec& state, double J, double Jcoupling1,double Jcoupling2,int qubits_env1){// {{{
 //     std::cout << "En apply_ising_star J_interaction="<<J_interaction << std::endl;
     int qubits=cfpmath::log_base_2(state.size());
