@@ -379,18 +379,18 @@ FromUnitToPauli[channel_]:=Dagger[w].channel.w;
 EigensystemOrdered[A_]:=Module[{eigs,vecs,list1,list2},
 {eigs,vecs}=Eigensystem[A];
 list1=Partition[Riffle[eigs,vecs],2];
-list2=Sort[Sort[list1,Re[#1[[1]]]<Re[#2[[1]]]&],Abs[Im[#1[[1]]]]>Im[#2[[1]]]&];
+list2=Sort[Sort[list1,Re[#1[[1]]]<Re[#2[[1]]]&],Im[#1[[1]]]>Im[#2[[1]]]&];
 list2//Transpose
 ];
 
 RealMatrixLogarithmRealCase[matrix_,k_:0]:=Module[{eig,eigneg,vectors,V,L,pos},
 {eig,vectors}=Eigensystem[matrix];
 If[Element[eig,Reals]==False,Print["Se uso la rutina para logaritmo complejo"];RealMatrixLogarithmComplexCase[matrix,k],
-V=Transpose[vectors];
-eigneg=Select[eig,#<0&];
+V=Transpose[vectors]//Chop;
+eigneg=Select[eig,#<0&]//Chop;
 L=DiagonalMatrix[Log[Abs[eig]]];
 If[Length[eigneg]==0,V.L.Inverse[V],
-If[Length[eigneg]==2&&Chop[eigneg[[1]]-eigneg[[2]],10^(-8)]==0,
+If[Length[eigneg]==2&&Chop[eigneg[[1]]-eigneg[[2]],10^(-10)]==0,
 pos=Position[eig,eigneg[[1]]][[{1,2},1]];
 L[[pos[[1]],pos[[2]]]]=(2 k+1) Pi;
 L[[pos[[2]],pos[[1]]]]=-(2 k+1) Pi;
@@ -399,13 +399,15 @@ V.L.Inverse[V]
 ]
 ];
 
-RealMatrixLogarithmComplexCase[channel_,k_:0]:=Module[{mat,diag,w,e,pos,list,d2,w2,chreorlog,wreal},
+RealMatrixLogarithmComplexCase[channel_,k_:0]:=Module[{mat,diag,w,e,pos,list,d2,w2,chreorlog,wreal,list2,is},
 {diag,w}=Chop[EigensystemOrdered[channel]]//Chop;
 If[Element[diag,Reals],Print["Se uso la rutina para logaritmo real"];RealMatrixLogarithmRealCase[channel,k],
 mat=DiagonalMatrix[diag];
 w=Transpose[w];
 e=ConstantArray[0,Dimensions[channel]];
-list=Select[diag,Chop[Im[#]]!=0&];
+list=Select[diag,Chop[Im[#]]!=0&]//Chop;
+list2=Select[diag,Chop[Im[#]]==0&]//Chop;
+If[(Length[list2]==2&&AllTrue[list2,NonNegative])==False||(Length[list2]==1)==True,is=False,is=True];
 pos=Flatten[Table[Position[diag,i],{i,list}]];
 mat[[pos[[1]],pos[[1]]]]=Re[diag[[pos[[1]]]]];
 mat[[pos[[2]],pos[[2]]]]=Re[diag[[pos[[1]]]]];
@@ -419,7 +421,7 @@ If[Total[Flatten[Chop[d2-diag]]]==0,
 
 w2=Transpose[w2];d2=DiagonalMatrix[d2];
 wreal=w.Inverse[w2]//Chop;
-wreal.chreorlog.Inverse[wreal]//Chop
+If[is,wreal.chreorlog.Inverse[wreal]//Chop,is]
 
 ,Return["bad calculation"]
 ]
@@ -443,7 +445,7 @@ If[is==True,L,False]
 DecompositionOfUnitalChannelsInSO[map_]:=Module[{a,e,i,newmap},
 newmap=Take[Chop[map],{2,4},{2,4}];
 {a,e,i}=SingularValueDecomposition[newmap];
-Chop[JordanDecomposition[Det[a]*Det[i]*(i.e.Transpose[i])]][[2]]
+Chop[Eigenvalues[Det[a]*Det[i]*(i.e.Transpose[i])]]
 ];
 
 HasHermitianPreservingAndCCPGenerator[matrix_,upto_:1]:=Module[{is,L,i,branches,b},
