@@ -330,21 +330,20 @@ DivisibilityKindOf[\[Lambda]_]:=DivisibilityKindOf[\[Lambda][[1]],\[Lambda][[2]]
 
 g=DiagonalMatrix[{1,-1,-1,-1}];
 
-DivisibilityKindOfGeneral[channel_,branches_:1]:=Module[{eigen,list},
-list=Sort[Sqrt[Chop[Eigenvalues[channel.g.channel.g]]]];
-(*list=Sort[Chop[SingularValueList[channel]]];*)
+DivisibilityKindOfGeneraltesting[channel_,branches_:1]:=Module[{eigen,list,tmp},
+tmp=Det[channel];
+If[HasHermitianPreservingAndCCPGenerator[channel,branches],4,
 If[
-(*Checking Complete Positivity*)
-PositiveSemidefiniteMatrixQ[Reshuffle[Chop[FromPauliToUnit[Chop[channel]]]],Tolerance->10^(-10)],
+list=DecompositionOfUnitalChannelsInSO[channel]//Diagonal;
+tmp>0&&Chop[Min[list]^2]>=Chop[Apply[Times,list]],3,
+If[tmp>0,2,
 If[
-(*Evaluating CP-divisibility and p-divisibility*)
-(*Evaluating for p-divsibility*)Chop[Det[channel]]>0,
-If[ (*Evaluating for CP-div*)
-list[[1]]^2list[[4]]^2>=Times[list],
-(*Evaluating for markov type evolution*)
-If[
-HasHermitianPreservingAndCCPGenerator[Chop[channel],branches],4,3
-],2],1],0]];
+PositiveSemidefiniteMatrixQ[Reshuffle[Chop[FromPauliToUnit[Chop[channel]]]],Tolerance->10^(-10)],1,0
+]
+]
+]
+]
+];
 
 EntanglementBreakingQ[x_,y_,z_]:=If[DivisibilityKindOf[x,y,z]>0,If[Max[0,1/4 (-Abs[-1+x+y-z]-Abs[-1+x-y+z]-Abs[-1-x+y+z]-Abs[1+x+y+z]+8 Max[1/4 Abs[-1+x+y-z],1/4 Abs[-1+x-y+z],1/4 Abs[-1-x+y+z],1/4 Abs[1+x+y+z]])]<=0,2,1],0];
 
@@ -404,7 +403,7 @@ RealMatrixLogarithmComplexCase[channel_,k_:0]:=Module[{mat,diag,w,e,pos,list,d2,
 If[Element[diag,Reals],Print["Se uso la rutina para logaritmo real"];RealMatrixLogarithmRealCase[channel,k],
 mat=DiagonalMatrix[diag];
 w=Transpose[w];
-e=ConstantArray[0,Dimensions[channel]];
+e=ConstantArray[0.0,Dimensions[channel]];
 list=Select[diag,Chop[Im[#]]!=0&]//Chop;
 list2=Select[diag,Chop[Im[#]]==0&]//Chop;
 If[(Length[list2]==2&&AllTrue[list2,NonNegative])==False||(Length[list2]==1)==True,is=False,is=True];
@@ -413,13 +412,14 @@ mat[[pos[[1]],pos[[1]]]]=Re[diag[[pos[[1]]]]];
 mat[[pos[[2]],pos[[2]]]]=Re[diag[[pos[[1]]]]];
 mat[[pos[[1]],pos[[2]]]]=Im[diag[[pos[[1]]]]];
 mat[[pos[[2]],pos[[1]]]]=-Im[diag[[pos[[1]]]]];
-{d2,w2}=EigensystemOrdered[mat];
+{d2,w2}=EigensystemOrdered[mat]//Chop;
 e[[pos[[1]],pos[[2]]]]=1;
 e[[pos[[2]],pos[[1]]]]=-1;
-chreorlog=MatrixLog[mat]+2 Pi k e;
+chreorlog=Chop[MatrixLog[mat]+2 Pi k e];
 If[Total[Flatten[Chop[d2-diag]]]==0,
 
-w2=Transpose[w2];d2=DiagonalMatrix[d2];
+w2=Transpose[w2]//Chop;
+d2=DiagonalMatrix[d2]//Chop;
 wreal=w.Inverse[w2]//Chop;
 If[is,wreal.chreorlog.Inverse[wreal]//Chop,is]
 
