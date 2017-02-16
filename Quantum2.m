@@ -330,7 +330,7 @@ DivisibilityKindOf[\[Lambda]_]:=DivisibilityKindOf[\[Lambda][[1]],\[Lambda][[2]]
 
 g=DiagonalMatrix[{1,-1,-1,-1}];
 
-DivisibilityKindOfGeneraltesting[channel_,branches_:1]:=Module[{eigen,list,tmp},
+DivisibilityKindOfGeneral[channel_,branches_:1]:=Module[{eigen,list,tmp},
 tmp=Det[channel];
 If[HasHermitianPreservingAndCCPGenerator[channel,branches],4,
 If[
