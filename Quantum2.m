@@ -317,7 +317,7 @@ If[
 Chop[1+\[Lambda]1+\[Lambda]2+\[Lambda]3]>=0&&Chop[1-\[Lambda]1-\[Lambda]2+\[Lambda]3]>=0&&Chop[1-\[Lambda]1+\[Lambda]2-\[Lambda]3]>=0&&Chop[1+\[Lambda]1-\[Lambda]2-\[Lambda]3]>=0,
 If[
 (*Evaluating CP-divisibility and p-divisibility*)
-(*Evaluating for p-divsibility*)\[Lambda]1 \[Lambda]2 \[Lambda]3>0,
+(*Evaluating for p-divsibility*)\[Lambda]1 \[Lambda]2 \[Lambda]3>=0,
 If[ (*Evaluating for CP-div*)
 list[[1]]^2>=\[Lambda]1*\[Lambda]2*\[Lambda]3,
 (*Evaluating for markov type evolution*)
@@ -330,20 +330,20 @@ DivisibilityKindOf[\[Lambda]_]:=DivisibilityKindOf[\[Lambda][[1]],\[Lambda][[2]]
 
 g=DiagonalMatrix[{1,-1,-1,-1}];
 
-DivisibilityKindOfGeneral[channel_,branches_:1]:=Module[{eigen,list,tmp},
-tmp=Det[channel];
-If[HasHermitianPreservingAndCCPGenerator[channel,branches],4,
+DivisibilityKindOfGeneral[channel_,branches_:1]:=Module[{eigen,list,tmp,det},
 If[
-list=DecompositionOfUnitalChannelsInSO[channel]//Diagonal;
-tmp>0&&Chop[Min[list]^2]>=Chop[Apply[Times,list]],3,
-If[tmp>0,2,
+(*Checking Complete Positivity*)
+PositiveSemidefiniteMatrixQ[tmp=Reshuffle[Chop[FromPauliToUnit[Chop[channel]]]],Tolerance->10^(-10)],
 If[
-PositiveSemidefiniteMatrixQ[Reshuffle[Chop[FromPauliToUnit[Chop[channel]]]],Tolerance->10^(-10)],1,0
-]
-]
-]
-]
-];
+(*Evaluating CP-divisibility and p-divisibility*)
+(*Evaluating for p-divsibility*)det=Chop[Det[channel]];det>=0,
+If[ (*Evaluating for CP-div*)
+list=DecompositionOfUnitalChannelsInSO[channel];
+Chop[Min[list^2]]>=det&&det>0,
+(*Evaluating for markov type evolution*)
+If[
+HasHermitianPreservingAndCCPGenerator[Chop[channel],branches],4,3
+],2],1],0]];
 
 EntanglementBreakingQ[x_,y_,z_]:=If[DivisibilityKindOf[x,y,z]>0,If[Max[0,1/4 (-Abs[-1+x+y-z]-Abs[-1+x-y+z]-Abs[-1-x+y+z]-Abs[1+x+y+z]+8 Max[1/4 Abs[-1+x+y-z],1/4 Abs[-1+x-y+z],1/4 Abs[-1-x+y+z],1/4 Abs[1+x+y+z]])]<=0,2,1],0];
 
@@ -387,20 +387,20 @@ RealMatrixLogarithmRealCase[matrix_,k_:0]:=Module[{eig,eigneg,vectors,V,L,pos},
 If[Element[eig,Reals]==False,Print["Se uso la rutina para logaritmo complejo"];RealMatrixLogarithmComplexCase[matrix,k],
 V=Transpose[vectors]//Chop;
 eigneg=Select[eig,#<0&]//Chop;
-L=DiagonalMatrix[Log[Abs[eig]]];
+L=DiagonalMatrix[Log[Abs[eig]]]//Chop;
 If[Length[eigneg]==0,V.L.Inverse[V],
 If[Length[eigneg]==2&&Chop[eigneg[[1]]-eigneg[[2]],10^(-10)]==0,
 pos=Position[eig,eigneg[[1]]][[{1,2},1]];
 L[[pos[[1]],pos[[2]]]]=(2 k+1) Pi;
 L[[pos[[2]],pos[[1]]]]=-(2 k+1) Pi;
-V.L.Inverse[V]
+V.L.Inverse[V]//Chop
 ,False]]
 ]
 ];
 
 RealMatrixLogarithmComplexCase[channel_,k_:0]:=Module[{mat,diag,w,e,pos,list,d2,w2,chreorlog,wreal,list2,is},
 {diag,w}=Chop[EigensystemOrdered[channel]]//Chop;
-If[Element[diag,Reals],Print["Se uso la rutina para logaritmo real"];RealMatrixLogarithmRealCase[channel,k],
+If[Element[diag,Reals],(*Print["Se uso la rutina para logaritmo real"];*)RealMatrixLogarithmRealCase[channel,k],
 mat=DiagonalMatrix[diag];
 w=Transpose[w];
 e=ConstantArray[0.0,Dimensions[channel]];
@@ -454,7 +454,7 @@ branches=Table[b=b+(-1)^(j+1)*j,{j,0,2*upto}];
 is=False;
 If[DiagonalizableMatrixQ[matrix],
 
-Table[If[PositiveSemidefiniteMatrixQ[\[Omega]ort.FullSimplify[Reshuffle[FromPauliToUnit[L=RealMatrixLogarithmComplexCase[Chop[matrix],k]//Chop]]].\[Omega]ort],is=True;i=k;Return[Null,Table],is=False;],{k,branches}];,
+Table[If[PositiveSemidefiniteMatrixQ[\[Omega]ort.FullSimplify[Reshuffle[FromPauliToUnit[L=RealMatrixLogarithmComplexCase[Chop[matrix],k]//Chop]//Chop]].\[Omega]ort//Chop],is=True;i=k;Return[Null,Table],is=False;],{k,branches}];,
 Return["non diagonalizable"];
 ];
 If[i!=0,Print["El logaritmo es real hasta k= "<>ToString[i]]];
