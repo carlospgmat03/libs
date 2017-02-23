@@ -58,7 +58,8 @@ UnitalChannelInPauliBasis::usage = "UnitalChannelInPauliBasis[x_,y_,z_], where x
 EigensystemOrdered::usage = "EigensystemOrdered[matrix_], Routine for compute Eigensystem with ordered Eigenvalues, see code for further information, this is useful for several routines which require the same basis ordering for different diagonalizations."
 RealMatrixLogarithmComplexCase::usage = "RealMatrixLogarithmComplexCase[matrix,k=0] Real logarithm of a matrix for the complex eigenvalues case, returns Falese if the logarithm doesnt exists."
 RealMatrixLogarithmRealCase::usage = "RealMatrixLogarithmComplexCase[matrix,k=0] Real logarithm of a matrix for the real eigenvalues case, returns Falese if the logarithm doesnt exists."
-HermiticityPreservingAndCCPOfGeneratortesting::usage= "HermiticityPreservingAndCCPOfGeneratortesting[matrix,upto_Branch] Test if the given channels has a hermiticity preserving and ccp generator, returns False if there is no such generator."
+HermiticityPreservingAndCCPOfGenerator::usage= "HermiticityPreservingAndCCPOfGenerator[matrix,upto_Branch] Test if the given channels has a hermiticity preserving and ccp generator, returns False if there is no such generator."
+HasHermitianPreservingAndCCPGenerator::usage = "HasHermiticitianPreservingAndCCPOfGenerator[matrix_,upto_Branch] Returns True if the channels has hermitian preserving and ccp generator."
 
 
 Begin["Private`"] 
@@ -316,7 +317,7 @@ If[
 Chop[1+\[Lambda]1+\[Lambda]2+\[Lambda]3]>=0&&Chop[1-\[Lambda]1-\[Lambda]2+\[Lambda]3]>=0&&Chop[1-\[Lambda]1+\[Lambda]2-\[Lambda]3]>=0&&Chop[1+\[Lambda]1-\[Lambda]2-\[Lambda]3]>=0,
 If[
 (*Evaluating CP-divisibility and p-divisibility*)
-(*Evaluating for p-divsibility*)\[Lambda]1 \[Lambda]2 \[Lambda]3>0,
+(*Evaluating for p-divsibility*)\[Lambda]1 \[Lambda]2 \[Lambda]3>=0,
 If[ (*Evaluating for CP-div*)
 list[[1]]^2>=\[Lambda]1*\[Lambda]2*\[Lambda]3,
 (*Evaluating for markov type evolution*)
@@ -329,20 +330,19 @@ DivisibilityKindOf[\[Lambda]_]:=DivisibilityKindOf[\[Lambda][[1]],\[Lambda][[2]]
 
 g=DiagonalMatrix[{1,-1,-1,-1}];
 
-DivisibilityKindOfGeneral[channel_]:=Module[{eigen,list},
-list=Sort[Sqrt[Chop[Eigenvalues[channel.g.channel.g]]]];
-(*list=Sort[Chop[SingularValueList[channel]]];*)
+DivisibilityKindOfGeneral[channel_,branches_:1]:=Module[{eigen,list,tmp,det},
 If[
 (*Checking Complete Positivity*)
-PositiveSemidefiniteMatrixQ[Reshuffle[Chop[FromPauliToUnit[Chop[channel]]]],Tolerance->10^(-10)],
+PositiveSemidefiniteMatrixQ[tmp=Reshuffle[Chop[FromPauliToUnit[Chop[channel]]]],Tolerance->10^(-10)],
 If[
 (*Evaluating CP-divisibility and p-divisibility*)
-(*Evaluating for p-divsibility*)Chop[Det[channel]]>0,
+(*Evaluating for p-divsibility*)det=Chop[Det[channel]];det>=0,
 If[ (*Evaluating for CP-div*)
-list[[1]]^2list[[4]]^2>=Chop[Det[channel]],
+list=DecompositionOfUnitalChannelsInSO[channel];
+Chop[Min[list^2]]>=det&&det>0,
 (*Evaluating for markov type evolution*)
 If[
-HermiticityPreservingAndCCPOfGenerator[Chop[channel]],4,3
+HasHermitianPreservingAndCCPGenerator[Chop[channel],branches],4,3
 ],2],1],0]];
 
 EntanglementBreakingQ[x_,y_,z_]:=If[DivisibilityKindOf[x,y,z]>0,If[Max[0,1/4 (-Abs[-1+x+y-z]-Abs[-1+x-y+z]-Abs[-1-x+y+z]-Abs[1+x+y+z]+8 Max[1/4 Abs[-1+x+y-z],1/4 Abs[-1+x-y+z],1/4 Abs[-1-x+y+z],1/4 Abs[1+x+y+z]])]<=0,2,1],0];
@@ -378,47 +378,50 @@ FromUnitToPauli[channel_]:=Dagger[w].channel.w;
 EigensystemOrdered[A_]:=Module[{eigs,vecs,list1,list2},
 {eigs,vecs}=Eigensystem[A];
 list1=Partition[Riffle[eigs,vecs],2];
-list2=Sort[Sort[list1,Re[#1[[1]]]<Re[#2[[1]]]&],Abs[Im[#1[[1]]]]>Im[#2[[1]]]&];
+list2=Sort[Sort[list1,Re[#1[[1]]]<Re[#2[[1]]]&],Im[#1[[1]]]>Im[#2[[1]]]&];
 list2//Transpose
 ];
 
 RealMatrixLogarithmRealCase[matrix_,k_:0]:=Module[{eig,eigneg,vectors,V,L,pos},
 {eig,vectors}=Eigensystem[matrix];
 If[Element[eig,Reals]==False,Print["Se uso la rutina para logaritmo complejo"];RealMatrixLogarithmComplexCase[matrix,k],
-V=Transpose[vectors];
-eigneg=Select[eig,#<0&];
-L=DiagonalMatrix[Log[Abs[eig]]];
+V=Transpose[vectors]//Chop;
+eigneg=Select[eig,#<0&]//Chop;
+L=DiagonalMatrix[Log[Abs[eig]]]//Chop;
 If[Length[eigneg]==0,V.L.Inverse[V],
-If[Length[eigneg]==2&&Chop[eigneg[[1]]-eigneg[[2]],10^(-8)]==0,
+If[Length[eigneg]==2&&Chop[eigneg[[1]]-eigneg[[2]],10^(-10)]==0,
 pos=Position[eig,eigneg[[1]]][[{1,2},1]];
 L[[pos[[1]],pos[[2]]]]=(2 k+1) Pi;
 L[[pos[[2]],pos[[1]]]]=-(2 k+1) Pi;
-V.L.Inverse[V]
+V.L.Inverse[V]//Chop
 ,False]]
 ]
 ];
 
-RealMatrixLogarithmComplexCase[channel_,k_:0]:=Module[{mat,diag,w,e,pos,list,d2,w2,chreorlog,wreal},
+RealMatrixLogarithmComplexCase[channel_,k_:0]:=Module[{mat,diag,w,e,pos,list,d2,w2,chreorlog,wreal,list2,is},
 {diag,w}=Chop[EigensystemOrdered[channel]]//Chop;
-If[Element[diag,Reals],Print["Se uso la rutina para logaritmo real"];RealMatrixLogarithmRealCase[channel,k],
+If[Element[diag,Reals],(*Print["Se uso la rutina para logaritmo real"];*)RealMatrixLogarithmRealCase[channel,k],
 mat=DiagonalMatrix[diag];
 w=Transpose[w];
-e=ConstantArray[0,Dimensions[channel]];
-list=Select[diag,Chop[Im[#]]!=0&];
+e=ConstantArray[0.0,Dimensions[channel]];
+list=Select[diag,Chop[Im[#]]!=0&]//Chop;
+list2=Select[diag,Chop[Im[#]]==0&]//Chop;
+If[(Length[list2]==2&&AllTrue[list2,NonNegative])==False||(Length[list2]==1)==True,is=False,is=True];
 pos=Flatten[Table[Position[diag,i],{i,list}]];
 mat[[pos[[1]],pos[[1]]]]=Re[diag[[pos[[1]]]]];
 mat[[pos[[2]],pos[[2]]]]=Re[diag[[pos[[1]]]]];
 mat[[pos[[1]],pos[[2]]]]=Im[diag[[pos[[1]]]]];
 mat[[pos[[2]],pos[[1]]]]=-Im[diag[[pos[[1]]]]];
-{d2,w2}=EigensystemOrdered[mat];
+{d2,w2}=EigensystemOrdered[mat]//Chop;
 e[[pos[[1]],pos[[2]]]]=1;
 e[[pos[[2]],pos[[1]]]]=-1;
-chreorlog=MatrixLog[mat]+2 Pi k e;
+chreorlog=Chop[MatrixLog[mat]+2 Pi k e];
 If[Total[Flatten[Chop[d2-diag]]]==0,
 
-w2=Transpose[w2];d2=DiagonalMatrix[d2];
+w2=Transpose[w2]//Chop;
+d2=DiagonalMatrix[d2]//Chop;
 wreal=w.Inverse[w2]//Chop;
-wreal.chreorlog.Inverse[wreal]//Chop
+If[is,wreal.chreorlog.Inverse[wreal]//Chop,is]
 
 ,Return["bad calculation"]
 ]
@@ -426,7 +429,7 @@ wreal.chreorlog.Inverse[wreal]//Chop
 ];
 
 
-HermiticityPreservingAndCCPOfGeneratortesting[matrix_,upto_:1]:=Module[{is,L,i,branches,b},
+HermiticityPreservingAndCCPOfGenerator[matrix_,upto_:1]:=Module[{is,L,i,branches,b},
 b=0;
 branches=Table[b=b+(-1)^(j+1)*j,{j,0,2*upto}];
 is=False;
@@ -442,7 +445,20 @@ If[is==True,L,False]
 DecompositionOfUnitalChannelsInSO[map_]:=Module[{a,e,i,newmap},
 newmap=Take[Chop[map],{2,4},{2,4}];
 {a,e,i}=SingularValueDecomposition[newmap];
-Chop[JordanDecomposition[Det[a]*Det[i]*(i.newmap.Transpose[i])]][[2]]
+Chop[Eigenvalues[Det[a]*Det[i]*(i.e.Transpose[i])]]
+];
+
+HasHermitianPreservingAndCCPGenerator[matrix_,upto_:1]:=Module[{is,L,i,branches,b},
+b=0;
+branches=Table[b=b+(-1)^(j+1)*j,{j,0,2*upto}];
+is=False;
+If[DiagonalizableMatrixQ[matrix],
+
+Table[If[PositiveSemidefiniteMatrixQ[\[Omega]ort.FullSimplify[Reshuffle[FromPauliToUnit[L=RealMatrixLogarithmComplexCase[Chop[matrix],k]//Chop]//Chop]].\[Omega]ort//Chop],is=True;i=k;Return[Null,Table],is=False;],{k,branches}];,
+Return["non diagonalizable"];
+];
+If[i!=0,Print["El logaritmo es real hasta k= "<>ToString[i]]];
+If[is==True,is,False]
 ];
 
 UnitalChannelInPauliBasis[x_,y_,z_]:=DiagonalMatrix[(1-x-y-z){1,1,1,1}+x{1,1,-1,-1}+y{1,-1,1,-1}+z{1,-1,-1,1}];
@@ -450,3 +466,6 @@ UnitalChannelInPauliBasis[vec_]:=UnitalChannelInPauliBasis[vec[[1]],vec[[2]],vec
 
 End[] 
 EndPackage[]
+
+
+
