@@ -457,7 +457,7 @@ If[DiagonalizableMatrixQ[matrix],
 Table[If[PositiveSemidefiniteMatrixQ[\[Omega]ort.FullSimplify[Reshuffle[FromPauliToUnit[L=RealMatrixLogarithmComplexCase[Chop[matrix],k]//Chop]//Chop]].\[Omega]ort//Chop],is=True;i=k;Return[Null,Table],is=False;],{k,branches}];,
 Return["non diagonalizable"];
 ];
-If[i!=0,Print["El logaritmo es real hasta k= "<>ToString[i]]];
+If[i!=0,Print["Hermiticity preserving and ccp condition is fulfilled until k= "<>ToString[i]]];
 If[is==True,is,False]
 ];
 
