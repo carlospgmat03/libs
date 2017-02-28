@@ -49,7 +49,12 @@ Normalization::usage = "default sucks, SizeIndependent yields  Hij Hkl = delta i
 (* {{{ Matrix manipulation and advanced linear algebra*)
 BaseForHermitianMatrices::usage = "Base element for Hermitian matrices"
 Commutator::usage = "Makes the commutator between A and B: Commutator[A,B]=A.B-B.A"
-PartialTrace::usage = "Yields the partial trace of a given state. The second argument indicates the digits to leave. PartialTrace[Rho_?MatrixQ, DigitsToLeave_] or PartialTrace[Psi_?VectorQ, LocationDigits_]"
+PartialTrace::usage = "Yields the partial trace of a multiple qubit state. The second argument represents the qubit states to be left 
+in binary. For example, suppose you have five qubits and you want the first and last qubit to be left, you would write:
+           1  0  0  0  1
+Position:  4  3  2  1  0    
+Then, the second argument would be 17. 
+PartialTrace[Rho_?MatrixQ, DigitsToLeave_] or PartialTrace[Psi_?VectorQ, LocationDigits_]"
 PartialTranspose::usage = "Takes the partial transpososition with  respect
   to the indices specified, PartialTranspose[A_, TransposeIndices_]"
 PartialTransposeFirst::usage = "Transpose the first part of a bipartite system with equal dimensions"
@@ -60,6 +65,9 @@ tensorProduct::usage = "Creates the tensor product for qubits, like TensorProduc
 tensorPower::usage = "Creates the tensor product of n matrices"
 OrthonormalBasisContaningVector::usage=" OrthonormalBasisContaningVector[psi_?VectorQ] will create an orthonorlam basis that contains the given vector"
 GetMatrixForm[Gate_, Qubits_] := Gate /@ IdentityMatrix[Power[2, Qubits]]
+ArbitraryPartialTrace::usage="Yields the partial trace of a Matrix. The first entry is the dimension of the Hilbert Space that you want
+to remove or trace out. The second is the dimension of the Hilbert space that you want to keep. The third is the Matrix on which this 
+operation will be applied."
 (* }}} *)
 (* {{{ Quantum information routines *)
 ApplyControlGate::usage = "ApplyControlGate[U_, State_, TargetQubit_, ControlQubit_]"
@@ -599,6 +607,20 @@ sum]
 GHZ[qu_]:=1/Sqrt[2]Table[If[i==0||i==2^qu-1,1,0],{i,0,2^qu-1}]
 (* }}} *)
 (* }}} *)
+(*{{{*)ArbitratyPartialTrace[hilbertdimrem_, hilbertdimkeep_, M_] := 
+ If[IntegerQ[hilbertdimrem] == True && IntegerQ[hilbertdimkeep] == True,
+  \[CapitalXi] = {};
+  \[Xi] = {};
+  For[s = 0, s < hilbertdimkeep, s++,
+   \[Xi] = {};
+   For[j = 0, j < hilbertdimkeep, j++,
+    AppendTo[\[Xi], 
+     Chop[Sum[
+       M[[i + s*hilbertdimrem, i + j*hilbertdimrem]], {i, 1, 
+        hilbertdimrem}]]]
+    ];
+   AppendTo[\[CapitalXi], \[Xi]];
+   ]; Return[\[CapitalXi]]](*}}}*)
 End[] 
 EndPackage[]
 (* }}} *)
