@@ -64,6 +64,7 @@ DecompositionOfUnitalChannelsInSO31::usage = "Performs decomposition in orthochr
 LorentzMatrixQ::usage = "LorentzMatrixQ[matrix_] returns if the given matrix is a valid Lorentz transformation with the signature +---."
 ForceSameSignatureForLorentz::usage = "ForceSameSignatureForLorentz[matrix_] Forces or fixes the signature of the given Lorentz transformation."
 QuantumMaptoR::usage = "QuantumMaptoR[channel_] Representation of Jamiolokowski state in \[Sigma]i\otimes \[Sigma]j basis."
+DiagonalMatrixQ::usage = "DiagonalMatrixQ[matrix_] Works similar to the other matrix tests of mathematica."
 
 
 Begin["Private`"] 
@@ -334,16 +335,18 @@ DivisibilityKindOf[\[Lambda]_]:=DivisibilityKindOf[\[Lambda][[1]],\[Lambda][[2]]
 
 g=DiagonalMatrix[{1,-1,-1,-1}];
 
-DivisibilityKindOfGeneral[channel_,branches_:1]:=Module[{eigen,list,tmp,det},
+DivisibilityKindOfGeneral[channel_,branches_:1]:=Module[{eigen,list,tmp,det,form},
 If[
 (*Checking Complete Positivity*)
 PositiveSemidefiniteMatrixQ[tmp=Reshuffle[Chop[FromPauliToUnit[Chop[channel]]]],Tolerance->10^(-10)],
 If[
 (*Evaluating CP-divisibility and p-divisibility*)
 (*Evaluating for p-divsibility*)det=Chop[Det[channel]];det>=0,
-If[ (*Evaluating for CP-div*)
-list=DecompositionOfUnitalChannelsInSO[channel];
-Chop[Min[list^2]]>=det&&det>0,
+(*Evaluating for CP-div*)
+form=DecompositionOfUnitalChannelsInSO31[channel][[2]];
+list=SingularValueList[Take[form,{2,4},{2,4}]];
+If[ 
+det>0&&((DiagonalMatrixQ[form]==False)||(DiagonalizableMatrixQ[form]==True&&Chop[Min[list^2]]>=det)||DiagonalizableMatrixQ[form]==True&&MatrixRank[Take[form,{2,4},{2,4}]]<2),
 (*Evaluating for markov type evolution*)
 If[
 HasHermitianPreservingAndCCPGenerator[Chop[channel],branches],4,3
@@ -500,6 +503,8 @@ If[is==True,is,False]
 
 UnitalChannelInPauliBasis[x_,y_,z_]:=DiagonalMatrix[(1-x-y-z){1,1,1,1}+x{1,1,-1,-1}+y{1,-1,1,-1}+z{1,-1,-1,1}];
 UnitalChannelInPauliBasis[vec_]:=UnitalChannelInPauliBasis[vec[[1]],vec[[2]],vec[[3]]];
+
+DiagonalMatrixQ[matrix_]:=If[Total[Abs[Flatten[DiagonalMatrix[Diagonal[matrix]]-matrix]]]==0,True,False]
 
 End[] 
 EndPackage[]
