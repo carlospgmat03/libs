@@ -60,6 +60,10 @@ RealMatrixLogarithmComplexCase::usage = "RealMatrixLogarithmComplexCase[matrix,k
 RealMatrixLogarithmRealCase::usage = "RealMatrixLogarithmComplexCase[matrix,k=0] Real logarithm of a matrix for the real eigenvalues case, returns Falese if the logarithm doesnt exists."
 HermiticityPreservingAndCCPOfGenerator::usage= "HermiticityPreservingAndCCPOfGenerator[matrix,upto_Branch] Test if the given channels has a hermiticity preserving and ccp generator, returns False if there is no such generator."
 HasHermitianPreservingAndCCPGenerator::usage = "HasHermiticitianPreservingAndCCPOfGenerator[matrix_,upto_Branch] Returns True if the channels has hermitian preserving and ccp generator."
+DecompositionOfUnitalChannelsInSO31::usage = "Performs decomposition in orthochronus Lorentz group of the matrix, returns False if the decomposition can not be done."
+LorentzMatrixQ::usage = "LorentzMatrixQ[matrix_] returns if the given matrix is a valid Lorentz transformation with the signature +---."
+ForceSameSignatureForLorentz::usage = "ForceSameSignatureForLorentz[matrix_] Forces or fixes the signature of the given Lorentz transformation."
+QuantumMaptoR::usage = "QuantumMaptoR[channel_] Representation of Jamiolokowski state in \[Sigma]i\otimes \[Sigma]j basis."
 
 
 Begin["Private`"] 
@@ -435,7 +439,7 @@ branches=Table[b=b+(-1)^(j+1)*j,{j,0,2*upto}];
 is=False;
 If[DiagonalizableMatrixQ[matrix],
 
-Table[If[PositiveSemidefiniteMatrixQ[\[Omega]ort.FullSimplify[Reshuffle[FromPauliToUnit[L=RealMatrixLogarithmComplexCase[Chop[matrix],k]//Chop]]].\[Omega]ort],is=True;i=k;Return[Null,Table],is=False;],{k,branches}];,
+Table[If[PositiveSemidefiniteMatrixQ[Chop[\[Omega]ort.FullSimplify[Reshuffle[FromPauliToUnit[L=RealMatrixLogarithmComplexCase[Chop[matrix],k]//Chop]]].\[Omega]ort,0.0000000001]],is=True;i=k;Return[Null,Table],is=False;],{k,branches}];,
 Return["non diagonalizable"];
 ];
 If[i!=0,Print["El logaritmo es real hasta k= "<>ToString[i]]];
@@ -446,6 +450,37 @@ DecompositionOfUnitalChannelsInSO[map_]:=Module[{a,e,i,newmap},
 newmap=Take[Chop[map],{2,4},{2,4}];
 {a,e,i}=SingularValueDecomposition[newmap];
 Chop[Eigenvalues[Det[a]*Det[i]*(i.e.Transpose[i])]]
+];
+
+ForceSameSignatureForLorentz[matrix_]:=Module[{g,tmpmat,eigs,o,tildeM},
+g=DiagonalMatrix[{1,-1,-1,-1}];
+tmpmat=matrix.g.Transpose[matrix]//Chop;
+{eigs,o}=EigensystemOrdered[tmpmat];tildeM=DiagonalMatrix[eigs];
+o.matrix
+];
+
+QuantumMaptoR[channel_]:=Module[{g,\[Rho]},
+g=DiagonalMatrix[{1,-1,-1,-1}];
+\[Rho]=Reshuffle[FromPauliToUnit[channel]]/2//Chop;
+Table[Tr[\[Rho].KroneckerProduct[PauliMatrix[i],PauliMatrix[j]]],{i,0,3},{j,0,3}]//FullSimplify//Chop
+];
+
+LorentzMatrixQ[matrix_]:=
+matrix[[1,1]]>0&&Det[matrix]==1&&matrix.g==Transpose[matrix].g;
+
+DecompositionOfUnitalChannelsInSO31[matrix_]:=Module[{c,x,j,n,eig,o,d,leftL,rightL},
+c=g.matrix.g.Transpose[matrix]//Chop;
+{x,j}=SchurDecomposition[c]//Chop;x=Inverse[x]//Chop;
+n=x.g.Transpose[x];
+{eig,o}=Eigensystem[n]//FullSimplify;
+leftL=ForceSameSignatureForLorentz[Transpose[x].Transpose[o]];
+c=Transpose[c];
+{x,j}=SchurDecomposition[c]//Chop;x=Inverse[x]//Chop;
+n=x.g.Transpose[x];
+{eig,o}=Eigensystem[n]//FullSimplify;
+rightL=ForceSameSignatureForLorentz[Transpose[x].Transpose[o]];
+If[LorentzMatrixQ[leftL]&&LorentzMatrixQ[rightL],Print["False"];Abort[]];
+{leftL,Transpose[leftL].matrix.rightL,rightL}//Chop
 ];
 
 HasHermitianPreservingAndCCPGenerator[matrix_,upto_:1]:=Module[{is,L,i,branches,b},
