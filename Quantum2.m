@@ -63,7 +63,7 @@ HasHermitianPreservingAndCCPGenerator::usage = "HasHermiticitianPreservingAndCCP
 DecompositionOfUnitalChannelsInSO31::usage = "Performs decomposition in orthochronus Lorentz group of the matrix, returns False if the decomposition can not be done."
 LorentzMatrixQ::usage = "LorentzMatrixQ[matrix_] returns if the given matrix is a valid Lorentz transformation with the signature +---."
 ForceSameSignatureForLorentz::usage = "ForceSameSignatureForLorentz[matrix_] Forces or fixes the signature of the given Lorentz transformation."
-QuantumMaptoR::usage = "QuantumMaptoR[channel_] Representation of Jamiolokowski state in \[Sigma]i\otimes \[Sigma]j basis."
+QuantumMaptoR::usage = "QuantumMaptoR[channel_] Representation of Jamiolokowski state in \[Sigma]iotimes \[Sigma]j basis."
 DiagonalMatrixQ::usage = "DiagonalMatrixQ[matrix_] Works similar to the other matrix tests of mathematica."
 
 
@@ -346,7 +346,7 @@ If[
 form=DecompositionOfUnitalChannelsInSO31[channel][[2]];
 list=SingularValueList[Take[form,{2,4},{2,4}]];
 If[ 
-det>0&&((DiagonalMatrixQ[form]==False)||(DiagonalizableMatrixQ[form]==True&&Chop[Min[list^2]]>=det)||DiagonalizableMatrixQ[form]==True&&MatrixRank[Take[form,{2,4},{2,4}]]<2),
+det>0&&((DiagonalMatrixQ[form]==False)||(DiagonalizableMatrixQ[form]&&Chop[Min[list^2]]>=det)||(DiagonalizableMatrixQ[form]==True&&MatrixRank[Take[form,{2,4},{2,4}]]<2)),
 (*Evaluating for markov type evolution*)
 If[
 HasHermitianPreservingAndCCPGenerator[Chop[channel],branches],4,3
@@ -475,17 +475,16 @@ DecompositionOfUnitalChannelsInSO31[matrix_]:=Module[{c,x,j,n,eig,o,d,leftL,righ
 c=g.matrix.g.Transpose[matrix]//Chop;
 {x,j}=SchurDecomposition[c]//Chop;x=Inverse[x]//Chop;
 n=x.g.Transpose[x];
-{eig,o}=Eigensystem[n]//FullSimplify;
+{eig,o}=Eigensystem[n]//Chop;
 leftL=ForceSameSignatureForLorentz[Transpose[x].Transpose[o]]//Chop;
 c=Transpose[c];
 {x,j}=SchurDecomposition[c]//Chop;x=Inverse[x]//Chop;
 n=x.g.Transpose[x];
-{eig,o}=Eigensystem[n]//FullSimplify;
+{eig,o}=Eigensystem[n]//Chop;
 rightL=ForceSameSignatureForLorentz[Transpose[x].Transpose[o]]//Chop;
 If[Det[rightL]==-1,rightL=g.rightL;];
 If[Det[leftL]==-1,leftL=g.leftL;];
-If[(LorentzMatrixQ[leftL]&&LorentzMatrixQ[rightL])==False,Print["False"];Abort[]];
-{leftL,Transpose[leftL].matrix.rightL,rightL}//Chop
+If[(LorentzMatrixQ[leftL]&&LorentzMatrixQ[rightL])==False,Print["Decomposition not done"];,{leftL,Transpose[leftL].matrix.rightL,rightL}//Chop]
 ];
 
 HasHermitianPreservingAndCCPGenerator[matrix_,upto_:1]:=Module[{is,L,i,branches,b},
@@ -504,7 +503,7 @@ If[is==True,is,False]
 UnitalChannelInPauliBasis[x_,y_,z_]:=DiagonalMatrix[(1-x-y-z){1,1,1,1}+x{1,1,-1,-1}+y{1,-1,1,-1}+z{1,-1,-1,1}];
 UnitalChannelInPauliBasis[vec_]:=UnitalChannelInPauliBasis[vec[[1]],vec[[2]],vec[[3]]];
 
-DiagonalMatrixQ[matrix_]:=If[Total[Abs[Flatten[DiagonalMatrix[Diagonal[matrix]]-matrix]]]==0,True,False]
+DiagonalMatrixQ[matrix_]:=If[Total[Abs[Flatten[DiagonalMatrix[Diagonal[matrix]]-matrix]]]==0,True,False];
 
 End[] 
 EndPackage[]
