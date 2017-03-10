@@ -466,20 +466,22 @@ Table[Tr[\[Rho].KroneckerProduct[PauliMatrix[i],PauliMatrix[j]]],{i,0,3},{j,0,3}
 ];
 
 LorentzMatrixQ[matrix_]:=
-matrix[[1,1]]>0&&Det[matrix]==1&&matrix.g==Transpose[matrix].g;
+Chop[matrix[[1,1]]]>0&&Chop[Det[matrix]]==1&&Chop[matrix.g.Transpose[matrix]]==g;
 
 DecompositionOfUnitalChannelsInSO31[matrix_]:=Module[{c,x,j,n,eig,o,d,leftL,rightL},
 c=g.matrix.g.Transpose[matrix]//Chop;
 {x,j}=SchurDecomposition[c]//Chop;x=Inverse[x]//Chop;
 n=x.g.Transpose[x];
 {eig,o}=Eigensystem[n]//FullSimplify;
-leftL=ForceSameSignatureForLorentz[Transpose[x].Transpose[o]];
+leftL=ForceSameSignatureForLorentz[Transpose[x].Transpose[o]]//Chop;
 c=Transpose[c];
 {x,j}=SchurDecomposition[c]//Chop;x=Inverse[x]//Chop;
 n=x.g.Transpose[x];
 {eig,o}=Eigensystem[n]//FullSimplify;
-rightL=ForceSameSignatureForLorentz[Transpose[x].Transpose[o]];
-If[LorentzMatrixQ[leftL]&&LorentzMatrixQ[rightL],Print["False"];Abort[]];
+rightL=ForceSameSignatureForLorentz[Transpose[x].Transpose[o]]//Chop;
+If[Det[rightL]==-1,rightL=g.rightL;];
+If[Det[leftL]==-1,leftL=g.leftL;];
+If[(LorentzMatrixQ[leftL]&&LorentzMatrixQ[rightL])==False,Print["False"];Abort[]];
 {leftL,Transpose[leftL].matrix.rightL,rightL}//Chop
 ];
 
