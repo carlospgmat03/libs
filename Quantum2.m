@@ -444,11 +444,8 @@ branches=Table[b=b+(-1)^(j+1)*j,{j,0,2*upto}];
 is=False;
 If[DiagonalizableMatrixQ[matrix],
 
-<<<<<<< HEAD
+
 Table[If[PositiveSemidefiniteMatrixQ[Chop[\[Omega]ort.Chop[Reshuffle[FromPauliToUnit[L=RealMatrixLogarithmComplexCase[Chop[matrix],k]//Chop]]].\[Omega]ort]],is=True;i=k;Return[Null,Table],is=False;],{k,branches}];,
-=======
-Table[If[PositiveSemidefiniteMatrixCustomQ[Chop[\[Omega]ort.FullSimplify[Reshuffle[FromPauliToUnit[L=RealMatrixLogarithmComplexCase[Chop[matrix],k]//Chop]]].\[Omega]ort,0.0000000001]],is=True;i=k;Return[Null,Table],is=False;],{k,branches}];,
->>>>>>> 530ed04423bf1805dff1123eef024b858d07dc53
 Return["non diagonalizable"];
 ];
 If[i!=0,Print["El logaritmo es real hasta k= "<>ToString[i]]];
