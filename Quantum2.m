@@ -53,18 +53,18 @@ QuantumMapInPauliBasis::usage = "QuantumMapInPauliBasis[channel_] This function 
 QuantumMapInUnitBasis::usage = "QuantumMapInInUnitBasis[channel_] This function constructs the Pauli basis channel representation of one qubit"
 FromPauliToUnit::usage = " Takes channels in Pauli basis to unital matrices basis."
 FromUnitToPauli::usage = " Oposite of From Unit to Pauli."
-DecompositionOfUnitalChannelsInSO::usage = "to test yet"
 UnitalChannelInPauliBasis::usage = "UnitalChannelInPauliBasis[x_,y_,z_], where x,y and z are the weights of the corresponding unitaries, by convexity teh weight of the identity operation is automatically determined "
 EigensystemOrdered::usage = "EigensystemOrdered[matrix_], Routine for compute Eigensystem with ordered Eigenvalues, see code for further information, this is useful for several routines which require the same basis ordering for different diagonalizations."
 RealMatrixLogarithmComplexCase::usage = "RealMatrixLogarithmComplexCase[matrix,k=0] Real logarithm of a matrix for the complex eigenvalues case, returns Falese if the logarithm doesnt exists."
 RealMatrixLogarithmRealCase::usage = "RealMatrixLogarithmComplexCase[matrix,k=0] Real logarithm of a matrix for the real eigenvalues case, returns Falese if the logarithm doesnt exists."
 HermiticityPreservingAndCCPOfGenerator::usage= "HermiticityPreservingAndCCPOfGenerator[matrix,upto_Branch] Test if the given channels has a hermiticity preserving and ccp generator, returns False if there is no such generator."
 HasHermitianPreservingAndCCPGenerator::usage = "HasHermiticitianPreservingAndCCPOfGenerator[matrix_,upto_Branch] Returns True if the channels has hermitian preserving and ccp generator."
-DecompositionOfUnitalChannelsInSO31::usage = "Performs decomposition in orthochronus Lorentz group of the matrix, returns False if the decomposition can not be done."
+DecompositionOfChannelsInSO31::usage = "Performs decomposition in orthochronus Lorentz group of the matrix, returns False if the decomposition can not be done."
 LorentzMatrixQ::usage = "LorentzMatrixQ[matrix_] returns if the given matrix is a valid Lorentz transformation with the signature +---."
 ForceSameSignatureForLorentz::usage = "ForceSameSignatureForLorentz[matrix_] Forces or fixes the signature of the given Lorentz transformation."
 QuantumMaptoR::usage = "QuantumMaptoR[channel_] Representation of Jamiolokowski state in \[Sigma]iotimes \[Sigma]j basis."
 DiagonalMatrixQ::usage = "DiagonalMatrixQ[matrix_] Works similar to the other matrix tests of mathematica."
+PositiveSemidefiniteMatrixCustomQ::usage = "Mathematica test gives strange results, this routine check such test hunred times."
 
 
 Begin["Private`"] 
@@ -333,6 +333,8 @@ HermiticityPreservingAndCCPOfTheGeneratorQForDiagonal[\[Lambda]1,\[Lambda]2,\[La
 
 DivisibilityKindOf[\[Lambda]_]:=DivisibilityKindOf[\[Lambda][[1]],\[Lambda][[2]],\[Lambda][[3]]];
 
+PositiveSemidefiniteMatrixCustomQ[matrix_]:=And@@Table[PositiveSemidefiniteMatrixQ[matrix],{100}];
+
 g=DiagonalMatrix[{1,-1,-1,-1}];
 
 DivisibilityKindOfGeneral[channel_,branches_:1]:=Module[{eigen,list,tmp,det,form},
@@ -341,12 +343,12 @@ If[
 PositiveSemidefiniteMatrixQ[tmp=Reshuffle[Chop[FromPauliToUnit[Chop[channel]]]],Tolerance->10^(-10)],
 If[
 (*Evaluating CP-divisibility and p-divisibility*)
-(*Evaluating for p-divsibility*)det=Chop[Det[channel]];det>=0,
+(*Evaluating for p-divsibility*)
+det=Chop[Det[channel]];det>=0,
 (*Evaluating for CP-div*)
-form=DecompositionOfUnitalChannelsInSO31[channel][[2]];
-list=SingularValueList[Take[form,{2,4},{2,4}]];
+form=DecompositionOfChannelsInSO31[channel//Chop][[2]]//Chop;
 If[ 
-det>0&&((DiagonalMatrixQ[form]==False)||(DiagonalizableMatrixQ[form]&&Chop[Min[list^2]]>=det)||(DiagonalizableMatrixQ[form]==True&&MatrixRank[Take[form,{2,4},{2,4}]]<2)),
+HasHermitianPreservingAndCCPGenerator[form,branches],
 (*Evaluating for markov type evolution*)
 If[
 HasHermitianPreservingAndCCPGenerator[Chop[channel],branches],4,3
@@ -442,14 +444,14 @@ branches=Table[b=b+(-1)^(j+1)*j,{j,0,2*upto}];
 is=False;
 If[DiagonalizableMatrixQ[matrix],
 
-Table[If[PositiveSemidefiniteMatrixQ[Chop[\[Omega]ort.FullSimplify[Reshuffle[FromPauliToUnit[L=RealMatrixLogarithmComplexCase[Chop[matrix],k]//Chop]]].\[Omega]ort,0.0000000001]],is=True;i=k;Return[Null,Table],is=False;],{k,branches}];,
+Table[If[PositiveSemidefiniteMatrixCustomQ[Chop[\[Omega]ort.FullSimplify[Reshuffle[FromPauliToUnit[L=RealMatrixLogarithmComplexCase[Chop[matrix],k]//Chop]]].\[Omega]ort,0.0000000001]],is=True;i=k;Return[Null,Table],is=False;],{k,branches}];,
 Return["non diagonalizable"];
 ];
 If[i!=0,Print["El logaritmo es real hasta k= "<>ToString[i]]];
 If[is==True,L,False]
 ];
 
-DecompositionOfUnitalChannelsInSO[map_]:=Module[{a,e,i,newmap},
+DecompositionOfChannelsInSO[map_]:=Module[{a,e,i,newmap},
 newmap=Take[Chop[map],{2,4},{2,4}];
 {a,e,i}=SingularValueDecomposition[newmap];
 Chop[Eigenvalues[Det[a]*Det[i]*(i.e.Transpose[i])]]
@@ -470,7 +472,7 @@ Table[Tr[\[Rho].KroneckerProduct[PauliMatrix[i],PauliMatrix[j]]],{i,0,3},{j,0,3}
 LorentzMatrixQ[matrix_]:=
 Chop[matrix[[1,1]]]>0&&Chop[Det[matrix]]==1&&Chop[matrix.g.Transpose[matrix]]==g;
 
-DecompositionOfUnitalChannelsInSO31[matrix_]:=Module[{c,x,j,n,eig,o,d,leftL,rightL},
+DecompositionOfChannelsInSO31[matrix_]:=Module[{c,x,j,n,eig,o,d,leftL,rightL},
 c=g.matrix.g.Transpose[matrix]//Chop;
 {x,j}=SchurDecomposition[c]//Chop;x=Inverse[x]//Chop;
 n=x.g.Transpose[x]//Chop;
@@ -492,7 +494,7 @@ branches=Table[b=b+(-1)^(j+1)*j,{j,0,2*upto}];
 is=False;
 If[DiagonalizableMatrixQ[matrix],
 
-Table[If[PositiveSemidefiniteMatrixQ[\[Omega]ort.FullSimplify[Reshuffle[FromPauliToUnit[L=RealMatrixLogarithmComplexCase[Chop[matrix],k]//Chop]//Chop]].\[Omega]ort//Chop],is=True;i=k;Return[Null,Table],is=False;],{k,branches}];,
+Table[If[PositiveSemidefiniteMatrixCustomQ[\[Omega]ort.FullSimplify[Reshuffle[FromPauliToUnit[L=RealMatrixLogarithmComplexCase[Chop[matrix],k]//Chop]//Chop]].\[Omega]ort//Chop],is=True;i=k;Return[Null,Table],is=False;],{k,branches}];,
 Return["non diagonalizable"];
 ];
 If[i!=0,Print["Hermiticity preserving and ccp condition is fulfilled until k= "<>ToString[i]]];
