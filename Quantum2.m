@@ -481,8 +481,8 @@ c=g.Transpose[matrix].g.matrix;
 n=x.g.Transpose[x]//Chop;
 {eig2,o}=EigensystemOrdered[n]//Chop;
 rightL=Transpose[x].Transpose[o]//Chop;
-If[Det[rightL]==-1,If[rightL[[1,1]]<0,rightL=(-g).rightL;,rightL=(g).rightL;]];
-If[Det[leftL]==-1,If[leftL[[1,1]]<0,leftL=(-g).leftL;,leftL=(g).leftL;]];
+If[Det[rightL]==-1,rightL=Sign[rightL[[1,1]]]g.rightL;,If[rightL[[1,1]]<0,rightL=-g.g.rightL;]];
+If[Det[leftL]==-1,leftL=Sign[leftL[[1,1]]]g.leftL;,If[leftL[[1,1]]<0,leftL=-g.g.leftL;]];
 If[(LorentzMatrixQ[leftL]&&LorentzMatrixQ[rightL])==False,Print["Decomposition not done"];,{leftL,Transpose[leftL].matrix.rightL,rightL}//Chop]
 ];
 
