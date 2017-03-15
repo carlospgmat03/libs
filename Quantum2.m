@@ -455,11 +455,10 @@ newmap=Take[Chop[map],{2,4},{2,4}];
 Chop[Eigenvalues[Det[a]*Det[i]*(i.e.Transpose[i])]]
 ];
 
-ForceSameSignatureForLorentz[matrix_]:=Module[{g,tmpmat,eigs,o,tildeM},
-g=DiagonalMatrix[{1,-1,-1,-1}];
+ForceSameSignatureForLorentz[matrix_]:=Module[{tmpmat,eigs,o,tildeM},
 tmpmat=matrix.g.Transpose[matrix]//Chop;
 {eigs,o}=EigensystemOrdered[tmpmat];tildeM=DiagonalMatrix[eigs];
-o.matrix
+{o.matrix,o}
 ];
 
 QuantumMaptoR[channel_]:=Module[{g,\[Rho]},
@@ -474,14 +473,14 @@ Chop[matrix[[1,1]]]>0&&Chop[Det[matrix]]==1&&Chop[matrix.g.Transpose[matrix]]==g
 DecompositionOfUnitalChannelsInSO31[matrix_]:=Module[{c,x,j,n,eig,o,d,leftL,rightL},
 c=g.matrix.g.Transpose[matrix]//Chop;
 {x,j}=SchurDecomposition[c]//Chop;x=Inverse[x]//Chop;
-n=x.g.Transpose[x];
-{eig,o}=Eigensystem[n]//Chop;
-leftL=ForceSameSignatureForLorentz[Transpose[x].Transpose[o]]//Chop;
-c=Transpose[c];
+n=x.g.Transpose[x]//Chop;
+{eig1,o}=EigensystemOrdered[n]//Chop;
+leftL=Transpose[x].Transpose[o]//Chop;
+c=g.Transpose[matrix].g.matrix;
 {x,j}=SchurDecomposition[c]//Chop;x=Inverse[x]//Chop;
-n=x.g.Transpose[x];
-{eig,o}=Eigensystem[n]//Chop;
-rightL=ForceSameSignatureForLorentz[Transpose[x].Transpose[o]]//Chop;
+n=x.g.Transpose[x]//Chop;
+{eig2,o}=EigensystemOrdered[n]//Chop;
+rightL=Transpose[x].Transpose[o]//Chop;
 If[Det[rightL]==-1,If[rightL[[1,1]]<0,rightL=(-g).rightL;,rightL=(g).rightL;]];
 If[Det[leftL]==-1,If[leftL[[1,1]]<0,leftL=(-g).leftL;,leftL=(g).leftL;]];
 If[(LorentzMatrixQ[leftL]&&LorentzMatrixQ[rightL])==False,Print["Decomposition not done"];,{leftL,Transpose[leftL].matrix.rightL,rightL}//Chop]
