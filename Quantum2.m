@@ -65,6 +65,7 @@ ForceSameSignatureForLorentz::usage = "ForceSameSignatureForLorentz[matrix_] For
 QuantumMaptoR::usage = "QuantumMaptoR[channel_] Representation of Jamiolokowski state in \[Sigma]iotimes \[Sigma]j basis."
 DiagonalMatrixQ::usage = "DiagonalMatrixQ[matrix_] Works similar to the other matrix tests of mathematica."
 PositiveSemidefiniteMatrixCustomQ::usage = "Mathematica test gives strange results, this routine check such test hunred times."
+DecompositionOfChannelsInSO::usage = "Singular value decomposition but in SO."
 
 
 Begin["Private`"] 
@@ -445,7 +446,7 @@ is=False;
 If[DiagonalizableMatrixQ[matrix],
 
 
-Table[If[PositiveSemidefiniteMatrixQ[Chop[\[Omega]ort.Chop[Reshuffle[FromPauliToUnit[L=RealMatrixLogarithmComplexCase[Chop[matrix],k]//Chop]]].\[Omega]ort]],is=True;i=k;Return[Null,Table],is=False;],{k,branches}];,
+Table[If[PositiveSemidefiniteMatrixCustomQ[Chop[\[Omega]ort.Chop[Reshuffle[FromPauliToUnit[L=RealMatrixLogarithmComplexCase[Chop[matrix],k]//Chop]]].\[Omega]ort]],is=True;i=k;Return[Null,Table],is=False;],{k,branches}];,
 Return["non diagonalizable"];
 ];
 If[i!=0,Print["El logaritmo es real hasta k= "<>ToString[i]]];
@@ -473,7 +474,7 @@ Table[Tr[\[Rho].KroneckerProduct[PauliMatrix[i],PauliMatrix[j]]],{i,0,3},{j,0,3}
 LorentzMatrixQ[matrix_]:=
 Chop[matrix[[1,1]]]>0&&Chop[Det[matrix]]==1&&Chop[matrix.g.Transpose[matrix]]==g;
 
-DecompositionOfChannelsInSO31[matrix_]:=Module[{c,x,j,n,eig,o,d,leftL,rightL},
+DecompositionOfChannelsInSO31[matrix_]:=Module[{c,x,j,n,eig1,eig2,o,d,leftL,rightL},
 c=g.matrix.g.Transpose[matrix]//Chop;
 {x,j}=SchurDecomposition[c]//Chop;x=Inverse[x]//Chop;
 n=x.g.Transpose[x]//Chop;
@@ -483,6 +484,7 @@ c=g.Transpose[matrix].g.matrix;
 {x,j}=SchurDecomposition[c]//Chop;x=Inverse[x]//Chop;
 n=x.g.Transpose[x]//Chop;
 {eig2,o}=EigensystemOrdered[n]//Chop;
+If[Chop[eig1]==Diagonal[g]&&eig2==Diagonal[g],None,Print["Wrong calculation"];Abort[];];
 rightL=Transpose[x].Transpose[o]//Chop;
 If[Det[rightL]==-1,rightL=Sign[rightL[[1,1]]]g.rightL;,If[rightL[[1,1]]<0,rightL=-g.g.rightL;]];
 If[Det[leftL]==-1,leftL=Sign[leftL[[1,1]]]g.leftL;,If[leftL[[1,1]]<0,leftL=-g.g.leftL;]];
