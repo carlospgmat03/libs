@@ -65,7 +65,11 @@ ForceSameSignatureForLorentz::usage = "ForceSameSignatureForLorentz[matrix_] For
 QuantumMaptoR::usage = "QuantumMaptoR[channel_] Representation of Jamiolokowski state in \[Sigma]iotimes \[Sigma]j basis."
 DiagonalMatrixQ::usage = "DiagonalMatrixQ[matrix_] Works similar to the other matrix tests of mathematica."
 PositiveSemidefiniteMatrixCustomQ::usage = "Mathematica test gives strange results, this routine check such test hunred times."
+PositiveSemidefiniteMatrixCustom2Q::usage = "Custom check."
 DecompositionOfChannelsInSO::usage = "Singular value decomposition but in SO."
+HermitianPart::usage = "HermitianPart."
+DecompositionOfChannelsInSO31Diagonal::usage= "The same of DecompositionOfChannelsInSO31 but forcing a diagonal in the spatial block."
+AddOne::usage="Direct sum from behind with an identity of dimension one."
 
 
 Begin["Private`"] 
@@ -334,20 +338,22 @@ HermiticityPreservingAndCCPOfTheGeneratorQForDiagonal[\[Lambda]1,\[Lambda]2,\[La
 
 DivisibilityKindOf[\[Lambda]_]:=DivisibilityKindOf[\[Lambda][[1]],\[Lambda][[2]],\[Lambda][[3]]];
 
-PositiveSemidefiniteMatrixCustomQ[matrix_]:=And@@Table[PositiveSemidefiniteMatrixQ[matrix],{100}];
+PositiveSemidefiniteMatrixCustomQ[matrix_]:=And@@Table[PositiveSemidefiniteMatrixQ[matrix],{1000}];
+
+PositiveSemidefiniteMatrixCustom2Q[matrix_]:=And@@Table[v=RandomState[Length[matrix]];Chop[QuantumDotProduct[v,HermitianPart[matrix].v]]>=0,{1000}];
 
 g=DiagonalMatrix[{1,-1,-1,-1}];
 
 DivisibilityKindOfGeneral[channel_,branches_:1]:=Module[{eigen,list,tmp,det,form},
 If[
 (*Checking Complete Positivity*)
-PositiveSemidefiniteMatrixQ[tmp=Reshuffle[Chop[FromPauliToUnit[Chop[channel]]]],Tolerance->10^(-10)],
+PositiveSemidefiniteMatrixCustom2Q[tmp=Reshuffle[Chop[FromPauliToUnit[Chop[channel]]]]],
 If[
 (*Evaluating CP-divisibility and p-divisibility*)
 (*Evaluating for p-divsibility*)
 det=Chop[Det[channel]];det>=0,
 (*Evaluating for CP-div*)
-form=DecompositionOfChannelsInSO31[channel//Chop][[2]]//Chop;
+form=DecompositionOfChannelsInSO31Diagonal[channel//Chop][[2]]//Chop;
 If[ 
 HasHermitianPreservingAndCCPGenerator[form,branches],
 (*Evaluating for markov type evolution*)
@@ -444,19 +450,17 @@ b=0;
 branches=Table[b=b+(-1)^(j+1)*j,{j,0,2*upto}];
 is=False;
 If[DiagonalizableMatrixQ[matrix],
-
-
-Table[If[PositiveSemidefiniteMatrixCustomQ[Chop[\[Omega]ort.Chop[Reshuffle[FromPauliToUnit[L=RealMatrixLogarithmComplexCase[Chop[matrix],k]//Chop]]].\[Omega]ort]],is=True;i=k;Return[Null,Table],is=False;],{k,branches}];,
+Table[If[PositiveSemidefiniteMatrixCustom2Q[Chop[\[Omega]ort.Chop[Reshuffle[FromPauliToUnit[L=RealMatrixLogarithmComplexCase[Chop[matrix],k]//Chop]]].\[Omega]ort]],is=True;i=k;Return[Null,Table],is=False;],{k,branches}];,
 Return["non diagonalizable"];
 ];
 If[i!=0,Print["El logaritmo es real hasta k= "<>ToString[i]]];
 If[is==True,L,False]
 ];
 
-DecompositionOfChannelsInSO[map_]:=Module[{a,e,i,newmap},
-newmap=Take[Chop[map],{2,4},{2,4}];
-{a,e,i}=SingularValueDecomposition[newmap];
-Chop[Eigenvalues[Det[a]*Det[i]*(i.e.Transpose[i])]]
+DecompositionOfChannelsInSO[map_]:=Module[{a,e,i,newmap,eig,vecs},
+{a,e,i}=SingularValueDecomposition[map];
+{eig,vecs}=Chop[Eigensystem[Det[a]*Det[i]*(i.e.Transpose[i])]];
+{a.Transpose[i].Transpose[vecs],DiagonalMatrix[eig],vecs}
 ];
 
 ForceSameSignatureForLorentz[matrix_]:=Module[{tmpmat,eigs,o,tildeM},
@@ -464,6 +468,8 @@ tmpmat=matrix.g.Transpose[matrix]//Chop;
 {eigs,o}=EigensystemOrdered[tmpmat];tildeM=DiagonalMatrix[eigs];
 {o.matrix,o}
 ];
+
+HermitianPart[m_]:=0.5*(m+Dagger[m]);
 
 QuantumMaptoR[channel_]:=Module[{g,\[Rho]},
 g=DiagonalMatrix[{1,-1,-1,-1}];
@@ -491,13 +497,45 @@ If[Det[leftL]==-1,leftL=Sign[leftL[[1,1]]]g.leftL;,If[leftL[[1,1]]<0,leftL=-g.g.
 If[(LorentzMatrixQ[leftL]&&LorentzMatrixQ[rightL])==False,Print["Decomposition not done"];,{leftL,Transpose[leftL].matrix.rightL,rightL}//Chop]
 ];
 
+AddOne[matrix_]:=Flatten[{{{1.0,0.0,0.0,0.0}},Table[Flatten[{0.0,matrix[[i,All]]}],{i,1,3}]},1];
+
+DecompositionOfChannelsInSO31Diagonal[matrix_]:=Module[{c,x,j,n,eig1,eig2,o,d,leftL,rightL,form,aux,form2,a,e,i},
+c=g.matrix.g.Transpose[matrix]//Chop;
+{x,j}=SchurDecomposition[c]//Chop;x=Inverse[x]//Chop;
+n=x.g.Transpose[x]//Chop;
+{eig1,o}=EigensystemOrdered[n]//Chop;
+leftL=Transpose[x].Transpose[o]//Chop;
+c=g.Transpose[matrix].g.matrix;
+{x,j}=SchurDecomposition[c]//Chop;x=Inverse[x]//Chop;
+n=x.g.Transpose[x]//Chop;
+{eig2,o}=EigensystemOrdered[n]//Chop;
+If[Chop[eig1]==Diagonal[g]&&eig2==Diagonal[g],None,Print["Wrong calculation"];Abort[];];
+rightL=Transpose[x].Transpose[o]//Chop;
+If[Det[rightL]==-1,rightL=Sign[rightL[[1,1]]]g.rightL;,If[rightL[[1,1]]<0,rightL=-g.g.rightL;]];
+If[Det[leftL]==-1,leftL=Sign[leftL[[1,1]]]g.leftL;,If[leftL[[1,1]]<0,leftL=-g.g.leftL;]];
+form=Transpose[leftL].matrix.rightL;
+form2=AddOne[Take[form,{2,4},{2,4}]];
+If[DiagonalMatrixQ[form2]==False,
+{a,e,i}=DecompositionOfChannelsInSO[form2]//Chop;
+aux=form-form2;
+d=aux[[All,1]];
+d=Transpose[a].d//Chop;
+e[[All,1]]=d;e[[1,1]]=1;
+];
+leftL=leftL.a//Chop;
+rightL=rightL.Transpose[i]//Chop;
+If[Det[rightL]==-1,rightL=Sign[rightL[[1,1]]]g.rightL;,If[rightL[[1,1]]<0,rightL=-g.g.rightL;]];
+If[Det[leftL]==-1,leftL=Sign[leftL[[1,1]]]g.leftL;,If[leftL[[1,1]]<0,leftL=-g.g.leftL;]];
+If[(LorentzMatrixQ[leftL]&&LorentzMatrixQ[rightL])==False,Print["Decomposition not done"];,{leftL,e,rightL}//Chop]
+];
+
 HasHermitianPreservingAndCCPGenerator[matrix_,upto_:1]:=Module[{is,L,i,branches,b},
 b=0;
 branches=Table[b=b+(-1)^(j+1)*j,{j,0,2*upto}];
 is=False;
 If[DiagonalizableMatrixQ[matrix],
 
-Table[If[PositiveSemidefiniteMatrixCustomQ[\[Omega]ort.FullSimplify[Reshuffle[FromPauliToUnit[L=RealMatrixLogarithmComplexCase[Chop[matrix],k]//Chop]//Chop]].\[Omega]ort//Chop],is=True;i=k;Return[Null,Table],is=False;],{k,branches}];,
+Table[If[PositiveSemidefiniteMatrixCustom2Q[\[Omega]ort.FullSimplify[Reshuffle[FromPauliToUnit[L=RealMatrixLogarithmComplexCase[Chop[matrix],k]//Chop]//Chop]].\[Omega]ort//Chop],is=True;i=k;Return[Null,Table],is=False;],{k,branches}];,
 Return["non diagonalizable"];
 ];
 If[i!=0,Print["Hermiticity preserving and ccp condition is fulfilled until k= "<>ToString[i]]];
