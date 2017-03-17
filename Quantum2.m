@@ -70,6 +70,7 @@ DecompositionOfChannelsInSO::usage = "Singular value decomposition but in SO."
 HermitianPart::usage = "HermitianPart."
 DecompositionOfChannelsInSO31Diagonal::usage= "The same of DecompositionOfChannelsInSO31 but forcing a diagonal in the spatial block."
 AddOne::usage="Direct sum from behind with an identity of dimension one."
+InfinitySupressor::usage = "InfinitySupressor[lista_,infinity_] This functions makes infinities finide by a given bound."
 
 
 Begin["Private`"] 
@@ -546,6 +547,12 @@ UnitalChannelInPauliBasis[x_,y_,z_]:=DiagonalMatrix[(1-x-y-z){1,1,1,1}+x{1,1,-1,
 UnitalChannelInPauliBasis[vec_]:=UnitalChannelInPauliBasis[vec[[1]],vec[[2]],vec[[3]]];
 
 DiagonalMatrixQ[matrix_]:=If[Total[Abs[Flatten[DiagonalMatrix[Diagonal[matrix]]-matrix]]]==0,True,False];
+
+InfinitySupressor[lista_,infinity_]:=Module[{list},
+list=lista;
+Table[If[list[[i]][[2]]>infinity,list[[i]][[2]]=infinity],{i,Length[list]}];
+list
+];
 
 End[] 
 EndPackage[]
