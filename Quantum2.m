@@ -540,7 +540,6 @@ If[(LorentzMatrixQ[leftL]&&LorentzMatrixQ[rightL])==False,Print["Decomposition n
 
 PartialDecompositionofChannelInSO[matrix_]:=Module[{form2,a,e,i,aux,form,d,leftL,rightL},
 form2=AddOne[Take[matrix,{2,4},{2,4}]];
-If[DiagonalMatrixQ[form2]==False,
 {a,e,i}=DecompositionOfChannelsInSO[form2]//Chop;
 aux=matrix-form2;
 d=aux[[All,1]];
@@ -548,10 +547,7 @@ d=Transpose[a].d//Chop;
 e[[All,1]]=d;e[[1,1]]=1;
 leftL=a//Chop;
 rightL=Transpose[i]//Chop;
-];
-If[Det[rightL]==-1,rightL=Sign[rightL[[1,1]]]g.rightL;,If[rightL[[1,1]]<0,rightL=-g.g.rightL;]];
-If[Det[leftL]==-1,leftL=Sign[leftL[[1,1]]]g.leftL;,If[leftL[[1,1]]<0,leftL=-g.g.leftL;]];
-If[(LorentzMatrixQ[leftL]&&LorentzMatrixQ[rightL])==False,Print["Decomposition not done"];,{leftL,e,rightL}//Chop]
+{leftL,e,rightL}
 ];
 
 HasHermitianPreservingAndCCPGenerator[matrix_,upto_:1]:=Module[{is,L,i,branches,b},
