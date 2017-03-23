@@ -501,33 +501,39 @@ If[(LorentzMatrixQ[leftL]&&LorentzMatrixQ[rightL])==False,Print["Decomposition n
 AddOne[matrix_]:=Flatten[{{{1.0,0.0,0.0,0.0}},Table[Flatten[{0.0,matrix[[i,All]]}],{i,1,3}]},1];
 
 DecompositionOfChannelsInSO31Diagonal[matrix_]:=Module[{c,x,j,n,eig1,eig2,o,d,leftL,rightL,form,aux,form2,a,e,i},
+(*Transformada Izquierda:*)
 c=g.matrix.g.Transpose[matrix]//Chop;
 {x,j}=SchurDecomposition[c]//Chop;x=Inverse[x]//Chop;
 n=x.g.Transpose[x]//Chop;
 {eig1,o}=EigensystemOrdered[n]//Chop;
 leftL=Transpose[x].Transpose[o]//Chop;
+(*Transformada Derecha:*)
 c=g.Transpose[matrix].g.matrix;
 {x,j}=SchurDecomposition[c]//Chop;x=Inverse[x]//Chop;
 n=x.g.Transpose[x]//Chop;
 {eig2,o}=EigensystemOrdered[n]//Chop;
 If[Chop[eig1]==Diagonal[g]&&eig2==Diagonal[g],None,Print["Wrong calculation"];Abort[];];
 rightL=Transpose[x].Transpose[o]//Chop;
-If[Det[rightL]==-1,rightL=Sign[rightL[[1,1]]]g.rightL;,If[rightL[[1,1]]<0,rightL=-g.g.rightL;]];
-If[Det[leftL]==-1,leftL=Sign[leftL[[1,1]]]g.leftL;,If[leftL[[1,1]]<0,leftL=-g.g.leftL;]];
+(*Se define la forma normal preliminar, pues puede que no salga diagonal*)
 form=Transpose[leftL].matrix.rightL;
 e=form;
+(*En este paso construyo un canal solo con el bloque espacial de la matriz: *)
 form2=AddOne[Take[form,{2,4},{2,4}]];
+(*Por si no sale diagonal el bloque espacial, aqui se fuerza descomponiendolo en SO(3):*)
 If[DiagonalMatrixQ[form2]==False,
 {a,e,i}=DecompositionOfChannelsInSO[form2]//Chop;
 aux=form-form2;
 d=aux[[All,1]];
 d=Transpose[a].d//Chop;
 e[[All,1]]=d;e[[1,1]]=1;
+(*Se redefinen las transformaciones de Lorentz con las nuevas rotaciones:*)
 leftL=leftL.a//Chop;
 rightL=rightL.Transpose[i]//Chop;
 ];
+(*Se hacen propias y ortocronas usando el grupo cociente O(3,1)/SO^+(3,1):*)
 If[Det[rightL]==-1,rightL=Sign[rightL[[1,1]]]g.rightL;,If[rightL[[1,1]]<0,rightL=-g.g.rightL;]];
 If[Det[leftL]==-1,leftL=Sign[leftL[[1,1]]]g.leftL;,If[leftL[[1,1]]<0,leftL=-g.g.leftL;]];
+(*Un test util para mantener esta funcion y el output:*)
 If[(LorentzMatrixQ[leftL]&&LorentzMatrixQ[rightL])==False,Print["Decomposition not done"];,{leftL,e,rightL}//Chop]
 ];
 
