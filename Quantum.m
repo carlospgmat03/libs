@@ -122,6 +122,7 @@ EvolvGate::usage="EvolvGate[Gate_, steps_, env_, state_]... Evoluciona cualquier
 MakeQuantumChannel::usage="MakeQuantumChannel[Gate_, steps_, env_] Donde Gate va de la forma Gate[#, otherparameters_]  donde debe ponerse # en el lugar donde Gate toma el estado"
 SumPositiveDerivatives::usage="SumPositiveDerivatives[list_] Suma todas las contribuciones list(max)-list(min) sucesivos cuando la derivada es positiva"
 GHZ::usage="GHZ[qu_] Creates a GHZ state, |000000\[RightAngleBracket]+|111111\[RightAngleBracket]"
+RandomMixedState::usage="RandomMixedState[n_,combinations_], Constructs a Random mixed state of diemnsion n with random uniform combinations of pure states wti Haar measure."
 (* }}} *)
 (* }}} *)
 Begin["Private`"] 
@@ -621,6 +622,12 @@ GHZ[qu_]:=1/Sqrt[2]Table[If[i==0||i==2^qu-1,1,0],{i,0,2^qu-1}]
     ];
    AppendTo[\[CapitalXi], \[Xi]];
    ]; Return[\[CapitalXi]]](*}}}*)
+(*{{{*)RandomMixedState[n_,combinations_]:=Module[{p,statelist},
+statelist=Table[Proyector[RandomState[n]],{combinations}];
+p=RandomReal[{0,1.0},combinations];
+p=p/Total[p];
+p.statelist//Chop
+];(*}}}*)
 End[] 
 EndPackage[]
 (* }}} *)
