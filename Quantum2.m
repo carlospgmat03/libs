@@ -66,6 +66,7 @@ QuantumMaptoR::usage = "QuantumMaptoR[channel_] Representation of Jamiolokowski 
 DiagonalMatrixQ::usage = "DiagonalMatrixQ[matrix_] Works similar to the other matrix tests of mathematica."
 PositiveSemidefiniteMatrixCustomQ::usage = "Mathematica test gives strange results, this routine check such test hunred times."
 PositiveSemidefiniteMatrixCustom2Q::usage = "Custom check."
+PositiveSemidefiniteMatrixCustom3Q::usage = "By eigenvalues of the hermitian part"
 DecompositionOfChannelsInSO::usage = "Singular value decomposition but in SO."
 HermitianPart::usage = "HermitianPart."
 DecompositionOfChannelsInSO31Diagonal::usage= "The same of DecompositionOfChannelsInSO31 but forcing a diagonal in the spatial block."
@@ -344,12 +345,14 @@ PositiveSemidefiniteMatrixCustomQ[matrix_]:=And@@Table[PositiveSemidefiniteMatri
 
 PositiveSemidefiniteMatrixCustom2Q[matrix_]:=And@@Table[v=RandomState[Length[matrix]];Chop[QuantumDotProduct[v,HermitianPart[matrix].v]]>=0,{1000}];
 
+PositiveSemidefiniteMatrixCustom3Q[matrix_]:=And@@NonNegative[Chop[Eigenvalues[HermitianPart[matrix]]]];
+
 g=DiagonalMatrix[{1,-1,-1,-1}];
 
 DivisibilityKindOfGeneral[channel_,branches_:1]:=Module[{eigen,list,tmp,det,form},
 If[
 (*Checking Complete Positivity*)
-PositiveSemidefiniteMatrixCustom2Q[tmp=Reshuffle[Chop[FromPauliToUnit[Chop[channel]]]]],
+PositiveSemidefiniteMatrixCustomQ[tmp=Reshuffle[Chop[FromPauliToUnit[Chop[channel]]]]],
 If[
 (*Evaluating CP-divisibility and p-divisibility*)
 (*Evaluating for p-divsibility*)
@@ -452,7 +455,7 @@ b=0;
 branches=Table[b=b+(-1)^(j+1)*j,{j,0,2*upto}];
 is=False;
 If[DiagonalizableMatrixQ[matrix],
-Table[If[PositiveSemidefiniteMatrixCustom2Q[Chop[\[Omega]ort.Chop[Reshuffle[FromPauliToUnit[L=RealMatrixLogarithmComplexCase[Chop[matrix],k]//Chop]]].\[Omega]ort]],is=True;i=k;Return[Null,Table],is=False;],{k,branches}];,
+Table[If[PositiveSemidefiniteMatrixCustom3Q[Chop[\[Omega]ort.Chop[Reshuffle[FromPauliToUnit[L=RealMatrixLogarithmComplexCase[Chop[matrix],k]//Chop]]].\[Omega]ort]],is=True;i=k;Return[Null,Table],is=False;],{k,branches}];,
 Return["non diagonalizable"];
 ];
 If[i!=0,Print["El logaritmo es real hasta k= "<>ToString[i]]];
@@ -556,7 +559,7 @@ branches=Table[b=b+(-1)^(j+1)*j,{j,0,2*upto}];
 is=False;
 If[DiagonalizableMatrixQ[matrix],
 
-Table[If[PositiveSemidefiniteMatrixCustom2Q[\[Omega]ort.FullSimplify[Reshuffle[FromPauliToUnit[L=RealMatrixLogarithmComplexCase[Chop[matrix],k]//Chop]//Chop]].\[Omega]ort//Chop],is=True;i=k;Return[Null,Table],is=False;],{k,branches}];,
+Table[If[PositiveSemidefiniteMatrixCustom3Q[\[Omega]ort.FullSimplify[Reshuffle[FromPauliToUnit[L=RealMatrixLogarithmComplexCase[Chop[matrix],k]//Chop]//Chop]].\[Omega]ort//Chop],is=True;i=k;Return[Null,Table],is=False;],{k,branches}];,
 Return["non diagonalizable"];
 ];
 If[i!=0,Print["Hermiticity preserving and ccp condition is fulfilled until k= "<>ToString[i]]];
