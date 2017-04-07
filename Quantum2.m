@@ -73,6 +73,7 @@ DecompositionOfChannelsInSO31Diagonal::usage= "The same of DecompositionOfChanne
 AddOne::usage="Direct sum from behind with an identity of dimension one."
 InfinitySupressor::usage = "InfinitySupressor[lista_,infinity_] This functions makes infinities finide by a given bound."
 PartialDecompositionofChannelInSO::usage = "PartialDecompositionofChannelInSO[matrix_]."
+TestViaRankOfCPDIV::usage = "TestViaRankOfCPDIV[matrix_], gives True or False."
 
 
 Begin["Private`"] 
@@ -349,18 +350,26 @@ PositiveSemidefiniteMatrixCustom3Q[matrix_]:=And@@NonNegative[Chop[Eigenvalues[H
 
 g=DiagonalMatrix[{1,-1,-1,-1}];
 
+TestViaRankOfCPDIV[matrix_]:=Module[{c},
+c=matrix.g.Transpose[matrix].g;
+If[DiagonalizableMatrixQ[matrix]||(MatrixRank[c]<MatrixRank[matrix]),
+If[(MatrixRank[c]<MatrixRank[matrix])&&(Det[matrix]>=0),True,
+If[(Apply[Times,Sort[Abs[Eigenvalues[c]]][[{1,4}]]]>=Det[matrix])&&(Det[matrix]>=0),True,False
+],False]
+,"Did nothing, check what is happening manually."]
+]
+
 DivisibilityKindOfGeneral[channel_,branches_:1]:=Module[{eigen,list,tmp,det,form},
 If[
 (*Checking Complete Positivity*)
-PositiveSemidefiniteMatrixCustomQ[tmp=Reshuffle[Chop[FromPauliToUnit[Chop[channel]]]]],
+PositiveSemidefiniteMatrixQ[tmp=Reshuffle[Chop[FromPauliToUnit[Chop[channel]]]]],
 If[
 (*Evaluating CP-divisibility and p-divisibility*)
 (*Evaluating for p-divsibility*)
-det=Chop[Det[channel]];det>=0,
+det=Chop[Det[channel]];det>0,
 (*Evaluating for CP-div*)
-form=DecompositionOfChannelsInSO31Diagonal[channel//Chop][[2]]//Chop;
 If[ 
-HasHermitianPreservingAndCCPGenerator[form,branches],
+TestViaRankOfCPDIV[channel],
 (*Evaluating for markov type evolution*)
 If[
 HasHermitianPreservingAndCCPGenerator[Chop[channel],branches],4,3
