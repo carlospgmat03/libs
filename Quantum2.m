@@ -351,29 +351,25 @@ PositiveSemidefiniteMatrixCustom3Q[matrix_]:=And@@NonNegative[Chop[Eigenvalues[H
 g=DiagonalMatrix[{1,-1,-1,-1}];
 
 TestViaRankOfCPDIV[matrix_]:=Module[{c},
-c=matrix.g.Transpose[matrix].g;
+c=matrix.g.Transpose[matrix].g//Chop;
 If[DiagonalizableMatrixQ[matrix]||(MatrixRank[c]<MatrixRank[matrix]),
 If[(MatrixRank[c]<MatrixRank[matrix])&&(Det[matrix]>=0),True,
-If[(Apply[Times,Sort[Abs[Eigenvalues[c]]][[{1,4}]]]>=Det[matrix])&&(Det[matrix]>=0),True,False
+If[(Chop[Apply[Times,Sort[Abs[Eigenvalues[c]]][[{1,4}]]]]>=Det[matrix])&&(Det[matrix]>=0),True,False
 ],False]
 ,"Did nothing, check what is happening manually."]
-]
+];
+
 
 DivisibilityKindOfGeneral[channel_,branches_:1]:=Module[{eigen,list,tmp,det,form},
 If[
 (*Checking Complete Positivity*)
 PositiveSemidefiniteMatrixQ[tmp=Reshuffle[Chop[FromPauliToUnit[Chop[channel]]]]],
 If[
-(*Evaluating CP-divisibility and p-divisibility*)
-(*Evaluating for p-divsibility*)
-det=Chop[Det[channel]];det>0,
-(*Evaluating for CP-div*)
-If[ 
-TestViaRankOfCPDIV[channel],
-(*Evaluating for markov type evolution*)
-If[
-HasHermitianPreservingAndCCPGenerator[Chop[channel],branches],4,3
-],2],1],0]];
+HasHermitianPreservingAndCCPGenerator[Chop[channel],branches],4,
+If[TestViaRankOfCPDIV[channel],3,
+If[Chop[Det[channel]]>0,2,1]]
+],0]
+];
 
 EntanglementBreakingQ[x_,y_,z_]:=If[DivisibilityKindOf[x,y,z]>0,If[Max[0,1/4 (-Abs[-1+x+y-z]-Abs[-1+x-y+z]-Abs[-1-x+y+z]-Abs[1+x+y+z]+8 Max[1/4 Abs[-1+x+y-z],1/4 Abs[-1+x-y+z],1/4 Abs[-1-x+y+z],1/4 Abs[1+x+y+z]])]<=0,2,1],0];
 
