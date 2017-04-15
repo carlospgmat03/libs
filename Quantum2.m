@@ -350,13 +350,15 @@ PositiveSemidefiniteMatrixCustom3Q[matrix_]:=And@@NonNegative[Chop[Eigenvalues[H
 
 g=DiagonalMatrix[{1,-1,-1,-1}];
 
-TestViaRankOfCPDIV[matrix_]:=Module[{c},
+TestViaRankOfCPDIV[matrix_]:=Module[{c,rank,var,det},
 c=matrix.g.Transpose[matrix].g//Chop;
-If[DiagonalizableMatrixQ[matrix]||(MatrixRank[c]<MatrixRank[matrix]),
-If[(MatrixRank[c]<MatrixRank[matrix])&&(Det[matrix]>=0),True,
-If[(Chop[Apply[Times,Sort[Abs[Eigenvalues[c]]][[{1,4}]]]]>=Det[matrix])&&(Det[matrix]>=0),True,False
+rank=MatrixRank[matrix];
+det=Det[matrix];
+If[((var=DiagonalizableMatrixQ[matrix])||(MatrixRank[c]<rank))&&det>=0,
+If[var&&(rank<2||(Chop[Apply[Times,Sort[Abs[Eigenvalues[c]]][[{1,4}]]]]>=det&&det>0)),True,
+If[(MatrixRank[c]<rank),True,False
 ],False]
-,"Did nothing, check what is happening manually."]
+,False]
 ];
 
 
