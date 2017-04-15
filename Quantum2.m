@@ -365,7 +365,7 @@ If[(MatrixRank[c]<rank),True,False
 DivisibilityKindOfGeneral[channel_,branches_:1]:=Module[{eigen,list,tmp,det,form},
 If[
 (*Checking Complete Positivity*)
-PositiveSemidefiniteMatrixQ[tmp=Reshuffle[Chop[FromPauliToUnit[Chop[channel]]]]],
+PositiveSemidefiniteMatrixCustom3Q[tmp=Reshuffle[Chop[FromPauliToUnit[Chop[channel]]]]],
 If[
 HasHermitianPreservingAndCCPGenerator[Chop[channel],branches],4,
 If[TestViaRankOfCPDIV[channel],3,
