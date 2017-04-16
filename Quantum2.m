@@ -350,12 +350,13 @@ PositiveSemidefiniteMatrixCustom3Q[matrix_]:=And@@NonNegative[Chop[Eigenvalues[H
 
 g=DiagonalMatrix[{1,-1,-1,-1}];
 
-TestViaRankOfCPDIV[matrix_]:=Module[{c,rank,var,det},
+TestViaRankOfCPDIV[matrix_]:=Module[{c,rank,var,det,list},
 c=matrix.g.Transpose[matrix].g//Chop;
 rank=MatrixRank[matrix];
 det=Det[matrix];
+list=Sqrt[Abs[Eigenvalues[c]]];
 If[((var=DiagonalizableMatrixQ[matrix])||(MatrixRank[c]<rank))&&det>=0,
-If[var&&(rank<2||(Chop[Apply[Times,Sort[Abs[Eigenvalues[c]]][[{1,4}]]]]>=det&&det>0)),True,
+If[var&&(rank<2||(Chop[Apply[Times,Sort[list^2][[{1,4}]]]]>=(Times@@list)&&det>0)),True,
 If[(MatrixRank[c]<rank),True,False
 ],False]
 ,False]
