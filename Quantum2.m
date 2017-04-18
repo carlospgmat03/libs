@@ -74,6 +74,7 @@ AddOne::usage="Direct sum from behind with an identity of dimension one."
 InfinitySupressor::usage = "InfinitySupressor[lista_,infinity_] This functions makes infinities finide by a given bound."
 PartialDecompositionofChannelInSO::usage = "PartialDecompositionofChannelInSO[matrix_]."
 TestViaRankOfCPDIV::usage = "TestViaRankOfCPDIV[matrix_], gives True or False."
+KrausRank::usage = "Computes the Kraus rank of qubit channels given in Pauli basis."
 
 
 Begin["Private`"] 
@@ -586,6 +587,8 @@ list=lista;
 Table[If[list[[i]][[2]]>infinity,list[[i]][[2]]=infinity],{i,Length[list]}];
 list
 ];
+
+KrausRank[channel_]:=MatrixRank[Reshuffle[FromPauliToUnit[channel]]];
 
 End[] 
 EndPackage[]
