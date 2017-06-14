@@ -75,6 +75,7 @@ InfinitySupressor::usage = "InfinitySupressor[lista_,infinity_] This functions m
 PartialDecompositionofChannelInSO::usage = "PartialDecompositionofChannelInSO[matrix_]."
 TestViaRankOfCPDIV::usage = "TestViaRankOfCPDIV[matrix_], gives True or False."
 KrausRank::usage = "Computes the Kraus rank of qubit channels given in Pauli basis."
+WolfEisertCubittCiracMeasureQubitCase::usage = "WolfEisertCubittCiracMeasureQubitCase[channel_] Computes waht the name says, checking up to 10 branches."
 
 
 Begin["Private`"] 
@@ -585,6 +586,16 @@ Return["non diagonalizable"];
 ];
 If[i!=0,Print["Hermiticity preserving and ccp condition is fulfilled until k= "<>ToString[i]]];
 If[is==True,is,False]
+];
+
+WolfEisertCubittCiracMeasureQubitCase[channel_]:=Module[{dev,branches,noise,lol},
+branches=5;
+noise:=-\[Mu] DiagonalMatrix[{0,1,1,1}];
+dev=RealMatrixLogarithmComplexCase[channel,10];
+If[Length[dev]==0,0,
+lol=Min[DeleteCases[Table[If[PositiveSemidefiniteMatrixCustom3Q[Chop[\[Omega]ort.FromPauliToUnit[RealMatrixLogarithmComplexCase[channel,i]+noise].\[Omega]ort]],noise,None],{i,0,5},{\[Mu],0.0,1.0,0.01}]//Flatten,None]];
+Exp[-3lol]
+]
 ];
 
 UnitalChannelInPauliBasis[x_,y_,z_]:=DiagonalMatrix[(1-x-y-z){1,1,1,1}+x{1,1,-1,-1}+y{1,-1,1,-1}+z{1,-1,-1,1}];
