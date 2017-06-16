@@ -588,12 +588,11 @@ If[i!=0,Print["Hermiticity preserving and ccp condition is fulfilled until k= "<
 If[is==True,is,False]
 ];
 
-WolfEisertCubittCiracMeasureQubitCase[channel_]:=Module[{dev,branches,noise,lol,\[Mu]},
-branches=10;
+WolfEisertCubittCiracMeasureQubitCase[channel_,OptionsPattern[{branches->5,noisedelta->0.01}]]:=Module[{dev,noise,lol,\[Mu]},
 noise[\[Mu]_]:=-\[Mu] DiagonalMatrix[{0,1,1,1}];
 dev=RealMatrixLogarithmComplexCase[channel,10];
 If[Length[dev]==0,0,
-lol=Min[DeleteCases[Table[If[PositiveSemidefiniteMatrixCustom3Q[Chop[\[Omega]ort.Reshuffle[FromPauliToUnit[RealMatrixLogarithmComplexCase[channel,i]+noise[j]]].\[Omega]ort]],j,None],{i,0,5},{j,0.0,1.0,0.01}]//Flatten,None]];
+lol=Min[DeleteCases[Table[If[PositiveSemidefiniteMatrixCustom3Q[Chop[\[Omega]ort.Reshuffle[FromPauliToUnit[RealMatrixLogarithmComplexCase[channel,i]+noise[j]]].\[Omega]ort]],j,None],{i,0,OptionValue[branches]},{j,0.0,1.0,OptionValue[noisedelta]}]//Flatten,None]];
 Exp[-3lol]
 ]
 ];
