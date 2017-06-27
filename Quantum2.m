@@ -76,6 +76,8 @@ PartialDecompositionofChannelInSO::usage = "PartialDecompositionofChannelInSO[ma
 TestViaRankOfCPDIV::usage = "TestViaRankOfCPDIV[matrix_], gives True or False."
 KrausRank::usage = "Computes the Kraus rank of qubit channels given in Pauli basis."
 WolfEisertCubittCiracMeasureQubitCase::usage = "WolfEisertCubittCiracMeasureQubitCase[channel_] Computes waht the name says, checking up to 10 branches."
+HilbertSpaceBasisParametrization::usage = "HilbertSpaceBasisParametrization[n_] A most general parametrization of the basis of C^n, or equivalently an element of SU(n)."
+PhasesEliminator::usage = "PhasesEliminator[basis_] Removes global phases of the basis given by HilbertSpaceBasisParametrization."
 
 
 Begin["Private`"] 
@@ -609,8 +611,39 @@ list
 ];
 
 KrausRank[channel_]:=MatrixRank[Reshuffle[FromPauliToUnit[channel]]];
+	
+End[]
 
-End[] 
+SinCosList[j_,vec_]:=Table[If[i==j,Cos,Sin][\[Theta][vec][i+1]],{i,0,j}];	
+	
+SinList[j_,vec_]:=Table[Sin[\[Theta][vec][i+1]],{i,0,j}];
+
+SinTerm[j_,vec_]:=Times@@SinList[j,vec];
+
+SinCosTerm[j_,vec_]:=Times@@SinCosList[j,vec];
+
+Vector[index_,dim_,basis_]:=Sum[If[dim-1==i,SinTerm[i-1,index],SinCosTerm[i,index]]Exp[I \[Phi][index][i]]basis[[i+1]],{i,0,dim-1}];
+
+Vector[index_,dim_]:=Table[If[dim-1==i,SinTerm[i-1,index],SinCosTerm[i,index]]Exp[I \[Phi][index][i]],{i,0,dim-1}];
+
+vecuptoU[vec_,index_,b_]:=ReplaceAll[D[vec,\[Theta][index][b]],Table[\[Theta][index][i]->Pi/2,{i,1,b-1}]];
+
+BasisComplement[vec_,index_,dim_]:=Table[vecuptoU[vec,index,i],{i,dim-(index+1)}];
+
+HilbertSpaceBasisParametrization[n_]:=Module[{vec,basis},
+vec=Vector[0,n];
+Flatten[{{vec},Table[
+basis=BasisComplement[vec,i-1,n];
+vec=Vector[i,n-i,basis];
+vec
+,{i,n-1}]},1]
+];
+
+PhasesEliminator[basis_]:=Module[{len},
+len=Length[basis];
+ReplaceAll[basis,Table[\[Phi][i][0]->0,{i,0,len-1}]]
+];
+ 
 EndPackage[]
 
 
