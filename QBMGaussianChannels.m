@@ -46,8 +46,9 @@ matrixTstandAlone[t_]:={{-((2 M DA[t])/hbar),(2 A[t])/hbar},{(2 M^2 DDA[t])/hbar
 matrixNstandAlone[t_]:={{qsq+(4 A[t] (psq A[t]-hbar M DS[t]))/hbar^2-S[t]^2/qsq,-((2 M (A[t] (-2 psq DA[t]+hbar M DDS[t])+hbar M DA[t] DS[t]))/hbar^2)-(M DS[t] S[t])/qsq},{-((2 M (A[t] (-2 psq DA[t]+hbar M DDS[t])+hbar M DA[t] DS[t]))/hbar^2)-(M DS[t] S[t])/qsq,psq+M^2 ((4 DA[t] (psq DA[t]-hbar M DDS[t]))/hbar^2-DS[t]^2/qsq)}};
 \[HBar]:=hbar;
 
-(*Desviaciones*)qsq:=1/(M \[Beta]\[Beta]) Sum[1/(\[Omega]0^2+(2Pi n/(\[Beta]\[Beta] hbar))^2+Abs[2Pi n/(\[Beta]\[Beta] hbar)] \[Gamma]hat[Abs[2Pi n/(\[Beta]\[Beta] hbar)]]),{n,-1000,1000}];
-psq:=M/\[Beta]\[Beta] Sum[(\[Omega]0^2+Abs[2Pi n/(\[Beta]\[Beta] hbar)]\[Gamma]hat[Abs[2Pi n/(\[Beta]\[Beta] hbar)]])/(\[Omega]0^2+(2Pi n/(\[Beta]\[Beta] hbar))^2+Abs[2Pi n/(\[Beta]\[Beta] hbar)]\[Gamma]hat[Abs[2Pi n/(\[Beta]\[Beta] hbar)]]),{n,-1000,1000}];
+(*Desviaciones*)
+qsq:=1/(M \[Beta]\[Beta]) Sum[1/(\[Omega]0^2+(2Pi n/(\[Beta]\[Beta] hbar))^2+Abs[2Pi n/(\[Beta]\[Beta] hbar)] \[Gamma]hat[Abs[2Pi n/(\[Beta]\[Beta] hbar)]]),{n,-10000,1000}];
+psq:=M/\[Beta]\[Beta] Sum[(\[Omega]0^2+Abs[2Pi n/(\[Beta]\[Beta] hbar)]\[Gamma]hat[Abs[2Pi n/(\[Beta]\[Beta] hbar)]])/(\[Omega]0^2+(2Pi n/(\[Beta]\[Beta] hbar))^2+Abs[2Pi n/(\[Beta]\[Beta] hbar)]\[Gamma]hat[Abs[2Pi n/(\[Beta]\[Beta] hbar)]]),{n,-10000,10000}];
 GLaplace[z_]:=1/(\[Omega]0^2+z^2+z \[Gamma]hat[z]);
 GFourier[\[Omega]_]:=GLaplace[-I \[Omega]]-GLaplace[I \[Omega]];
 (*Funciones del ba\[NTilde]o*)
