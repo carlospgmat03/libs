@@ -126,7 +126,7 @@ Flatten[ParallelTable[
 listcorr=Table[{i,A[i],DA[i],DDA[i],S[i],DS[i],DDS[i]},{i,limitetiempo1,limitetiempo2,step}]//Transpose;
 F=ComputeFlist[listcorr][[All,2]];
 FforCharlie=ListIntegrate[ComputeFlist[listcorr]][[All,2]];
-{\[Gamma]\[Gamma]=i,\[Omega]0=j,Transpose[listcorr],step*Total[F],CharlieMeasure[F]}
+{\[Gamma]\[Gamma]=i,\[Omega]0=j,Transpose[listcorr],step*Total[F],CharlieMeasure[FforCharlie]}
 ,{i,limite\[Gamma]1,limite\[Gamma]2,delta\[Gamma]},{j,limite\[Omega]01,limite\[Omega]02,delta\[Omega]0},DistributedContexts->All]
 ,1]];
 listF:=ComputeFlist[listcorr];
