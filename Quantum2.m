@@ -78,6 +78,7 @@ KrausRank::usage = "Computes the Kraus rank of qubit channels given in Pauli bas
 WolfEisertCubittCiracMeasureQubitCase::usage = "WolfEisertCubittCiracMeasureQubitCase[channel_] Computes waht the name says, checking up to 10 branches."
 HilbertSpaceBasisParametrization::usage = "HilbertSpaceBasisParametrization[n_] A most general parametrization of the basis of C^n, or equivalently an element of SU(n)."
 PhasesEliminator::usage = "PhasesEliminator[basis_] Removes global phases of the basis given by HilbertSpaceBasisParametrization."
+ListIntegrate::usage= "ListIntegrate[list_]."
 
 
 Begin["Private`"] 
@@ -611,6 +612,12 @@ list
 ];
 
 KrausRank[channel_]:=MatrixRank[Reshuffle[FromPauliToUnit[channel]]];
+
+ListIntegrate[list_]:=Module[{sum,step},
+step=list[[2]][[1]]-list[[1]][[1]];
+sum=0.0;
+step*Table[sum=sum+list[[i]],{i,1,Length[list]}]
+];
 	
 End[]
 
