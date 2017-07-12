@@ -26,10 +26,16 @@ ComputeF::usage = "ComputeF[A_]. Computes the Illuminatti indicator of divisibil
 ComputeFlist::usage = "ComputeFlist[listcorr_]."
 ComputecptpMatrixlist::usage = "ComputecptpMatrixlist[listcorr_]."
 ComputecptpMatrixComponents::usage = "ComputecptpMatrixComponents[listcorr_,which_]."
+PlotA::usage = "PlotA."
+PlotS::usage = "PlotS."
+PlotN::usage = "PlotN."
+PlotT::usage= "PlotT."
+PlotTN::usage = "PlotTN."
+PlotF::usage = "PlotF."
+Correlator::usage = "Correaltor[init_,end_,step_] Constructs listcorr."
 
 
 (* ::Input::Initialization:: *)
-Begin["Private`"] 
 \[CapitalOmega]={{0,1},{-1,0}};
 matrixTstandAlone[A_,DA_,DDA_]:={{-((2 M DA)/hbar),(2 A)/hbar},{(2 M^2 DDA)/hbar,-((2 M DA)/hbar)}}//Chop;
 matrixNstandAlone[A_,DA_,DDA_,S_,DS_,DDS_,qsq_,psq_]:={{qsq+(4 A (psq A-hbar M DS))/hbar^2-S^2/qsq,-((2 M (A (-2 psq DA+hbar M DDS)+hbar M DA DS))/hbar^2)-(M DS S)/qsq},{-((2 M (A (-2 psq DA+hbar M DDS)+hbar M DA DS))/hbar^2)-(M DS S)/qsq,psq+M^2 ((4 DA (psq DA-hbar M DDS))/hbar^2-DS^2/qsq)}}//Chop;
@@ -103,7 +109,14 @@ q=qsq;
 p=psq;
 Map[Chop[{#[[1]],matrixTstandAlone@@#[[{2,3,4}]],matrixNstandAlone@@Flatten[{Take[#,{2,7}],{q,p}}]}]&,Transpose[ list]]];
 ComputeTNInverse[list_]:=Map[{#[[1]],InverseTN[#[[{2,3}]]]}&,ComputeTN[list]];
-
+PlotA:=ListLinePlot[PlottingCorrelations[listcorr,pl={2,3,4}],PlotRange->All,PlotLegends->Placed[legends[[pl]],Above]];
+PlotS:=ListLinePlot[PlottingCorrelations[listcorr,pl={5,6,7}],PlotRange->All,PlotLegends->Placed[legends[[pl]],Above]];
+PlotN:=ListLinePlot[PlottingComponents[listcorr,pl={5,6,7,8}],PlotRange->All,PlotLegends->Placed[legendscomponents[[pl]],Right],PlotStyle->Automatic];
+PlotTN:=ListLinePlot[PlottingComponents[listcorr,pl={1,2,3,4,5,6,7,8}],PlotRange->Automatic,PlotLegends->Placed[legendscomponents[[pl]],Right],PlotStyle->{Automatic,Automatic,Automatic,Automatic,Automatic,Automatic,Automatic,Directive[Dashed,Opacity[0.5]]}];
+PlotT:=ListLinePlot[PlottingComponentsInverse[listcorr,pl={1,2,3,4}],PlotRange->All,PlotLegends->Placed[legendscomponents[[pl]],Right],PlotStyle->{Automatic,Automatic,Automatic,Automatic,Automatic,Automatic,Automatic,Directive[Dashed,Opacity[0.5]]}];
+PlotF:=ListLinePlot[listF,PlotRange->All,PlotStyle->Red];
+Correlator[init_,end_,step_]:=Module[{},
+listcorr=ParallelTable[t=i;{t,A[t],DA[t],DDA[t],S[t],DS[t],DDS[t]},{i,init,end,step},DistributedContexts->All]//Transpose];
 
 
 (* ::Subsubsubsection::Closed:: *)
@@ -118,5 +131,4 @@ term:=(I E^(-I t Root[I \[Omega]0^2 \[Omega]D+(-\[Omega]0^2-\[Gamma]\[Gamma] \[O
 (*Rest of the package*)
 
 
-End[]
 EndPackage[]
