@@ -52,8 +52,8 @@ GLaplace[z_]:=1/(\[Omega]0^2+z^2+z \[Gamma]hat[z]);
 GFourier[\[Omega]_]:=GLaplace[-I \[Omega]]-GLaplace[I \[Omega]];
 (*Funciones del ba\[NTilde]o*)
 SFourier[\[Omega]_]:=I hbar/(2M)Coth[hbar \[Omega] \[Beta]\[Beta]/2]GFourier[\[Omega]];
-SDesdeFourierNumerico[t_]:=-NIntegrate[SFourier[\[Omega]]Cos[\[Omega] t],{\[Omega],-Infinito,Infinito},Method->{"LocalAdaptive","SingularityDepth"->20,"SingularityHandler"->Automatic},Exclusions->{0}]/(2 Pi)//Chop;
-SDesdeFourierAnalitico[\[Tau]_]:=-I /(M \[Beta]\[Beta] Sqrt[2 Pi])ParallelSum[Chop[term/.n->i/.t->\[Tau]],{i,-sum,sum},DistributedContexts->All]//Chop;
+SDesdeFourierNumerico[t_]:=-NIntegrate[SFourier[\[Omega]]Cos[\[Omega] t],{\[Omega],-Infinito,Infinito},Method->{"LocalAdaptive","SingularityDepth"->40,"SingularityHandler"->Automatic},MaxRecursion->100,PrecisionGoal->12,WorkingPrecision->25,Exclusions->{SFourier[\[Omega]]^(-1)==0}]/(2 Pi)//Chop;
+SDesdeFourierAnalitico[\[Tau]_]:=-I /(M \[Beta]\[Beta] Sqrt[2 Pi])Sum[Chop[Chop[term]/.n->i/.t->\[Tau]],{i,-sum,sum}]//Chop;
 ADesdeLaplace[t_]:=(-hbar/(2 M))InverseLaplaceTransform[GLaplace[z],z,\[Tau]]/.\[Tau]->t//Chop;
 ADesdeFourier[t_]:=(-hbar/(2 M Sqrt[2 Pi]))InverseFourierTransform[GFourier[\[Omega]],\[Omega],\[Tau]]/.\[Tau]->t//Chop;
 A[t_]:=ADesdeLaplace[t];
