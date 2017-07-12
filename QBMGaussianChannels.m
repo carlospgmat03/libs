@@ -32,6 +32,7 @@ PlotN::usage = "PlotN."
 PlotT::usage= "PlotT."
 PlotTN::usage = "PlotTN."
 PlotF::usage = "PlotF."
+listF::usage = "ComputeFlist[listcorr]."
 Correlator::usage = "Correaltor[init_,end_,step_] Constructs listcorr."
 BarridoEn\[Omega]0y\[Gamma]\[Gamma]::usage = "BarridoEn\[Omega]0y\[Gamma]\[Gamma][limite\[Gamma]1_,limite\[Gamma]2_,delta\[Gamma]_,limite\[Omega]01_,limite\[Omega]02_,delta\[Omega]0_,limitetiempo1_,limitetiempo2_,step_]."
 DrudeTable::usage = "DrudeTable[init_,end_,step_]."
@@ -128,7 +129,7 @@ FforCharlie=ListIntegrate[ComputeFlist[listcorr]][[All,2]];
 {\[Gamma]\[Gamma]=i,\[Omega]0=j,Transpose[listcorr],step*Total[F],CharlieMeasure[F]}
 ,{i,limite\[Gamma]1,limite\[Gamma]2,delta\[Gamma]},{j,limite\[Omega]01,limite\[Omega]02,delta\[Omega]0},DistributedContexts->All]
 ,1]];
-
+listF:=ComputeFlist[listcorr];
 DrudeTable[init_,end_,step_]:=ParallelTable[\[Omega]D=j;ComputeFlist[Table[{i,A[i],DA[i],DDA[i],S[i],DS[i],DDS[i]},{i,0.01,20.0,0.1}]//Transpose],{j,init,end,step},DistributedContexts->All];
 
 
