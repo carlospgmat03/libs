@@ -121,11 +121,12 @@ PlotF:=ListLinePlot[ComputeFlist[listcorr],PlotRange->All,PlotStyle->Red];
 Correlator[init_,end_,step_]:=Module[{},
 listcorr=ParallelTable[t=i;{t,A[t],DA[t],DDA[t],S[t],DS[t],DDS[t]},{i,init,end,step},DistributedContexts->All]//Transpose;];
 
-BarridoEn\[Omega]0y\[Gamma]\[Gamma][limite\[Gamma]1_,limite\[Gamma]2_,delta\[Gamma]_,limite\[Omega]01_,limite\[Omega]02_,delta\[Omega]0_,limitetiempo1_,limitetiempo2_,step_]:=Module[{F,listcorr,FforCharlie},
+BarridoEn\[Omega]0y\[Gamma]\[Gamma][limite\[Gamma]1_,limite\[Gamma]2_,delta\[Gamma]_,limite\[Omega]01_,limite\[Omega]02_,delta\[Omega]0_,limitetiempo1_,limitetiempo2_,step_]:=Module[{F,listcorr,FforCharlie,Flist},
 Flatten[ParallelTable[
 listcorr=Table[{i,A[i],DA[i],DDA[i],S[i],DS[i],DDS[i]},{i,limitetiempo1,limitetiempo2,step}]//Transpose;
-F=ComputeFlist[listcorr][[All,2]];
-FforCharlie=ListIntegrate[ComputeFlist[listcorr]][[All,2]];
+Flist=ComputeFlist[listcorr];
+F=Flist[[All,2]];
+FforCharlie=ListIntegrate[Flist][[All,2]];
 {\[Gamma]\[Gamma]=i,\[Omega]0=j,Transpose[listcorr],step*Total[F],CharlieMeasure[FforCharlie]}
 ,{i,limite\[Gamma]1,limite\[Gamma]2,delta\[Gamma]},{j,limite\[Omega]01,limite\[Omega]02,delta\[Omega]0},DistributedContexts->All]
 ,1]];
