@@ -117,7 +117,7 @@ PlotA:=ListLinePlot[PlottingCorrelations[listcorr,pl={2,3,4}],PlotRange->All,Plo
 PlotS:=ListLinePlot[PlottingCorrelations[listcorr,pl={5,6,7}],PlotRange->All,PlotLegends->Placed[legends[[pl]],Above]];
 PlotN:=ListLinePlot[PlottingComponents[listcorr,pl={5,6,7,8}],PlotRange->All,PlotLegends->Placed[legendscomponents[[pl]],Right],PlotStyle->Automatic];
 PlotTN:=ListLinePlot[PlottingComponents[listcorr,pl={1,2,3,4,5,6,7,8}],PlotRange->Automatic,PlotLegends->Placed[legendscomponents[[pl]],Right],PlotStyle->{Automatic,Automatic,Automatic,Automatic,Automatic,Automatic,Automatic,Directive[Dashed,Opacity[0.5]]}];
-PlotT:=ListLinePlot[PlottingComponentsInverse[listcorr,pl={1,2,3,4}],PlotRange->All,PlotLegends->Placed[legendscomponents[[pl]],Right],PlotStyle->{Automatic,Automatic,Automatic,Automatic,Automatic,Automatic,Automatic,Directive[Dashed,Opacity[0.5]]}];
+PlotT:=ListLinePlot[PlottingComponents[listcorr,pl={1,2,3,4}],PlotRange->All,PlotLegends->Placed[legendscomponents[[pl]],Right],PlotStyle->{Automatic,Automatic,Automatic,Automatic,Automatic,Automatic,Automatic,Directive[Dashed,Opacity[0.5]]}];
 PlotF:=ListLinePlot[ComputeFlist[listcorr],PlotRange->All,PlotStyle->Red];
 Correlator[init_,end_,step_]:=Module[{},
 listcorr=Table[{i,A[i],DA[i],DDA[i],S[i],DS[i],DDS[i]},{i,init,end,step}]//Transpose;];
