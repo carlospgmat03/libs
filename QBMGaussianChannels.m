@@ -35,7 +35,7 @@ PlotF::usage = "PlotF."
 listF::usage = "ComputeFlist[listcorr]."
 Correlator::usage = "Correaltor[init_,end_,step_] Constructs listcorr."
 BarridoEn\[Omega]0y\[Gamma]\[Gamma]::usage = "BarridoEn\[Omega]0y\[Gamma]\[Gamma][limite\[Gamma]1_,limite\[Gamma]2_,delta\[Gamma]_,limite\[Omega]01_,limite\[Omega]02_,delta\[Omega]0_,limitetiempo1_,limitetiempo2_,step_]."
-DrudeTable::usage = "DrudeTable[init_,end_,step_]."
+DrudeTable::usage = "DrudeTable[init_,end_,step_,time_]."
 
 
 (* ::Input::Initialization:: *)
@@ -132,7 +132,8 @@ FforCharlie=ListIntegrate[Flist][[All,2]];
 ,{i,limite\[Gamma]1,limite\[Gamma]2,delta\[Gamma]},{j,limite\[Omega]01,limite\[Omega]02,delta\[Omega]0},DistributedContexts->All]
 ,1]];
 listF:=ComputeFlist[listcorr];
-DrudeTable[init_,end_,step_]:=ParallelTable[\[Omega]D=j;ComputeFlist[Table[{i,A[i],DA[i],DDA[i],S[i],DS[i],DDS[i]},{i,0.01,20.0,0.1}]//Transpose],{j,init,end,step},DistributedContexts->All];
+DrudeTable[init_,end_,step_,timeinit_,timeend_,timestep_]:=ParallelTable[\[Omega]D=j;ComputeFlist[Table[{i,A[i],DA[i],DDA[i],S[i],DS[i],DDS[i]},{i,timeinit,timeend,timestep}]//Transpose],{j,init,end,step},DistributedContexts->All];
+DrudeTable[init_,end_,step_]:=DrudeTable[init,end,step,0.01,20.0,0.1];
 
 
 (* ::Subsubsubsection::Closed:: *)
