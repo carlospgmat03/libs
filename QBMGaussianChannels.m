@@ -75,7 +75,7 @@ a=PseudoInverse[Chop[A[[1]]],Tolerance->10^(-8)];
 {a,-a.A[[2]].Transpose[a]}
 ];
 cptpCondition[A_]:=PositiveSemidefiniteMatrixCustom2Q[cptpMatrix[A]];
-cptpMatrix[A_]:=Chop[HermitianPart[A[[2]]-0.5*I \[CapitalOmega]+0.5*I A[[1]].\[CapitalOmega].Transpose[A[[1]]]],10^(-8)];
+cptpMatrix[A_]:=Chop[A[[2]]-0.5*I \[CapitalOmega]+0.5*I A[[1]].\[CapitalOmega].Transpose[A[[1]]]];
 ComputeF[A_]:=Module[{list},
 list=Chop[Eigenvalues[cptpMatrix[A]]];
 0.5*Total[Re[Abs[list]-list]]
