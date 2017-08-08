@@ -31,6 +31,9 @@ PlotS::usage = "PlotS."
 PlotN::usage = "PlotN."
 PlotT::usage= "PlotT."
 PlotTN::usage = "PlotTN."
+PlotNInverse::usage = "PlotNInverse."
+PlotTInverse::usage= "PlotTInverse."
+PlotTNInverse::usage = "PlotTNInverse."
 PlotF::usage = "PlotF."
 listF::usage = "ComputeFlist[listcorr]."
 Correlator::usage = "Correaltor[init_,end_,step_] Constructs listcorr."
@@ -68,11 +71,11 @@ DDS[t_]:=(S[t+mesh]-2.0* S[t]+S[t-mesh])/mesh^2;
 
 CompositionLaw[A_,B_]:={A[[1]].B[[1]],A[[1]].B[[2]].Transpose[A[[1]]]+A[[2]]};
 InverseTN[A_]:=Module[{a},
-a=PseudoInverse[A[[1]]]//Chop;
+a=PseudoInverse[Chop[A[[1]]],Tolerance->10^(-8)];
 {a,-a.A[[2]].Transpose[a]}
 ];
 cptpCondition[A_]:=PositiveSemidefiniteMatrixCustom2Q[cptpMatrix[A]];
-cptpMatrix[A_]:=Chop[A[[2]]-0.5*I \[CapitalOmega]+0.5*I A[[1]].\[CapitalOmega].Transpose[A[[1]]]];
+cptpMatrix[A_]:=Chop[HermitianPart[A[[2]]-0.5*I \[CapitalOmega]+0.5*I A[[1]].\[CapitalOmega].Transpose[A[[1]]]],10^(-8)];
 ComputeF[A_]:=Module[{list},
 list=Chop[Eigenvalues[cptpMatrix[A]]];
 0.5*Total[Re[Abs[list]-list]]
@@ -100,7 +103,7 @@ PlottingComponentsInverse[listcorr_,which_]:=Transpose[Map[First[{Partition[Riff
 (*Contstruye una rutina q de putazo ya haga los plots para el set de parametros.*)
 
 ComputeFlist[listcorr_]:=Module[{list},
-list=ComputeTN[listcorr];
+list=Chop[ComputeTN[listcorr]];
 Table[{list[[i]][[1]],ComputeF[CompositionLaw[list[[i+1]][[{2,3}]],InverseTN[list[[i]][[{2,3}]]]//Chop]//Chop]},{i,1,Length[list]-1}]
 ];
 ComputecptpMatrixlist[listcorr_]:=Module[{list},
@@ -118,6 +121,9 @@ PlotS:=ListLinePlot[PlottingCorrelations[listcorr,pl={5,6,7}],PlotRange->All,Plo
 PlotN:=ListLinePlot[PlottingComponents[listcorr,pl={5,6,7,8}],PlotRange->All,PlotLegends->Placed[legendscomponents[[pl]],Right],PlotStyle->Automatic];
 PlotTN:=ListLinePlot[PlottingComponents[listcorr,pl={1,2,3,4,5,6,7,8}],PlotRange->Automatic,PlotLegends->Placed[legendscomponents[[pl]],Right],PlotStyle->{Automatic,Automatic,Automatic,Automatic,Automatic,Automatic,Automatic,Directive[Dashed,Opacity[0.5]]}];
 PlotT:=ListLinePlot[PlottingComponents[listcorr,pl={1,2,3,4}],PlotRange->All,PlotLegends->Placed[legendscomponents[[pl]],Right],PlotStyle->{Automatic,Automatic,Automatic,Automatic,Automatic,Automatic,Automatic,Directive[Dashed,Opacity[0.5]]}];
+PlotNInverse:=ListLinePlot[PlottingComponentsInverse[listcorr,pl={5,6,7,8}],PlotRange->All,PlotLegends->Placed[legendscomponents[[pl]],Right],PlotStyle->Automatic];
+PlotTNInverse:=ListLinePlot[PlottingComponentsInverse[listcorr,pl={1,2,3,4,5,6,7,8}],PlotRange->Automatic,PlotLegends->Placed[legendscomponents[[pl]],Right],PlotStyle->{Automatic,Automatic,Automatic,Automatic,Automatic,Automatic,Automatic,Directive[Dashed,Opacity[0.5]]}];
+PlotTInverse:=ListLinePlot[PlottingComponentsInverse[listcorr,pl={1,2,3,4}],PlotRange->All,PlotLegends->Placed[legendscomponents[[pl]],Right],PlotStyle->{Automatic,Automatic,Automatic,Automatic,Automatic,Automatic,Automatic,Directive[Dashed,Opacity[0.5]]}];
 PlotF:=ListLinePlot[ComputeFlist[listcorr],PlotRange->All,PlotStyle->Red];
 Correlator[init_,end_,step_]:=Module[{},
 listcorr=Table[{i,A[i],DA[i],DDA[i],S[i],DS[i],DDS[i]},{i,init,end,step}]//Transpose;];
