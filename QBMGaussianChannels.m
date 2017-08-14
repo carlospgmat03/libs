@@ -1,6 +1,6 @@
 (* ::Package:: *)
 
-BeginPackage["QBMGaussianChannels`",{"Quantum2`"}]
+BeginPackage["QBMGaussianChannels`",{"Quantum`","Quantum2`"}]
 matrixTstandAlone::usage = "matrixTstandAlone[A_,DA_,DDA_] or matrixTstandAlone[t_]";
 matrixNstandAlone::usage = "matrixNstandAlone[A_,DA_,DDA_,S_,DS_,DDS_,qsq_,psq_] or matrixNstandAlone[t_]";
 qsq::usage = "Just call it." 
@@ -39,6 +39,7 @@ listF::usage = "ComputeFlist[listcorr]."
 Correlator::usage = "Correaltor[init_,end_,step_] Constructs listcorr."
 BarridoEn\[Omega]0y\[Gamma]\[Gamma]::usage = "BarridoEn\[Omega]0y\[Gamma]\[Gamma][limite\[Gamma]1_,limite\[Gamma]2_,delta\[Gamma]_,limite\[Omega]01_,limite\[Omega]02_,delta\[Omega]0_,limitetiempo1_,limitetiempo2_,step_]."
 DrudeTable::usage = "DrudeTable[init_,end_,step_,time_]."
+CustomPseudoInverse::usage = "CustomInverse[m_,tolerance_]"
 
 
 (* ::Input::Initialization:: *)
@@ -71,7 +72,7 @@ DDS[t_]:=(S[t+mesh]-2.0* S[t]+S[t-mesh])/mesh^2;
 
 CompositionLaw[A_,B_]:={A[[1]].B[[1]],A[[1]].B[[2]].Transpose[A[[1]]]+A[[2]]};
 InverseTN[A_]:=Module[{a},
-a=PseudoInverse[Chop[A[[1]]],Tolerance->10^(-8)];
+a=CustomPseudoInverse[Chop[A[[1]]],0.00000001];
 {a,-a.A[[2]].Transpose[a]}
 ];
 cptpCondition[A_]:=PositiveSemidefiniteMatrixCustom2Q[cptpMatrix[A]];
@@ -140,6 +141,11 @@ FforCharlie=ListIntegrate[Flist][[All,2]];
 listF:=ComputeFlist[listcorr];
 DrudeTable[init_,end_,step_,timeinit_,timeend_,timestep_]:=ParallelTable[\[Omega]D=j;ComputeFlist[Table[{i,A[i],DA[i],DDA[i],S[i],DS[i],DDS[i]},{i,timeinit,timeend,timestep}]//Transpose],{j,init,end,step},DistributedContexts->All];
 DrudeTable[init_,end_,step_]:=DrudeTable[init,end,step,0.01,20.0,0.1];
+CustomPseudoInverse[m_,tolerance_]:=Module[{s,v,d,vinv},
+{s,v,d}=SingularValueDecomposition[m];
+vinv=SparseArray[{i_, i_}:>If[v[[i,i]]>tolerance,1/v[[i,i]],0],Length[v]];
+d.vinv.ConjugateTranspose[s]
+]
 
 
 (* ::Subsubsubsection::Closed:: *)
