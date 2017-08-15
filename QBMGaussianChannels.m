@@ -40,6 +40,7 @@ Correlator::usage = "Correaltor[init_,end_,step_] Constructs listcorr."
 BarridoEn\[Omega]0y\[Gamma]\[Gamma]::usage = "BarridoEn\[Omega]0y\[Gamma]\[Gamma][limite\[Gamma]1_,limite\[Gamma]2_,delta\[Gamma]_,limite\[Omega]01_,limite\[Omega]02_,delta\[Omega]0_,limitetiempo1_,limitetiempo2_,step_]."
 DrudeTable::usage = "DrudeTable[init_,end_,step_,time_]."
 CustomPseudoInverse::usage = "CustomInverse[m_,tolerance_]"
+ComputeTN\[Epsilon]list::usage = "ComputeTN\[Epsilon]list[listcorr_]"
 
 
 (* ::Input::Initialization:: *)
@@ -70,11 +71,12 @@ DDS[t_]:=(S[t+mesh]-2.0* S[t]+S[t-mesh])/mesh^2;
 \[Gamma]Drude[\[Omega]_]:=\[Gamma]\[Gamma] \[Omega]D/(\[Omega]+\[Omega]D);
 
 
-CompositionLaw[A_,B_]:={A[[1]].B[[1]],A[[1]].B[[2]].Transpose[A[[1]]]+A[[2]]};
-InverseTN[A_]:=Module[{a},
-a=CustomPseudoInverse[Chop[A[[1]]],0.00000001];
-{a,-a.A[[2]].Transpose[a]}
-];
+CompositionLaw[A_,B_]:=Chop[{A[[1]].B[[1]],A[[1]].B[[2]].Transpose[A[[1]]]+A[[2]]}];
+InverseTN[A_]:=Module[{a,d},
+d=0.001;
+a=CustomPseudoInverse[A[[1]],d];
+{a[[1]],If[a[[2]],{{0,0},{0,0}},-a[[1]].A[[2]].Transpose[a[[1]]]]}
+]
 cptpCondition[A_]:=PositiveSemidefiniteMatrixCustom2Q[cptpMatrix[A]];
 cptpMatrix[A_]:=Chop[A[[2]]-0.5*I \[CapitalOmega]+0.5*I A[[1]].\[CapitalOmega].Transpose[A[[1]]]];
 ComputeF[A_]:=Module[{list},
@@ -107,6 +109,10 @@ ComputeFlist[listcorr_]:=Module[{list},
 list=Chop[ComputeTN[listcorr]];
 Table[{list[[i]][[1]],ComputeF[CompositionLaw[list[[i+1]][[{2,3}]],InverseTN[list[[i]][[{2,3}]]]//Chop]//Chop]},{i,1,Length[list]-1}]
 ];
+ComputeTN\[Epsilon]list[listcorr_]:=Module[{list},
+list=Chop[ComputeTN[listcorr]];
+Table[{list[[i]][[1]],CompositionLaw[list[[i+1]][[{2,3}]],InverseTN[list[[i]][[{2,3}]]]//Chop]},{i,1,Length[list]-1}]
+];
 ComputecptpMatrixlist[listcorr_]:=Module[{list},
 list=ComputeTN[listcorr];
 Table[{list[[i]][[1]],cptpMatrix[CompositionLaw[list[[i+1]][[{2,3}]],InverseTN[list[[i]][[{2,3}]]]//Chop]//Chop]//Chop},{i,1,Length[list]-1}]
@@ -115,7 +121,7 @@ ComputecptpMatrixComponents[listcorr_,which_]:=Transpose[Map[First[{Partition[Ri
 ComputeTN[list_]:=Module[{q,p},
 q=qsq;
 p=psq;
-Map[Chop[{#[[1]],matrixTstandAlone@@#[[{2,3,4}]],matrixNstandAlone@@Flatten[{Take[#,{2,7}],{q,p}}]}]&,Transpose[ list]]];
+Map[Chop[{#[[1]],Threshold[matrixTstandAlone@@#[[{2,3,4}]],0.0000001],matrixNstandAlone@@Flatten[{Take[#,{2,7}],{q,p}}]}]&,Transpose[ list]]];
 ComputeTNInverse[list_]:=Map[{#[[1]],InverseTN[#[[{2,3}]]]}&,ComputeTN[list]];
 PlotA:=ListLinePlot[PlottingCorrelations[listcorr,pl={2,3,4}],PlotRange->All,PlotLegends->Placed[legends[[pl]],Above]];
 PlotS:=ListLinePlot[PlottingCorrelations[listcorr,pl={5,6,7}],PlotRange->All,PlotLegends->Placed[legends[[pl]],Above]];
@@ -141,10 +147,11 @@ FforCharlie=ListIntegrate[Flist][[All,2]];
 listF:=ComputeFlist[listcorr];
 DrudeTable[init_,end_,step_,timeinit_,timeend_,timestep_]:=ParallelTable[\[Omega]D=j;ComputeFlist[Table[{i,A[i],DA[i],DDA[i],S[i],DS[i],DDS[i]},{i,timeinit,timeend,timestep}]//Transpose],{j,init,end,step},DistributedContexts->All];
 DrudeTable[init_,end_,step_]:=DrudeTable[init,end,step,0.01,20.0,0.1];
-CustomPseudoInverse[m_,tolerance_]:=Module[{s,v,d,vinv},
+CustomPseudoInverse[m_,tolerance_]:=Module[{s,v,d,vinv,f},
 {s,v,d}=SingularValueDecomposition[m];
-vinv=SparseArray[{i_, i_}:>If[v[[i,i]]>tolerance,1/v[[i,i]],0],Length[v]];
-d.vinv.ConjugateTranspose[s]
+f=False;
+vinv=SparseArray[{i_, i_}:>If[v[[i,i]]>tolerance,1/v[[i,i]],f=True;0],Length[v]];
+{d.vinv.ConjugateTranspose[s],f}
 ]
 
 
