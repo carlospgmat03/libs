@@ -73,9 +73,11 @@ DDS[t_]:=(S[t+mesh]-2.0* S[t]+S[t-mesh])/mesh^2;
 
 CompositionLaw[A_,B_]:=Chop[{A[[1]].B[[1]],A[[1]].B[[2]].Transpose[A[[1]]]+A[[2]]}];
 InverseTN[A_]:=Module[{a,d},
-d=0.001;
+d=0.00000001;
 a=CustomPseudoInverse[A[[1]],d];
 {a[[1]],If[a[[2]],{{0,0},{0,0}},-a[[1]].A[[2]].Transpose[a[[1]]]]}
+(*a=PseudoInverse[A[[1]],0.001];
+{a,-a.A[[2]].Transpose[a]}*)
 ]
 cptpCondition[A_]:=PositiveSemidefiniteMatrixCustom2Q[cptpMatrix[A]];
 cptpMatrix[A_]:=Chop[A[[2]]-0.5*I \[CapitalOmega]+0.5*I A[[1]].\[CapitalOmega].Transpose[A[[1]]]];
