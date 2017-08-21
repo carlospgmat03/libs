@@ -135,7 +135,7 @@ PlotTNInverse:=ListLinePlot[PlottingComponentsInverse[listcorr,pl={1,2,3,4,5,6,7
 PlotTInverse:=ListLinePlot[PlottingComponentsInverse[listcorr,pl={1,2,3,4}],PlotRange->All,PlotLegends->Placed[legendscomponents[[pl]],Right],PlotStyle->{Automatic,Automatic,Automatic,Automatic,Automatic,Automatic,Automatic,Directive[Dashed,Opacity[0.5]]}];
 PlotF:=ListLinePlot[ComputeFlist[listcorr],PlotRange->All,PlotStyle->Red];
 Correlator[init_,end_,step_]:=Module[{},
-listcorr=Table[{i,A[i],DA[i],DDA[i],S[i],DS[i],DDS[i]},{i,init,end,step}]//Transpose;];
+listcorr=Table[{i,A[i],DA[i],DDA[i],S[i],DS[i],DDS[i]},{i,init,end,step}]//Transpose];
 
 BarridoEn\[Omega]0y\[Gamma]\[Gamma][limite\[Gamma]1_,limite\[Gamma]2_,delta\[Gamma]_,limite\[Omega]01_,limite\[Omega]02_,delta\[Omega]0_,limitetiempo1_,limitetiempo2_,step_]:=Module[{F,listcorr,FforCharlie,Flist},
 Flatten[ParallelTable[
