@@ -30,6 +30,8 @@ PlotA::usage = "PlotA."
 PlotS::usage = "PlotS."
 PlotN::usage = "PlotN."
 PlotT::usage= "PlotT."
+PlotNSingular::usage = "In development"
+PlotTSingular::usage= "In development"
 PlotTN::usage = "PlotTN."
 PlotNInverse::usage = "PlotNInverse."
 PlotTInverse::usage= "PlotTInverse."
@@ -104,6 +106,9 @@ Transpose[Map[Partition[#,2]&,Transpose[listcorr][[All,target]]]]
 ];
 PlottingComponents[listcorr_,which_]:=Transpose[Map[First[{Partition[Riffle[ConstantArray[#[[1]],Length[which]],Flatten[#[[{2,3}]]][[which]]],2]}]&,ComputeTN[listcorr]]];
 PlottingComponentsInverse[listcorr_,which_]:=Transpose[Map[First[{Partition[Riffle[ConstantArray[#[[1]],Length[which]],Flatten[#[[2]]][[which]]],2]}]&,ComputeTNInverse[listcorr]]];
+(* Developing *)
+PlottingSingular[listcorr_,which_]:=Transpose[Map[First[{Partition[Riffle[ConstantArray[#[[1]],Length[which]],Flatten[#[[{2,3}]]][[which]]],2]}]&,ComputeTN[listcorr]]];
+(* Close developing *)
 
 (*Contstruye una rutina q de putazo ya haga los plots para el set de parametros.*)
 
