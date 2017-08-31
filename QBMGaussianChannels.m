@@ -107,10 +107,8 @@ Transpose[Map[Partition[#,2]&,Transpose[listcorr][[All,target]]]]
 PlottingComponents[listcorr_,which_]:=Transpose[Map[First[{Partition[Riffle[ConstantArray[#[[1]],Length[which]],Flatten[#[[{2,3}]]][[which]]],2]}]&,ComputeTN[listcorr]]];
 PlottingComponentsInverse[listcorr_,which_]:=Transpose[Map[First[{Partition[Riffle[ConstantArray[#[[1]],Length[which]],Flatten[#[[2]]][[which]]],2]}]&,ComputeTNInverse[listcorr]]];
 (* Developing *)
-PlottingSingular[listcorr_,which_]:=Transpose[Map[First[{Partition[Riffle[ConstantArray[#[[1]],Length[which]],Flatten[#[[{2,3}]]][[which]]],2]}]&,ComputeTN[listcorr]]];
+PlottingSingular[listcorr_,which_]:=Transpose[Map[Partition[Riffle[ConstantArray[#[[1]],2],SingularValueList[#[[1+which]]]],2]&,ComputeTN[listcorr]]]
 (* Close developing *)
-
-(*Contstruye una rutina q de putazo ya haga los plots para el set de parametros.*)
 
 ComputeFlist[listcorr_]:=Module[{list},
 list=Chop[ComputeTN[listcorr]];
