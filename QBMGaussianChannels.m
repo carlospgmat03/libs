@@ -30,8 +30,9 @@ PlotA::usage = "PlotA."
 PlotS::usage = "PlotS."
 PlotN::usage = "PlotN."
 PlotT::usage= "PlotT."
-PlotNSingular::usage = "In development"
-PlotTSingular::usage= "In development"
+PlotNSingular::usage = "Plots singular values of N"
+PlotTSingular::usage= "Plots singular values of T"
+ComputeSingularValues::usage = "ComputeSingularValues[listcorr_,which_]"
 PlotTN::usage = "PlotTN."
 PlotNInverse::usage = "PlotNInverse."
 PlotTInverse::usage= "PlotTInverse."
@@ -106,9 +107,20 @@ Transpose[Map[Partition[#,2]&,Transpose[listcorr][[All,target]]]]
 ];
 PlottingComponents[listcorr_,which_]:=Transpose[Map[First[{Partition[Riffle[ConstantArray[#[[1]],Length[which]],Flatten[#[[{2,3}]]][[which]]],2]}]&,ComputeTN[listcorr]]];
 PlottingComponentsInverse[listcorr_,which_]:=Transpose[Map[First[{Partition[Riffle[ConstantArray[#[[1]],Length[which]],Flatten[#[[2]]][[which]]],2]}]&,ComputeTNInverse[listcorr]]];
-(* Developing *)
-PlottingSingular[listcorr_,which_]:=Transpose[Map[Partition[Riffle[ConstantArray[#[[1]],2],SingularValueList[#[[1+which]]]],2]&,ComputeTN[listcorr]]]
-(* Close developing *)
+
+PlottingSingular[listcorr_,which_]:=Module[{list,tmp},
+list=ComputeTN[listcorr];
+Transpose[Table[tmp=SingularValueList[list[[i]][[which+1]]];{{list[[i]][[1]],tmp[[1]]},{list[[i]][[1]],tmp[[2]]}},{i,1,Length[list]}]]
+];(*Map[Partition[Riffle[ConstantArray[#[[1]],2],SingularValueList[#[[1+which]]]],2]&,ComputeTN[listcorr]];*)
+
+ComputeSingularValues[listcorr_,which_]:=Module[{list,tmp},
+list=ComputeTN[listcorr];
+Transpose[Table[tmp=SingularValueList[list[[i]][[which+1]]];{{list[[i]][[1]],tmp[[1]]},{list[[i]][[1]],tmp[[2]]}},{i,1,Length[list]}]]
+];
+
+PlotTSingular:=ListLinePlot[PlottingSingular[listcorr,1]];
+
+PlotNSingular:=ListLinePlot[PlottingSingular[listcorr,2]];
 
 ComputeFlist[listcorr_]:=Module[{list},
 list=Chop[ComputeTN[listcorr]];
