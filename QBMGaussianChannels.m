@@ -43,6 +43,7 @@ BarridoEn\[Omega]0y\[Gamma]\[Gamma]::usage = "BarridoEn\[Omega]0y\[Gamma]\[Gamma
 DrudeTable::usage = "DrudeTable[init_,end_,step_,time_]."
 CustomPseudoInverse::usage = "CustomInverse[m_,tolerance_]"
 ComputeTN\[Epsilon]list::usage = "ComputeTN\[Epsilon]list[listcorr_]"
+ComputeFHandlingAsymptoticLimit::usage = "listFHandlingAsymptoticLimit[listcorr_,epsilon_:0.0001]"
 
 
 (* ::Input::Initialization:: *)
@@ -88,7 +89,7 @@ list=Chop[Eigenvalues[cptpMatrix[A]]];
 0.5*Total[Re[Abs[list]-list]]
 ];
 (*EvaluateFunctionCollection[A_,DA_,DDA_,S_,DS_,DDS_,qsq_,psq_]:=Module[{\[Alpha],\[Beta],\[Theta],\[Gamma],\[Delta],\[Eta]},
-\[Alpha]=M DA/A;
+\[Alpha]=M DA/A;lisf
 \[Beta]=hbar/(2 A);
 \[Theta]=2/hbar M^2(DDA-DA^2/A);
 \[Gamma]=psq/(2 hbar)-M DS/(2 A)+hbar qsq/(8A^2)(1-S^2/qsq^2);
@@ -120,6 +121,18 @@ Transpose[Table[tmp=SingularValueList[list[[i]][[which+1]]];{{list[[i]][[1]],tmp
 PlotTSingular:=ListLinePlot[PlottingSingular[listcorr,1]];
 
 PlotNSingular:=ListLinePlot[PlottingSingular[listcorr,2]];
+
+ComputeFHandlingAsymptoticLimit[listcorr_,epsilon_:0.0001]:=Module[{out,list,list1,list2,pos1,pos2,limit,listF},
+list=ComputeSingularValues[listcorr,1];
+listF=ComputeFlist[listcorr];
+list1=list[[1]];
+list2=list[[2]];
+pos1=Position[list1[[All,1]],Select[list1,Abs[#[[2]]]<epsilon&][[1,1]]][[1,1]];
+pos2=Position[list2[[All,1]],Select[list2,Abs[#[[2]]]<epsilon&][[1,1]]][[1,1]];
+limit=Min[{pos1,pos2}];
+Table[listF[[i]]=Flatten[{listF[[i]][[1]],listF[[limit]][[2]]}],{i,limit,Length[listF]}];
+listF
+]
 
 ComputeFlist[listcorr_]:=Module[{list},
 list=Chop[ComputeTN[listcorr]];
