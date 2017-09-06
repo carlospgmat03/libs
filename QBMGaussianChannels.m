@@ -89,7 +89,7 @@ list=Chop[Eigenvalues[cptpMatrix[A]]];
 0.5*Total[Re[Abs[list]-list]]
 ];
 (*EvaluateFunctionCollection[A_,DA_,DDA_,S_,DS_,DDS_,qsq_,psq_]:=Module[{\[Alpha],\[Beta],\[Theta],\[Gamma],\[Delta],\[Eta]},
-\[Alpha]=M DA/A;lisf
+\[Alpha]=M DA/A;
 \[Beta]=hbar/(2 A);
 \[Theta]=2/hbar M^2(DDA-DA^2/A);
 \[Gamma]=psq/(2 hbar)-M DS/(2 A)+hbar qsq/(8A^2)(1-S^2/qsq^2);
