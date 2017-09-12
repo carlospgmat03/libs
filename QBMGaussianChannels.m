@@ -173,7 +173,7 @@ FforCharlie=ListIntegrate[Flist][[All,2]];
 {\[Gamma]\[Gamma]=i,\[Omega]0=j,Transpose[listcorr],step*Total[F],CharlieMeasure[FforCharlie]}
 ,{i,limite\[Gamma]1,limite\[Gamma]2,delta\[Gamma]},{j,limite\[Omega]01,limite\[Omega]02,delta\[Omega]0},DistributedContexts->All]
 ,1]];
-DrudeTable[init_,end_,step_,timeinit_,timeend_,timestep_]:=ParallelTable[\[Omega]D=j;ComputeFlist[Table[{i,A[i],DA[i],DDA[i],S[i],DS[i],DDS[i]},{i,timeinit,timeend,timestep}]//Transpose],{j,init,end,step},DistributedContexts->All];
+DrudeTable[init_,end_,step_,timeinit_,timeend_,timestep_]:=ParallelTable[\[Omega]D=j;ComputeFHandlingAsymptoticLimit[Table[{i,A[i],DA[i],DDA[i],S[i],DS[i],DDS[i]},{i,timeinit,timeend,timestep}]//Transpose],{j,init,end,step},DistributedContexts->All];
 DrudeTable[init_,end_,step_]:=DrudeTable[init,end,step,0.01,20.0,0.1];
 CustomPseudoInverse[m_,tolerance_]:=Module[{s,v,d,vinv,f},
 {s,v,d}=SingularValueDecomposition[m];
