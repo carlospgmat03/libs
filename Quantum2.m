@@ -79,6 +79,7 @@ WolfEisertCubittCiracMeasureQubitCase::usage = "WolfEisertCubittCiracMeasureQubi
 HilbertSpaceBasisParametrization::usage = "HilbertSpaceBasisParametrization[n_] A most general parametrization of the basis of C^n, or equivalently an element of SU(n)."
 PhasesEliminator::usage = "PhasesEliminator[basis_] Removes global phases of the basis given by HilbertSpaceBasisParametrization."
 ListIntegrate::usage= "ListIntegrate[list_]."
+ForwardNumericalDifferenceForTimeSeries::usage = "ForwardNumericalDifferenceForTimeSeries[a_,n_], where a is the list and n the used finite difference series order to compute the first derivstive."
 
 
 Begin["Private`"] 
@@ -621,6 +622,14 @@ step=list[[2]][[1]]-list[[1]][[1]];
 sum=0.0;
 step*Table[sum=sum+list[[i]],{i,1,Length[list]}]
 ];
+
+DeltaVector[a_,size_]:=Module[{l},
+l=ConstantArray[0,size];
+Table[l[[i]]=a[[i+1]]-a[[i]],{i,Length[a]-1}];
+l
+];
+
+ForwardNumericalDifferenceForTimeSeries[a_,n_]:=Module[{x},Take[Sum[SeriesCoefficient[Log[1+x],{x,0,i}]*(Nest[DeltaVector[#,Length[a]]&,a,i]),{i,1,n}],Length[a]-n]];
 	
 End[]
 

@@ -38,7 +38,8 @@ PlotNInverse::usage = "PlotNInverse."
 PlotTInverse::usage= "PlotTInverse."
 PlotTNInverse::usage = "PlotTNInverse."
 PlotF::usage = "PlotF."
-Correlator::usage = "Correaltor[init_,end_,step_] Constructs listcorr."
+Correlatorold::usage = "Correaltor[init_,end_,step_] Constructs listcorr."
+Correlator::usage = "Correlator[init_,end_,step_,o_:1,d_:4]."
 BarridoEn\[Omega]0y\[Gamma]\[Gamma]::usage = "BarridoEn\[Omega]0y\[Gamma]\[Gamma][limite\[Gamma]1_,limite\[Gamma]2_,delta\[Gamma]_,limite\[Omega]01_,limite\[Omega]02_,delta\[Omega]0_,limitetiempo1_,limitetiempo2_,step_]."
 DrudeTable::usage = "DrudeTable[init_,end_,step_,time_]."
 CustomPseudoInverse::usage = "CustomInverse[m_,tolerance_]"
@@ -150,7 +151,8 @@ ComputecptpMatrixComponents[listcorr_,which_]:=Transpose[Map[First[{Partition[Ri
 ComputeTN[list_]:=Module[{q,p},
 q=qsq;
 p=psq;
-Map[Chop[{#[[1]],Threshold[matrixTstandAlone@@#[[{2,3,4}]],0.0000001],matrixNstandAlone@@Flatten[{Take[#,{2,7}],{q,p}}]}]&,Transpose[ list]]];
+Map[Chop[{#[[1]],Threshold[matrixTstandAlone@@#[[{2,3,4}]],0.0000001],Chop[matrixNstandAlone@@Flatten[{Take[#,{2,7}],{q,p}}],0.00001]}]&,Transpose[ list]]];
+
 ComputeTNInverse[list_]:=Map[{#[[1]],InverseTN[#[[{2,3}]]]}&,ComputeTN[list]];
 PlotA:=ListLinePlot[PlottingCorrelations[listcorr,pl={2,3,4}],PlotRange->All,PlotLegends->Placed[legends[[pl]],Above]];
 PlotS:=ListLinePlot[PlottingCorrelations[listcorr,pl={5,6,7}],PlotRange->All,PlotLegends->Placed[legends[[pl]],Above]];
@@ -161,7 +163,21 @@ PlotNInverse:=ListLinePlot[PlottingComponentsInverse[listcorr,pl={5,6,7,8}],Plot
 PlotTNInverse:=ListLinePlot[PlottingComponentsInverse[listcorr,pl={1,2,3,4,5,6,7,8}],PlotRange->Automatic,PlotLegends->Placed[legendscomponents[[pl]],Right],PlotStyle->{Automatic,Automatic,Automatic,Automatic,Automatic,Automatic,Automatic,Directive[Dashed,Opacity[0.5]]}];
 PlotTInverse:=ListLinePlot[PlottingComponentsInverse[listcorr,pl={1,2,3,4}],PlotRange->All,PlotLegends->Placed[legendscomponents[[pl]],Right],PlotStyle->{Automatic,Automatic,Automatic,Automatic,Automatic,Automatic,Automatic,Directive[Dashed,Opacity[0.5]]}];
 PlotF:=ListLinePlot[listF,PlotRange->All,PlotStyle->Red];
-Correlator[init_,end_,step_]:=Module[{},
+
+Correlator[init_,end_,step_,o_:1,d_:4]:=Module[{list,h,x,DA,DDA,DS,DDS},
+list=Table[{i,A[i],S[i]},{i,init,end+2*o*step,step}];
+DA=GaussianFilter[ForwardNumericalDifferenceForTimeSeries[list[[All,2]],o]/step,d];
+DDA=GaussianFilter[ForwardNumericalDifferenceForTimeSeries[DA,o]/step,d];
+DS=GaussianFilter[ForwardNumericalDifferenceForTimeSeries[list[[All,3]],o]/step,d];
+DDS=GaussianFilter[ForwardNumericalDifferenceForTimeSeries[DS,o]/step,d];
+DA=Take[DA,Length[list]-2*o];
+DS=Take[DS,Length[list]-2*o];
+list=Take[list,Length[list]-2*o];
+list=Transpose[list];
+{list[[1]],list[[2]],DA,DDA,list[[3]],DS,DDS}
+];
+
+Correlatorold[init_,end_,step_]:=Module[{},
 listcorr=Table[{i,A[i],DA[i],DDA[i],S[i],DS[i],DDS[i]},{i,init,end,step}]//Transpose];
 
 BarridoEn\[Omega]0y\[Gamma]\[Gamma][limite\[Gamma]1_,limite\[Gamma]2_,delta\[Gamma]_,limite\[Omega]01_,limite\[Omega]02_,delta\[Omega]0_,limitetiempo1_,limitetiempo2_,step_]:=Module[{F,listcorr,FforCharlie,Flist},
