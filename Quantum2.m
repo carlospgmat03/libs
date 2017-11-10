@@ -508,7 +508,7 @@ HermitianPart[m_]:=0.5*(m+Dagger[m]);
 QuantumMaptoR[channel_]:=Module[{g,\[Rho]},
 g=DiagonalMatrix[{1,-1,-1,-1}];
 \[Rho]=Reshuffle[FromPauliToUnit[channel]]/2//Chop;
-(Table[Tr[\[Rho].KroneckerProduct[PauliMatrix[i],PauliMatrix[j]]],{i,0,3},{j,0,3}])/4//FullSimplify//Chop
+(Table[Tr[\[Rho].KroneckerProduct[PauliMatrix[i],PauliMatrix[j]]],{i,0,3},{j,0,3}])//FullSimplify//Chop
 ];
 
 LorentzMatrixQ[matrix_]:=
