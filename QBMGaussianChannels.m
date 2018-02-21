@@ -45,6 +45,7 @@ DrudeTable::usage = "DrudeTable[init_,end_,step_,time_]."
 CustomPseudoInverse::usage = "CustomInverse[m_,tolerance_]"
 ComputeTN\[Epsilon]list::usage = "ComputeTN\[Epsilon]list[listcorr_]"
 ComputeFHandlingAsymptoticLimit::usage = "listFHandlingAsymptoticLimit[listcorr_,epsilon_:0.0001]"
+\[CapitalLambda]::usage = "Matrix to get rid of the units."
 
 
 (* ::Input::Initialization:: *)
@@ -84,7 +85,7 @@ a=CustomPseudoInverse[A[[1]],d];
 {a,-a.A[[2]].Transpose[a]}*)
 ]
 cptpCondition[A_]:=PositiveSemidefiniteMatrixCustom2Q[cptpMatrix[A]];
-cptpMatrix[A_]:=Chop[A[[2]]-0.5*I \[CapitalOmega]+0.5*I A[[1]].\[CapitalOmega].Transpose[A[[1]]]];
+cptpMatrix[A_]:=Chop[\[CapitalLambda].A[[2]].\[CapitalLambda]-0.5*I \[CapitalOmega]+0.5*I \[CapitalLambda].A[[1]].\[CapitalOmega].Transpose[A[[1]]].\[CapitalLambda]];
 ComputeF[A_]:=Module[{list},
 list=Chop[Eigenvalues[cptpMatrix[A]]];
 0.5*Total[Re[Abs[list]-list]]
@@ -196,7 +197,10 @@ CustomPseudoInverse[m_,tolerance_]:=Module[{s,v,d,vinv,f},
 f=False;
 vinv=SparseArray[{i_, i_}:>If[v[[i,i]]>tolerance,1/v[[i,i]],f=True;0],Length[v]];
 {d.vinv.ConjugateTranspose[s],f}
-]
+];
+(*Para quitar unidades*)
+q0=Sqrt[hbar/(M \[Omega]0)];p0=Sqrt[hbar M \[Omega]0];
+\[CapitalLambda]:=DiagonalMatrix[{q0,p0}]//Inverse;
 
 
 (* ::Subsubsubsection::Closed:: *)
