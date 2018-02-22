@@ -57,8 +57,8 @@ matrixNstandAlone[t_]:={{qsq+(4 A[t] (psq A[t]-hbar M DS[t]))/hbar^2-S[t]^2/qsq,
 \[HBar]:=hbar;
 
 (*Desviaciones*)
-qsq:=1/(M \[Beta]\[Beta]) Sum[1/(\[Omega]0^2+(2Pi n/(\[Beta]\[Beta] hbar))^2+Abs[2Pi n/(\[Beta]\[Beta] hbar)] \[Gamma]hat[Abs[2Pi n/(\[Beta]\[Beta] hbar)]]),{n,-10000,1000}];
-psq:=M/\[Beta]\[Beta] Sum[(\[Omega]0^2+Abs[2Pi n/(\[Beta]\[Beta] hbar)]\[Gamma]hat[Abs[2Pi n/(\[Beta]\[Beta] hbar)]])/(\[Omega]0^2+(2Pi n/(\[Beta]\[Beta] hbar))^2+Abs[2Pi n/(\[Beta]\[Beta] hbar)]\[Gamma]hat[Abs[2Pi n/(\[Beta]\[Beta] hbar)]]),{n,-10000,10000}];
+qsq:=hbar/(M \[Omega]D)(*Precede factor para hacer esto adimensional*)1/(M \[Beta]\[Beta]) Sum[1/(\[Omega]0^2+(2Pi n/(\[Beta]\[Beta] hbar))^2+Abs[2Pi n/(\[Beta]\[Beta] hbar)] \[Gamma]hat[Abs[2Pi n/(\[Beta]\[Beta] hbar)]]),{n,-10000,1000}];
+psq:=hbar M \[Omega]D(*Precede factor para hacer esto adimensional*)M/\[Beta]\[Beta] Sum[(\[Omega]0^2+Abs[2Pi n/(\[Beta]\[Beta] hbar)]\[Gamma]hat[Abs[2Pi n/(\[Beta]\[Beta] hbar)]])/(\[Omega]0^2+(2Pi n/(\[Beta]\[Beta] hbar))^2+Abs[2Pi n/(\[Beta]\[Beta] hbar)]\[Gamma]hat[Abs[2Pi n/(\[Beta]\[Beta] hbar)]]),{n,-10000,10000}];
 GLaplace[z_]:=1/(\[Omega]0^2+z^2+z \[Gamma]hat[z]);
 GFourier[\[Omega]_]:=GLaplace[-I \[Omega]]-GLaplace[I \[Omega]];
 (*Funciones del ba\[NTilde]o*)
