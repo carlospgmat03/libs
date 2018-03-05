@@ -57,8 +57,8 @@ matrixNstandAlone[t_]:={{qsq+(4 A[t] (psq A[t]-hbar M DS[t]))/hbar^2-S[t]^2/qsq,
 \[HBar]:=hbar;
 
 (*Desviaciones*)
-qsq:=hbar/(M \[Omega]D)(*Precede factor para hacer esto adimensional*)1/(M \[Beta]\[Beta]) Sum[1/(\[Omega]0^2+(2Pi n/(\[Beta]\[Beta] hbar))^2+Abs[2Pi n/(\[Beta]\[Beta] hbar)] \[Gamma]hat[Abs[2Pi n/(\[Beta]\[Beta] hbar)]]),{n,-10000,1000}];
-psq:=hbar M \[Omega]D(*Precede factor para hacer esto adimensional*)M/\[Beta]\[Beta] Sum[(\[Omega]0^2+Abs[2Pi n/(\[Beta]\[Beta] hbar)]\[Gamma]hat[Abs[2Pi n/(\[Beta]\[Beta] hbar)]])/(\[Omega]0^2+(2Pi n/(\[Beta]\[Beta] hbar))^2+Abs[2Pi n/(\[Beta]\[Beta] hbar)]\[Gamma]hat[Abs[2Pi n/(\[Beta]\[Beta] hbar)]]),{n,-10000,10000}];
+qsq:=1/(M \[Beta]\[Beta]) Sum[1/(\[Omega]0^2+(2Pi n/(\[Beta]\[Beta] hbar))^2+Abs[2Pi n/(\[Beta]\[Beta] hbar)] \[Gamma]hat[Abs[2Pi n/(\[Beta]\[Beta] hbar)]]),{n,-10000,1000}];
+psq:=M/\[Beta]\[Beta] Sum[(\[Omega]0^2+Abs[2Pi n/(\[Beta]\[Beta] hbar)]\[Gamma]hat[Abs[2Pi n/(\[Beta]\[Beta] hbar)]])/(\[Omega]0^2+(2Pi n/(\[Beta]\[Beta] hbar))^2+Abs[2Pi n/(\[Beta]\[Beta] hbar)]\[Gamma]hat[Abs[2Pi n/(\[Beta]\[Beta] hbar)]]),{n,-10000,10000}];
 GLaplace[z_]:=1/(\[Omega]0^2+z^2+z \[Gamma]hat[z]);
 GFourier[\[Omega]_]:=GLaplace[-I \[Omega]]-GLaplace[I \[Omega]];
 (*Funciones del ba\[NTilde]o*)
@@ -85,7 +85,7 @@ a=CustomPseudoInverse[A[[1]],d];
 {a,-a.A[[2]].Transpose[a]}*)
 ]
 cptpCondition[A_]:=PositiveSemidefiniteMatrixCustom2Q[cptpMatrix[A]];
-cptpMatrix[A_]:=Chop[\[CapitalLambda].A[[2]].\[CapitalLambda]-0.5*I \[CapitalOmega]+0.5*I \[CapitalLambda].A[[1]].\[CapitalOmega].Transpose[A[[1]]].\[CapitalLambda]];
+cptpMatrix[A_]:=Chop[\[CapitalLambda].A[[2]].\[CapitalLambda]-0.5*I*\[CapitalOmega]+0.5*I*\[CapitalLambda].A[[1]].\[CapitalOmega].Transpose[A[[1]]].\[CapitalLambda]];
 ComputeF[A_]:=Module[{list},
 list=Chop[Eigenvalues[cptpMatrix[A]]];
 0.5*Total[Re[Abs[list]-list]]
