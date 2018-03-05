@@ -47,12 +47,14 @@ ComputeTN\[Epsilon]list::usage = "ComputeTN\[Epsilon]list[listcorr_]"
 ComputeFHandlingAsymptoticLimit::usage = "listFHandlingAsymptoticLimit[listcorr_,epsilon_:0.0001]"
 \[CapitalLambda]::usage = "Matrix to get rid of the units."
 TimeScaleCorrector::usage = "TimeScaleCorrector[factor_,list_]."
+TimeScaleCorrectorAndEpsilon::usage = "TimeScaleCorrectorAndEpsilon[factor_,paso_,list_]"
 
 
 (* ::Input::Initialization:: *)
 TimeScaleCorrector[factor_,list_]:=Module[{},
 Map[{factor #[[1]],#[[2]]}&,list]
 ];
+TimeScaleCorrectorAndEpsilon[factor_,paso_,list_]:=Module[{},({factor #1[[1]],#1[[2]]/paso}&)/@list];
 \[CapitalOmega]={{0,1},{-1,0}};
 matrixTstandAlone[A_,DA_,DDA_]:={{-((2 M DA)/hbar),(2 A)/hbar},{(2 M^2 DDA)/hbar,-((2 M DA)/hbar)}}//Chop;
 matrixNstandAlone[A_,DA_,DDA_,S_,DS_,DDS_,qsq_,psq_]:={{qsq+(4 A (psq A-hbar M DS))/hbar^2-S^2/qsq,-((2 M (A (-2 psq DA+hbar M DDS)+hbar M DA DS))/hbar^2)-(M DS S)/qsq},{-((2 M (A (-2 psq DA+hbar M DDS)+hbar M DA DS))/hbar^2)-(M DS S)/qsq,psq+M^2 ((4 DA (psq DA-hbar M DDS))/hbar^2-DS^2/qsq)}}//Chop;
@@ -91,8 +93,8 @@ a=CustomPseudoInverse[A[[1]],d];
 cptpCondition[A_]:=PositiveSemidefiniteMatrixCustom2Q[cptpMatrix[A]];
 cptpMatrix[A_]:=Chop[\[CapitalLambda].A[[2]].\[CapitalLambda]-0.5*I*\[CapitalOmega]+0.5*I*\[CapitalLambda].A[[1]].\[CapitalOmega].Transpose[A[[1]]].\[CapitalLambda]];
 ComputeF[A_]:=Module[{list},
-list=Chop[Eigenvalues[cptpMatrix[A]]];
-0.5*Total[Re[Abs[list]-list]]
+list=Re[Chop[Eigenvalues[cptpMatrix[A]]]];
+0.5*Total[Abs[list]-list]
 ];
 (*EvaluateFunctionCollection[A_,DA_,DDA_,S_,DS_,DDS_,qsq_,psq_]:=Module[{\[Alpha],\[Beta],\[Theta],\[Gamma],\[Delta],\[Eta]},
 \[Alpha]=M DA/A;
