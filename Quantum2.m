@@ -80,6 +80,7 @@ HilbertSpaceBasisParametrization::usage = "HilbertSpaceBasisParametrization[n_] 
 PhasesEliminator::usage = "PhasesEliminator[basis_] Removes global phases of the basis given by HilbertSpaceBasisParametrization."
 ListIntegrate::usage= "ListIntegrate[list_]."
 ForwardNumericalDifferenceForTimeSeries::usage = "ForwardNumericalDifferenceForTimeSeries[a_,n_], where a is the list and n the used finite difference series order to compute the first derivstive."
+RealJordanFormOnePair::usage = "RealJordanFormOnePair[channel_]."
 
 
 Begin["Private`"] 
@@ -662,6 +663,31 @@ PhasesEliminator[basis_]:=Module[{len},
 len=Length[basis];
 ReplaceAll[basis,Table[\[Phi][i][0]->0,{i,0,len-1}]]
 ];
+
+RealJordanFormOnePair[channel_]:=Module[{mat,diag,w,e,pos,list,d2,w2,chreorlog,wreal,list2,is},
+{diag,w}=Chop[EigensystemOrdered[channel]]//Chop;
+If[Element[diag,Reals],JordanDecomposition[channel],
+mat=DiagonalMatrix[diag];
+w=Transpose[w];
+e=ConstantArray[0.0,Dimensions[channel]];
+list=Select[diag,Chop[Im[#]]!=0&]//Chop;
+list2=Select[diag,Chop[Im[#]]==0&]//Chop;
+If[(Length[list2]==2&&AllTrue[list2,NonNegative])==False||(Length[list2]==1)==True,is=False,is=True];
+pos=Flatten[Table[Position[diag,i],{i,list}]];
+mat[[pos[[1]],pos[[1]]]]=Re[diag[[pos[[1]]]]];
+mat[[pos[[2]],pos[[2]]]]=Re[diag[[pos[[1]]]]];
+mat[[pos[[1]],pos[[2]]]]=Im[diag[[pos[[1]]]]];
+mat[[pos[[2]],pos[[1]]]]=-Im[diag[[pos[[1]]]]];
+{d2,w2}=EigensystemOrdered[mat]//Chop;
+If[Total[Flatten[Chop[d2-diag]]]==0,
+
+w2=Transpose[w2]//Chop;
+d2=DiagonalMatrix[d2]//Chop;
+wreal=w.Inverse[w2]//Chop;
+If[is,{wreal,mat//Chop},is]
+,Return["bad calculation"]
+]
+]];
  
 EndPackage[]
 
