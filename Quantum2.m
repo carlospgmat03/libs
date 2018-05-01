@@ -390,7 +390,7 @@ PositiveSemidefiniteMatrixCustom3Q[tmp=Reshuffle[Chop[FromPauliToUnit[Chop[chann
 If[
 HasHermitianPreservingAndCCPGenerator[Chop[channel],branches],4,
 If[TestViaRankOfCPDIV[channel],3,
-If[Chop[Det[channel]]>0,2,1]]
+If[Chop[Det[channel]]>=0,2,1]]
 ],0]*0.25
 ];
 
