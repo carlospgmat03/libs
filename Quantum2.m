@@ -495,7 +495,7 @@ If[is==True,L,False]
 DecompositionOfChannelsInSO[map_]:=Module[{a,e,i,newmap,eig,vecs},
 {a,e,i}=SingularValueDecomposition[map];
 {eig,vecs}=Chop[Eigensystem[Det[a]*Det[i]*(i.e.Transpose[i])]];
-{a.Transpose[i].Transpose[vecs],DiagonalMatrix[eig],vecs}
+{Det[a]*Det[i]*a.Transpose[i].Transpose[vecs],DiagonalMatrix[eig],vecs}
 ];
 
 ForceSameSignatureForLorentz[matrix_]:=Module[{tmpmat,eigs,o,tildeM},
