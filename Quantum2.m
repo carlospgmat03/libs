@@ -81,6 +81,9 @@ PhasesEliminator::usage = "PhasesEliminator[basis_] Removes global phases of the
 ListIntegrate::usage= "ListIntegrate[list_]."
 ForwardNumericalDifferenceForTimeSeries::usage = "ForwardNumericalDifferenceForTimeSeries[a_,n_], where a is the list and n the used finite difference series order to compute the first derivstive."
 RealJordanFormOnePair::usage = "RealJordanFormOnePair[channel_]."
+CPNoLRegion::usage = "CPNoLRegion[\[Lambda],\[Tau],region] Gives True if the channel parametrized by vectors \[Lambda] and \[Tau] is CP-divisible but not L-divisible, and if it is inside the chosen region. The variable region=1,2,3,0 states for negative octants of channels with positive determinant.
+ie, two negative eigenvalues in each region. For example region=1: \[Lambda]1>0,\[Lambda]2<0,\[Lambda]3<0 etc, while region zero explores the whole space. The
+function can be also called as CPNoLRegion[\[Lambda],\[Tau]] and CPNoLRegion[\[Lambda]], where autimatically region=0 and \[Tau]=0 & region=0 respectively."
 
 
 Begin["Private`"] 
@@ -631,6 +634,16 @@ l
 ];
 
 ForwardNumericalDifferenceForTimeSeries[a_,n_]:=Module[{x},Take[Sum[SeriesCoefficient[Log[1+x],{x,0,i}]*(Nest[DeltaVector[#,Length[a]]&,a,i]),{i,1,n}],Length[a]-n]];
+	
+CPNoLRegion[\[Lambda]_,\[Tau]_,region_]:=Module[{cha,regcheck,vals,cptp},
+cha:={{1,0,0,0},{\[Tau][[1]],\[Lambda][[1]],0,0},{\[Tau][[2]],0,\[Lambda][[2]],0},{\[Tau][[3]],0,0,\[Lambda][[3]]}};
+regcheck=Switch[region,1,\[Lambda][[1]]>=0&&\[Lambda][[2]]<=0&&\[Lambda][[3]]<=0,2,\[Lambda][[1]]<=0&&\[Lambda][[2]]>=0&&\[Lambda][[3]]<=0,3,\[Lambda][[1]]<=0&&\[Lambda][[2]]<=0&&\[Lambda][[3]]>=0,0,True];
+cptp=And@@Thread[(cha//FromPauliToUnit//Reshuffle//Eigenvalues//N//Chop)>0];
+vals=cha.g.Transpose[cha].g//Eigenvalues//Abs//Sqrt;
+(Min[vals]^2*Max[vals]^2>=Times@@vals)&&(Det[cha]>0)&&Not[\[Lambda][[1]]>=0&&\[Lambda][[2]]>=0&&\[Lambda][[3]]>=0]&&regcheck&&cptp
+];
+CPNoLRegion[\[Lambda]_,\[Tau]_]:=CPNoLRegion[\[Lambda],\[Tau],0];
+CPNoLRegion[\[Lambda]_]:=CPNoLRegion[\[Lambda],{0,0,0},0];
 	
 End[]
 
