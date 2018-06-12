@@ -84,6 +84,9 @@ RealJordanFormOnePair::usage = "RealJordanFormOnePair[channel_]."
 CPNoLRegion::usage = "CPNoLRegion[\[Lambda],\[Tau],region] Gives True if the channel parametrized by vectors \[Lambda] and \[Tau] is CP-divisible but not L-divisible, and if it is inside the chosen region. The variable region=1,2,3,0 states for negative octants of channels with positive determinant.
 ie, two negative eigenvalues in each region. For example region=1: \[Lambda]1>0,\[Lambda]2<0,\[Lambda]3<0 etc, while region zero explores the whole space. The
 function can be also called as CPNoLRegion[\[Lambda],\[Tau]] and CPNoLRegion[\[Lambda]], where autimatically region=0 and \[Tau]=0 & region=0 respectively."
+LRegion::usage = "LRegion[\[Lambda]_,\[Tau]_,region_] Gives True if the channel parametrized by vectors \[Lambda] and \[Tau] is L-divisible, and if it is inside the chosen region. The variable region=1,2,3,0 states for negative octants of channels with positive determinant.
+ie, two negative eigenvalues in each region. For example region=1: \[Lambda]1>0,\[Lambda]2<0,\[Lambda]3<0 etc, while region zero explores the whole space. The
+function can be also called as LRegion[\[Lambda],\[Tau]] and LRegion[\[Lambda]], where autimatically region=0 and \[Tau]=0 & region=0 respectively."
 
 
 Begin["Private`"] 
@@ -644,6 +647,38 @@ vals=cha.g.Transpose[cha].g//Eigenvalues//Abs//Sqrt;
 ];
 CPNoLRegion[\[Lambda]_,\[Tau]_]:=CPNoLRegion[\[Lambda],\[Tau],0];
 CPNoLRegion[\[Lambda]_]:=CPNoLRegion[\[Lambda],{0,0,0},0];
+
+LRegion[\[Lambda]_,\[Tau]_,region_]:=Module[{cha,regcheck,cptp},
+cha:={{1,0,0,0},{\[Tau][[1]],\[Lambda][[1]],0,0},{\[Tau][[2]],0,\[Lambda][[2]],0},{\[Tau][[3]],0,0,\[Lambda][[3]]}};regcheck=Switch[region,1,\[Lambda][[1]]>=0&&\[Lambda][[2]]<=0&&\[Lambda][[3]]<=0,2,\[Lambda][[1]]<=0&&\[Lambda][[2]]>=0&&\[Lambda][[3]]<=0,3,\[Lambda][[1]]<=0&&\[Lambda][[2]]<=0&&\[Lambda][[3]]>=0,0,True];cptp=And@@Thread[(cha//FromPauliToUnit//Reshuffle//Eigenvalues//N//Chop)>0];
+If[DiagonalizableMatrixQ[cha//Chop],HasHermitianPreservingAndCCPGenerator[Chop[cha],1]&&regcheck,False]
+];
+LRegion[\[Lambda]_,\[Tau]_]:=LRegion[\[Lambda],\[Tau],0];
+LRegion[\[Lambda]_]:=LRegion[\[Lambda],{0,0,0},0];
+
+RealJordanFormOnePair[channel_]:=Module[{mat,diag,w,e,pos,list,d2,w2,chreorlog,wreal,list2,is},
+{diag,w}=Chop[EigensystemOrdered[channel]]//Chop;
+If[Element[diag,Reals],JordanDecomposition[channel],
+mat=DiagonalMatrix[diag];
+w=Transpose[w];
+e=ConstantArray[0.0,Dimensions[channel]];
+list=Select[diag,Chop[Im[#]]!=0&]//Chop;
+list2=Select[diag,Chop[Im[#]]==0&]//Chop;
+If[(Length[list2]==2&&AllTrue[list2,NonNegative])==False||(Length[list2]==1)==True,is=False,is=True];
+pos=Flatten[Table[Position[diag,i],{i,list}]];
+mat[[pos[[1]],pos[[1]]]]=Re[diag[[pos[[1]]]]];
+mat[[pos[[2]],pos[[2]]]]=Re[diag[[pos[[1]]]]];
+mat[[pos[[1]],pos[[2]]]]=Im[diag[[pos[[1]]]]];
+mat[[pos[[2]],pos[[1]]]]=-Im[diag[[pos[[1]]]]];
+{d2,w2}=EigensystemOrdered[mat]//Chop;
+If[Total[Flatten[Chop[d2-diag]]]==0,
+
+w2=Transpose[w2]//Chop;
+d2=DiagonalMatrix[d2]//Chop;
+wreal=w.Inverse[w2]//Chop;
+If[is,{wreal,mat//Chop},is]
+,Return["bad calculation"]
+]
+]];
 	
 End[]
 
@@ -676,31 +711,6 @@ PhasesEliminator[basis_]:=Module[{len},
 len=Length[basis];
 ReplaceAll[basis,Table[\[Phi][i][0]->0,{i,0,len-1}]]
 ];
-
-RealJordanFormOnePair[channel_]:=Module[{mat,diag,w,e,pos,list,d2,w2,chreorlog,wreal,list2,is},
-{diag,w}=Chop[EigensystemOrdered[channel]]//Chop;
-If[Element[diag,Reals],JordanDecomposition[channel],
-mat=DiagonalMatrix[diag];
-w=Transpose[w];
-e=ConstantArray[0.0,Dimensions[channel]];
-list=Select[diag,Chop[Im[#]]!=0&]//Chop;
-list2=Select[diag,Chop[Im[#]]==0&]//Chop;
-If[(Length[list2]==2&&AllTrue[list2,NonNegative])==False||(Length[list2]==1)==True,is=False,is=True];
-pos=Flatten[Table[Position[diag,i],{i,list}]];
-mat[[pos[[1]],pos[[1]]]]=Re[diag[[pos[[1]]]]];
-mat[[pos[[2]],pos[[2]]]]=Re[diag[[pos[[1]]]]];
-mat[[pos[[1]],pos[[2]]]]=Im[diag[[pos[[1]]]]];
-mat[[pos[[2]],pos[[1]]]]=-Im[diag[[pos[[1]]]]];
-{d2,w2}=EigensystemOrdered[mat]//Chop;
-If[Total[Flatten[Chop[d2-diag]]]==0,
-
-w2=Transpose[w2]//Chop;
-d2=DiagonalMatrix[d2]//Chop;
-wreal=w.Inverse[w2]//Chop;
-If[is,{wreal,mat//Chop},is]
-,Return["bad calculation"]
-]
-]];
  
 EndPackage[]
 
