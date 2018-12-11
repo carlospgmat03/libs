@@ -123,6 +123,8 @@ MakeQuantumChannel::usage="MakeQuantumChannel[Gate_, steps_, env_] Donde Gate va
 SumPositiveDerivatives::usage="SumPositiveDerivatives[list_] Suma todas las contribuciones list(max)-list(min) sucesivos cuando la derivada es positiva"
 GHZ::usage="GHZ[qu_] Creates a GHZ state, |000000\[RightAngleBracket]+|111111\[RightAngleBracket]"
 RandomMixedState::usage="RandomMixedState[n_,combinations_], Constructs a Random mixed state of diemnsion n with random uniform combinations of pure states wti Haar measure."
+GellMann::usage = "GellMann[n_] Generalized Gell-Mann matrices from https://blog.suchideas.com/2016/04/sun-gell-mann-matrices-in-mathematica/ For example
+for n=2 it gives Pauli matrices, don't forget to add identity by yourself in need a complete basis."
 (* }}} *)
 (* }}} *)
 Begin["Private`"] 
@@ -627,7 +629,22 @@ statelist=Table[Proyector[RandomState[n]],{combinations}];
 p=RandomReal[{0,1.0},combinations];
 p=p/Total[p];
 p.statelist//Chop
-];(*}}}*)
+];
+GellMann[n_] :=
+ GellMann[n] = Flatten[Table[
+   (* Symmetric case *)
+   SparseArray[{{ j, k} -> 1, { k, j} -> 1}, {n, n}]
+  , {k, 2, n}, {j, 1, k - 1}], 1]~
+  Join~Flatten[Table[
+   (* Antisymmetric case *)
+   SparseArray[{{ j, k} -> -I, { k, j} -> +I}, {n, n}]
+  , {k, 2, n}, {j, 1, k - 1}], 1]~
+  Join~Table[
+   (* Diagonal case *)
+   Sqrt[2/l/(l + 1)] SparseArray[
+    Table[{j, j} -> 1, {j, 1, l}]~Join~{{l + 1, l + 1} -> -l}, {n, n}]
+  , {l, 1, n - 1}]
+(*}}}*)
 End[] 
 EndPackage[]
 (* }}} *)
