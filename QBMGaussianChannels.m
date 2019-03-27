@@ -87,7 +87,7 @@ a=CustomPseudoInverse[A[[1]],d];
 {a,-a.A[[2]].Transpose[a]}*)
 ]
 cptpCondition[A_]:=PositiveSemidefiniteMatrixCustom2Q[cptpMatrix[A]];
-cptpMatrix[A_]:=Chop[\[CapitalLambda].A[[2]].\[CapitalLambda]-0.5*I*\[CapitalOmega]+0.5*I*\[CapitalLambda].A[[1]].\[CapitalOmega].Transpose[A[[1]]].\[CapitalLambda]];
+cptpMatrix[A_]:=Chop[\[CapitalLambda].A[[2]].\[CapitalLambda]-0.5*I*\[CapitalOmega]+ hbar 0.5*I*\[CapitalLambda].A[[1]].\[CapitalOmega].Transpose[A[[1]]].\[CapitalLambda]];
 ComputeF[A_]:=Module[{list},
 list=Re[Chop[Eigenvalues[cptpMatrix[A]]]];
 0.5*Total[Abs[list]-list]
