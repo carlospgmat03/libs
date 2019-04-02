@@ -206,7 +206,7 @@ vinv=SparseArray[{i_, i_}:>If[v[[i,i]]>tolerance,1/v[[i,i]],f=True;0],Length[v]]
 q0=Sqrt[hbar/(M \[Omega]0)];p0=Sqrt[hbar M \[Omega]0];
 \[CapitalLambda]:=DiagonalMatrix[{q0,p0}]//Inverse;
 (*Souza*)
-PDivTest[list_]:=Module[{TN,fundquant,DdetT,DInvTNT,DTrN,DT,\[Kappa],\[Epsilon],\[Delta],indicatorfunction,discreteindicator,times},
+PDivTest[list_]:=Module[{TN,fundquant,DdetT,DInvTNT,DTrN,DT,\[Kappa],\[Epsilon],\[Delta],indicatorfunction,discreteindicator,times,\[Mu]},
 TN=ComputeTN[listcorr];times=Take[Transpose[TN][[1]],Length[TN]-5];step=times[[2]]-times[[1]];
 fundquant=Map[{#[[1]],Det[#[[2]]],Inverse[#[[2]]].#[[3]].Transpose[Inverse[#[[2]]]],Tr[#[[3]]],#[[2]],Inverse[#[[2]]].#[[3]]}&,TN];
 DdetT=ForwardNumericalDifferenceForTimeSeries[Transpose[fundquant][[2]],5]/step//Chop;
@@ -218,7 +218,8 @@ DT=ForwardNumericalDifferenceForTimeSeries[Transpose[fundquant][[5]],5]/step//Ch
 \[Delta]={times,Table[fundquant[[i]][[2]]^2Det[DInvTNT[[i]]],{i,Length[TN]-5}]}//Transpose;
 indicatorfunction={times,Table[If[\[Kappa][[i]][[2]]>=0,\[Delta][[i]][[2]]-0.25(Abs[\[Epsilon][[i]][[2]]]-\[Epsilon][[i]][[2]])^2,0],{i,Length[TN]-5}]}//Transpose;
 discreteindicator={times,Table[If[\[Kappa][[i]][[2]]>=0 &&\[Delta][[i]][[2]]-0.25(Abs[\[Epsilon][[i]][[2]]]-\[Epsilon][[i]][[2]])^2>=0,1,0],{i,Length[TN]-5}]}//Transpose;
-{discreteindicator,indicatorfunction,\[Epsilon],\[Delta],\[Kappa]}
+\[Mu]={times,Table[If[\[Delta][[i]][[2]]>=0, Sign[\[Kappa][[i]][[2]]]/Sqrt[\[Delta][[i]][[2]]],-Sqrt[Abs[\[Delta][[i]][[2]]]]],{i,Length[TN]-5}]}//Transpose;
+{\[Mu],discreteindicator,indicatorfunction,\[Epsilon],\[Delta],\[Kappa]}
 ];
 
 
