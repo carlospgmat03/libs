@@ -47,6 +47,8 @@ ComputeTN\[Epsilon]list::usage = "ComputeTN\[Epsilon]list[listcorr_]"
 ComputeFHandlingAsymptoticLimit::usage = "listFHandlingAsymptoticLimit[listcorr_,epsilon_:0.0001]"
 \[CapitalLambda]::usage = "Matrix to get rid of the units."
 TimeScaleCorrector::usage = "TimeScaleCorrector[factor_,list_]."
+PDivTest::usage = "PDivTest[list_], the input is a correlation list, it gives several quantities to characterize
+P-div of QBM."
 
 
 (* ::Input::Initialization:: *)
@@ -203,6 +205,21 @@ vinv=SparseArray[{i_, i_}:>If[v[[i,i]]>tolerance,1/v[[i,i]],f=True;0],Length[v]]
 (*Para quitar unidades*)
 q0=Sqrt[hbar/(M \[Omega]0)];p0=Sqrt[hbar M \[Omega]0];
 \[CapitalLambda]:=DiagonalMatrix[{q0,p0}]//Inverse;
+(*Souza*)
+PDivTest[list_]:=Module[{TN,fundquant,DdetT,DInvTNT,DTrN,DT,\[Kappa],\[Epsilon],\[Delta],indicatorfunction,discreteindicator,times},
+TN=ComputeTN[listcorr];times=Take[Transpose[TN][[1]],Length[TN]-5];step=times[[2]]-times[[1]];
+fundquant=Map[{#[[1]],Det[#[[2]]],Inverse[#[[2]]].#[[3]].Transpose[Inverse[#[[2]]]],Tr[#[[3]]],#[[2]],Inverse[#[[2]]].#[[3]]}&,TN];
+DdetT=ForwardNumericalDifferenceForTimeSeries[Transpose[fundquant][[2]],5]/step//Chop;
+DInvTNT=ForwardNumericalDifferenceForTimeSeries[Transpose[fundquant][[3]],5]/step//Chop;
+DTrN=ForwardNumericalDifferenceForTimeSeries[Transpose[fundquant][[4]],5]/step//Chop;
+DT=ForwardNumericalDifferenceForTimeSeries[Transpose[fundquant][[5]],5]/step//Chop;
+\[Kappa]={times,Table[DTrN[[i]]-2 Tr[DT[[i]].fundquant[[i]][[6]]],{i,Length[TN]-5}]}//Transpose;
+\[Epsilon]={times,Table[0.5 DdetT[[i]] (fundquant[[i]][[2]])^(-1),{i,Length[TN]-5}]}//Transpose;
+\[Delta]={times,Table[fundquant[[i]][[2]]^2Det[DInvTNT[[i]]],{i,Length[TN]-5}]}//Transpose;
+indicatorfunction={times,Table[If[\[Kappa][[i]][[2]]>=0,\[Delta][[i]][[2]]-0.25(Abs[\[Epsilon][[i]][[2]]]-\[Epsilon][[i]][[2]])^2,0],{i,Length[TN]-5}]}//Transpose;
+discreteindicator={times,Table[If[\[Kappa][[i]][[2]]>=0 &&\[Delta][[i]][[2]]-0.25(Abs[\[Epsilon][[i]][[2]]]-\[Epsilon][[i]][[2]])^2>=0,1,0],{i,Length[TN]-5}]}//Transpose;
+{discreteindicator,indicatorfunction,\[Epsilon],\[Delta],\[Kappa]}
+];
 
 
 (* ::Subsubsubsection::Closed:: *)
