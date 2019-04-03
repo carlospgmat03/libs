@@ -208,17 +208,17 @@ q0=Sqrt[hbar/(M \[Omega]0)];p0=Sqrt[hbar M \[Omega]0];
 (*Souza*)
 PDivTest[list_]:=Module[{TN,fundquant,DdetT,DInvTNT,DTrN,DT,\[Kappa],\[Epsilon],\[Delta],indicatorfunction,discreteindicator,times,\[Mu]},
 TN=ComputeTN[listcorr];times=Take[Transpose[TN][[1]],Length[TN]-5];step=times[[2]]-times[[1]];
-fundquant=Map[{#[[1]],Det[#[[2]]],Inverse[#[[2]]].#[[3]].Transpose[Inverse[#[[2]]]],Tr[#[[3]]],#[[2]],Inverse[#[[2]]].#[[3]]}&,TN];
+fundquant=Map[{(*1*)#[[1]],(*2*)Det[#[[2]]],(*3*)Inverse[#[[2]]].#[[3]].Transpose[Inverse[#[[2]]]],(*4*)Tr[#[[3]]],(*5*)#[[2]],(*6*)Inverse[#[[2]]].#[[3]]}&,TN];
 DdetT=ForwardNumericalDifferenceForTimeSeries[Transpose[fundquant][[2]],5]/step//Chop;
 DInvTNT=ForwardNumericalDifferenceForTimeSeries[Transpose[fundquant][[3]],5]/step//Chop;
 DTrN=ForwardNumericalDifferenceForTimeSeries[Transpose[fundquant][[4]],5]/step//Chop;
 DT=ForwardNumericalDifferenceForTimeSeries[Transpose[fundquant][[5]],5]/step//Chop;
 \[Kappa]={times,Table[DTrN[[i]]-2 Tr[DT[[i]].fundquant[[i]][[6]]],{i,Length[TN]-5}]}//Transpose;
 \[Epsilon]={times,Table[0.5 DdetT[[i]] (fundquant[[i]][[2]])^(-1),{i,Length[TN]-5}]}//Transpose;
-\[Delta]={times,Table[fundquant[[i]][[2]]^2Det[DInvTNT[[i]]],{i,Length[TN]-5}]}//Transpose;
+\[Delta]={times,Table[fundquant[[i]][[2]]^2 Det[DInvTNT[[i]]],{i,Length[TN]-5}]}//Transpose;
 indicatorfunction={times,Table[If[\[Kappa][[i]][[2]]>=0,\[Delta][[i]][[2]]-0.25(Abs[\[Epsilon][[i]][[2]]]-\[Epsilon][[i]][[2]])^2,0],{i,Length[TN]-5}]}//Transpose;
 discreteindicator={times,Table[If[\[Kappa][[i]][[2]]>=0 &&\[Delta][[i]][[2]]-0.25(Abs[\[Epsilon][[i]][[2]]]-\[Epsilon][[i]][[2]])^2>=0,1,0],{i,Length[TN]-5}]}//Transpose;
-\[Mu]={times,Table[If[\[Delta][[i]][[2]]>=0, Sign[\[Kappa][[i]][[2]]]/Sqrt[\[Delta][[i]][[2]]],-Sqrt[Abs[\[Delta][[i]][[2]]]]],{i,Length[TN]-5}]}//Transpose;
+\[Mu]={times,Table[If[\[Delta][[i]][[2]]>=0, Sign[\[Kappa][[i]][[2]]]*Sqrt[\[Delta][[i]][[2]]],-Sqrt[Abs[\[Delta][[i]][[2]]]]],{i,Length[TN]-5}]}//Transpose;
 {\[Mu],discreteindicator,indicatorfunction,\[Epsilon],\[Delta],\[Kappa]}
 ];
 
