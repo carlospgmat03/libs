@@ -125,6 +125,7 @@ GHZ::usage="GHZ[qu_] Creates a GHZ state, |000000\[RightAngleBracket]+|111111\[R
 RandomMixedState::usage="RandomMixedState[n_,combinations_], Constructs a Random mixed state of diemnsion n with random uniform combinations of pure states wti Haar measure."
 GellMann::usage = "GellMann[n_] Generalized Gell-Mann matrices from https://blog.suchideas.com/2016/04/sun-gell-mann-matrices-in-mathematica/ For example
 for n=2 it gives Pauli matrices, don't forget to add identity by yourself in need a complete basis."
+ApplySwap::usage= "ApplySwap[State,Target1,Target2] Applies Swap map betwen the two target qubits, the input can be a state vector or a density matrix."
 (* }}} *)
 (* }}} *)
 Begin["Private`"] 
@@ -643,7 +644,29 @@ GellMann[n_] :=
    (* Diagonal case *)
    Sqrt[2/l/(l + 1)] SparseArray[
     Table[{j, j} -> 1, {j, 1, l}]~Join~{{l + 1, l + 1} -> -l}, {n, n}]
-  , {l, 1, n - 1}]
+  , {l, 1, n - 1}];
+ApplySwap[State_?VectorQ,Target1_,Target2_]:=Module[{Aux,digits,len,digits1,digits2},
+len=Length[State];
+Aux=ConstantArray[0,len];
+Table[digits=IntegerDigits[i-1,2,IntegerPart[Log2[len]]];
+digits1=digits;
+digits1[[{Target1,Target2}]]=digits[[{Target2,Target1}]];
+Aux[[i]]=State[[FromDigits[digits1,2]+1]];,{i,1,Length[State]}];
+Aux
+];
+ApplySwap[State_?MatrixQ,Target1_,Target2_]:=Module[{Aux,digits,dim,digits1,digits2,digits1p,digits2p},
+dim=Dimensions[State];
+Aux=ConstantArray[0,dim];
+Table[
+digits1=IntegerDigits[i-1,2,IntegerPart[Log2[dim[[1]]]]];
+digits2=IntegerDigits[j-1,2,IntegerPart[Log2[dim[[1]]]]];
+digits1p=digits1;
+digits2p=digits2;
+digits1p[[{Target1,Target2}]]=digits1[[{Target2,Target1}]];
+digits2p[[{Target1,Target2}]]=digits2[[{Target2,Target1}]];
+Aux[[i,j]]=State[[FromDigits[digits1p,2]+1,FromDigits[digits2p,2]+1]];,{i,1,dim[[1]]},{j,1,dim[[1]]}];
+Aux
+];
 (*}}}*)
 End[] 
 EndPackage[]
