@@ -63,7 +63,7 @@ DecompositionOfChannelsInSO31::usage = "Performs decomposition in orthochronus L
 LorentzMatrixQ::usage = "LorentzMatrixQ[matrix_] returns if the given matrix is a valid Lorentz transformation with the signature +---."
 ForceSameSignatureForLorentz::usage = "ForceSameSignatureForLorentz[matrix_] Forces or fixes the signature of the given Lorentz transformation."
 QuantumMaptoR::usage = "QuantumMaptoR[channel_] Representation of Jamiolokowski state in \[Sigma]iotimes \[Sigma]j basis."
-DiagonalMatrixQ::usage = "DiagonalMatrixQ[matrix_] Works similar to the other matrix tests of mathematica."
+diagonalMatrixQ::usage = "diagonalMatrixQ[matrix_] Works similar to the other matrix tests of mathematica."
 PositiveSemidefiniteMatrixCustomQ::usage = "Mathematica test gives strange results, this routine check such test hunred times."
 PositiveSemidefiniteMatrixCustom2Q::usage = "Custom check."
 PositiveSemidefiniteMatrixCustom3Q::usage = "By eigenvalues of the hermitian part"
@@ -614,7 +614,7 @@ Exp[-3lol]
 UnitalChannelInPauliBasis[x_,y_,z_]:=DiagonalMatrix[(1-x-y-z){1,1,1,1}+x{1,1,-1,-1}+y{1,-1,1,-1}+z{1,-1,-1,1}];
 UnitalChannelInPauliBasis[vec_]:=UnitalChannelInPauliBasis[vec[[1]],vec[[2]],vec[[3]]];
 
-DiagonalMatrixQ[matrix_]:=If[Total[Abs[Flatten[DiagonalMatrix[Diagonal[matrix]]-matrix]]]==0,True,False];
+diagonalMatrixQ[matrix_]:=If[Total[Abs[Flatten[DiagonalMatrix[Diagonal[matrix]]-matrix]]]==0,True,False];
 
 InfinitySupressor[lista_,infinity_]:=Module[{list},
 list=lista;
