@@ -678,6 +678,9 @@ template <class Num_T> itpp::Vec<Num_T> get_column(const itpp::Array<itpp::Vec<N
   return tmp;
 } //}}}
 // Multiplication
+std::complex<double> expected_value(const itpp::cmat& A, const itpp::cvec& psi){ // {{{
+  return itpp::dot(conj(psi), A*psi);
+} // }}}
 template <class Num_T> itpp::Mat<Num_T> AtimesDiagB(const itpp::Mat<Num_T>& A, const itpp::Vec<Num_T>& B){ // {{{
   itpp::Mat<Num_T> tmp(A.cols(),A.rows());
   for (int i=0; i<tmp.cols(); i++){
@@ -1670,6 +1673,10 @@ double Purity(const itpp::Mat<std::complex<double> >& rho){// {{{
 		P += abs(itpp::dot (rho.get_col(i),rho.get_row(i)));
 	}
 	return P;
+}// }}}
+double Fidelity(const itpp::cvec psi, const itpp::Mat<std::complex<double> >& rho){// {{{
+// https://en.wikipedia.org/wiki/Fidelity_of_quantum_states#Definition
+rho*psi;
 }// }}}
 double Purity(const itpp::vec& eigenvalues){// {{{
         return itpp::dot(eigenvalues,eigenvalues);
