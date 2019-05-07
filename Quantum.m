@@ -126,6 +126,8 @@ RandomMixedState::usage="RandomMixedState[n_,combinations_], Constructs a Random
 GellMann::usage = "GellMann[n_] Generalized Gell-Mann matrices from https://blog.suchideas.com/2016/04/sun-gell-mann-matrices-in-mathematica/ For example
 for n=2 it gives Pauli matrices, don't forget to add identity by yourself in need a complete basis."
 ApplySwap::usage= "ApplySwap[State,Target1,Target2] Applies Swap map betwen the two target qubits, the input can be a state vector or a density matrix."
+ApplyLocalNoiseChain::usage = "ApplyLocalNoiseChain[State,p] Applies the map that transforoms the density matrix State into the assessible density matrix when local noise is present using fuzzy measurements."
+ApplyNoiseChain::usage = "ApplyNoiseChain[State,p] Applies the map that transforoms the density matrix State into the assessible density matrix when non-local noise is present using fuzzy measurements."
 (* }}} *)
 (* }}} *)
 Begin["Private`"] 
@@ -667,6 +669,17 @@ digits2p[[{Target1,Target2}]]=digits2[[{Target2,Target1}]];
 Aux[[i,j]]=State[[FromDigits[digits1p,2]+1,FromDigits[digits2p,2]+1]];,{i,1,dim[[1]]},{j,1,dim[[1]]}];
 Aux
 ];
+(*Coarse Graining stuff*)
+(*{{{*)
+ApplyLocalNoiseChain[State_?MatrixQ,p_]:=Module[{qubits},
+qubits=IntegerPart[Log2[Dimensions[State][[1]]]];
+p State+(1-p)/(qubits)(Sum[ApplySwap[State,i,Mod[i+1,qubits,1]],{i,1,qubits}])
+];
+ApplyNoiseChain[State_?MatrixQ,p_]:=Module[{qubits},
+qubits=IntegerPart[Log2[Dimensions[State][[1]]]];
+p State+2(1-p)/(qubits(qubits-1))(Sum[ApplySwap[State,i,j],{i,1,qubits},{j,i+1,qubits}])
+];
+(*}}}*)
 (*}}}*)
 End[] 
 EndPackage[]
