@@ -1674,10 +1674,10 @@ double Purity(const itpp::Mat<std::complex<double> >& rho){// {{{
 	}
 	return P;
 }// }}}
-double Fidelity(const itpp::cvec psi, const itpp::Mat<std::complex<double> >& rho){// {{{
-// https://en.wikipedia.org/wiki/Fidelity_of_quantum_states#Definition
-rho*psi;
-}// }}}
+// double Fidelity(const itpp::cvec psi, const itpp::Mat<std::complex<double> >& rho){// {{{
+// // https://en.wikipedia.org/wiki/Fidelity_of_quantum_states#Definition
+// rho*psi;
+// }// }}}
 double Purity(const itpp::vec& eigenvalues){// {{{
         return itpp::dot(eigenvalues,eigenvalues);
 }// }}}
