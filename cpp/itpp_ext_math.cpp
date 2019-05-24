@@ -1358,6 +1358,10 @@ itpp::Mat<std::complex<double> > Werner(const double alpha){// {{{
 	tmp(0,3)=tmp(3,0)=(1-alpha)/2;
 	return tmp;
 }// }}}
+itpp::cvec StatisticallyNormalRandomState(unsigned int dim){ // {{{
+  itpp::cvec tmp=itpp::randn_c(dim);
+  return tmp/sqrt(dim);
+} // }}}
 itpp::cvec RandomState(unsigned int dim){ // {{{
   itpp::cvec tmp=itpp::randn_c(dim);
   return tmp/norm(tmp);
