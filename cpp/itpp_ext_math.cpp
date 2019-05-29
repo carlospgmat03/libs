@@ -291,6 +291,7 @@ itpp::cmat Reorder_state_tensor_form(itpp::cvec vector,int which){ // {{{
 // Linear Algebra {{{
 // Vectorization of density matrices. 
 itpp::vec vectorization_density_matrix(const itpp::cmat& rho){ // {{{
+  // We use the gell man matrices, ordered as in https://blog.suchideas.com/2016/04/sun-gell-mann-matrices-in-mathematica/
   int dim=rho.cols();
   itpp::vec rho_vec(dim*dim-1);
 //   itpp::vec rho_vec(dim*dim);
