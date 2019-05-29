@@ -289,6 +289,31 @@ itpp::cmat Reorder_state_tensor_form(itpp::cvec vector,int which){ // {{{
 } // }}}
 // }}}
 // Linear Algebra {{{
+// Vectorization of density matrices. 
+itpp::vec vectorization_density_matrix(const itpp::cmat& rho){ // {{{
+  int dim=rho.cols();
+  itpp::vec rho_vec(dim*dim-1);
+//   itpp::vec rho_vec(dim*dim);
+  int vector_index=0;
+  for (int i=1; i<dim; i++){
+    for (int j=0; j<i; j++){
+      rho_vec(vector_index)=2*real(rho(j,i));
+      rho_vec(vector_index+(dim*(dim-1)/2))=2*imag(rho(j,i));
+//       cout << vector_index << ", " <<vector_index+(dim*(dim-1)/2) <<  endl;
+      vector_index++;
+    }
+  }
+  itpp::vec rho_diag = real(itpp::diag(rho));
+  double y=sqrt((2.*(dim-1))/dim);
+
+  for (int k=0; k<dim-1; k++){
+    rho_vec(k+dim*(dim-1)) = (sum(rho_diag.get(0,k)) - rho_diag(k+1))*y;
+  }
+//   rho_vec(dim*dim-1)=
+  return rho_vec;
+
+} // }}}
+//
 // Traces and Partial traces 
 itpp::cmat partial_trace(const itpp::cvec& state, int dim_leave){ // {{{
   // This partial trace allows to leave a space of arbitrary dimension. Let 
