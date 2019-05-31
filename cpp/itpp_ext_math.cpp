@@ -299,19 +299,60 @@ itpp::vec vectorization_density_matrix(const itpp::cmat& rho){ // {{{
   for (int i=1; i<dim; i++){
     for (int j=0; j<i; j++){
       rho_vec(vector_index)=2*real(rho(j,i));
-      rho_vec(vector_index+(dim*(dim-1)/2))=2*imag(rho(j,i));
+      rho_vec(vector_index+(dim*(dim-1)/2))=-2*imag(rho(j,i));
 //       cout << vector_index << ", " <<vector_index+(dim*(dim-1)/2) <<  endl;
       vector_index++;
     }
   }
   itpp::vec rho_diag = real(itpp::diag(rho));
-  double y=sqrt((2.*(dim-1))/dim);
+  double x,y;
 
-  for (int k=0; k<dim-1; k++){
-    rho_vec(k+dim*(dim-1)) = (sum(rho_diag.get(0,k)) - rho_diag(k+1))*y;
+  y=sqrt((2.*(dim))/(dim+1));
+  for (int k=1; k<dim; k++){
+    y=-sqrt((2.*k)/(k+1));
+    x=-y/k;
+//     reconstruyendo 
+//     std::cout << "k="<<k<<";  x="<<x<<";    y="<<y<<std::endl;
+    rho_vec(k+dim*(dim-1)-1) = x*sum(rho_diag.get(0,k-1)) + rho_diag(k)*y;
   }
 //   rho_vec(dim*dim-1)=
   return rho_vec;
+
+} // }}}
+itpp::cmat devectorization_density_matrix(const itpp::vec& rho_vec){ // {{{
+  // We use the gell man matrices, ordered as in https://blog.suchideas.com/2016/04/sun-gell-mann-matrices-in-mathematica/
+  int dim=cfpmath::isqrt(rho_vec.size()+1);
+  std::complex<double> Im(0.,1.);
+  itpp::cmat rho(dim,dim);
+//   itpp::vec rho_vec(dim*dim);
+  int vector_index=0;
+  for (int i=1; i<dim; i++){
+    for (int j=0; j<i; j++){
+      rho(j,i)=(rho_vec(vector_index) - Im*rho_vec(vector_index+(dim*(dim-1)/2)))/2.;
+      rho(i,j)=conj(rho(j,i));
+//       rho_vec(vector_index)=2*real(rho(j,i));
+//       rho_vec(vector_index+(dim*(dim-1)/2))=2*imag(rho(j,i));
+//       cout << vector_index << ", " <<vector_index+(dim*(dim-1)/2) <<  endl;
+      vector_index++;
+    }
+  }
+//   itpp::vec rho_diag = real(itpp::diag(rho));
+  double y, x, rho_parcial=0.;
+  int r_index;
+
+  for (int k=dim-1; k > 0;  k--){
+    r_index = dim*dim - (dim-k)-1;
+    x = sqrt(2./(k*k+k));
+    y = -k*x;
+//     std::cout << "k="<<k<<";  x="<<x<<";    y="<<y<<std::endl;
+    rho(k,k) = (rho_vec(r_index) - x*( 1- rho_parcial))/(y-x);
+    rho_parcial += real(rho(k,k));
+//     std::cout << "r_index =" << r_index << std::endl;
+//     rho_vec(k+dim*(dim-1)) = (sum(rho_diag.get(0,k)) - rho_diag(k+1))*y;
+  }
+  rho(0,0)=1-rho_parcial;
+//   rho_vec(dim*dim-1)=
+  return rho;
 
 } // }}}
 //
@@ -2069,13 +2110,39 @@ template <class Num_T> itpp::ivec waist(const itpp::Array<Num_T >& A){// {{{
 }// }}}
 // }}}
 // Pretty printing {{{
-void pretty_printing_1(itpp::cvec& c){
+void standard_printing(itpp::cvec& c){ // {{{
+
+  for (int i=0; i<c.size(); i++){
+    std::cout <<  real(c(i)) << std::endl;
+    std::cout <<  imag(c(i)) << std::endl;
+  }
+  return;
+} // }}}
+void standard_printing(itpp::cmat& c){ // {{{
+
+  for (int i=0; i<c.rows(); i++){
+    for (int j=0; j<c.cols(); j++){
+      std::cout <<  real(c(i,j)) << std::endl;
+      std::cout <<  imag(c(i,j)) << std::endl;
+    }
+  }
+  return;
+} // }}}
+void standard_printing(itpp::vec& c){ // {{{
+
+  for (int i=0; i<c.size(); i++){
+    std::cout <<  c(i) << std::endl;
+//     std::cout << i << "  " <<  c(i) << std::endl;
+  }
+  return;
+} // }}}
+void pretty_printing_1(itpp::cvec& c){ // {{{
 
   for (int i=0; i<c.size(); i++){
     std::cout << i << " " << c(i) << std::endl;
   }
   return;
-}
+} // }}}
 // }}}
 } // }}}
 #endif // ITPP_EXT_MATH_VARIOUS
