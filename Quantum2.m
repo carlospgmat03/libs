@@ -1,6 +1,7 @@
 (* ::Package:: *)
 
 (* {{{ *) BeginPackage["Quantum2`",{"Carlos`", "Quantum`"}]
+exportarSilvestre::usage = "lo que dice. sin argumentos."
 Isingterm::usage = "Isingterm[i_,j_,N_]"
 IsingChain::usage = "IsingChain[J_,N_]"
 Hallvsall::usage = "Hallvsall[J_,N_]"
@@ -90,6 +91,17 @@ function can be also called as LRegion[\[Lambda],\[Tau]] and LRegion[\[Lambda]],
 
 
 Begin["Private`"] 
+{shift, clock} = {
+  {{0, 0, 1}, {1, 0, 0}, {0, 1, 0}},
+  {{1, 0, 0}, {0, Exp[(2 \[Pi] I)/3], 0}, {0, 0,
+    Exp[(2 \[Pi] I)/3]^2}}};
+silvester =
+  MatrixPower[shift, #1].MatrixPower[clock, #2] & @@@
+   Tuples[{0, 1, 2}, {2}];
+silvester = 
+  Permute[silvester, FindPermutation[{2, 3, 4, 7, 5, 9, 6, 8}]];
+silvester = 
+  Permute[silvester, FindPermutation[{2, 3, 4, 7, 5, 9, 6, 8}]];
 
 Isingterm[i_,j_,N_]:=Module[{list},
 list=Table[If[k==i||k==j,PauliMatrix[3],IdentityMatrix[2]],{k,0,N-1}];
@@ -711,6 +723,8 @@ PhasesEliminator[basis_]:=Module[{len},
 len=Length[basis];
 ReplaceAll[basis,Table[\[Phi][i][0]->0,{i,0,len-1}]]
 ];
+
+exportarSilvestre[]:=silvester
  
 EndPackage[]
 
