@@ -1662,6 +1662,18 @@ void apply_swap(itpp::cvec& state, int position1, int position2){// {{{
   }
   return;
 } // }}}
+void apply_swap(itpp::cmat& rho, int position1, int position2){// {{{
+  int mask = cfpmath::pow_2(position1) + cfpmath::pow_2(position2);
+  int n1, n2;
+  for (int j=0; j<rho.cols()/4; j++){
+    n1=cfpmath::merge_two_numbers(2, j, mask); 
+    n2=cfpmath::merge_two_numbers(1, j, mask); 
+    rho.swap_rows(n1, n2);
+    rho.swap_cols(n1, n2);
+//     swap(state, n1, n2);
+  }
+  return;
+} // }}}
 void apply_cnot(itpp::cvec& state, int control, int target){// {{{
   int mask = cfpmath::pow_2(control) + cfpmath::pow_2(target);
   int n1, n2;
