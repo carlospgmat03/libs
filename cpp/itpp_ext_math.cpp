@@ -3,6 +3,8 @@
 #define ITPP_EXT_MATH_VARIOUS
 #include "itpp_ext_math.h"
 #include "cfp_math.cpp"
+#include <algorithm>    // std::next_permutation, std::sort
+
 // #include <purity_RMT.cpp>
 #include <itpp/itbase.h>
 #include <itpp/stat/misc_stat.h>
@@ -297,6 +299,44 @@ itpp::cmat Reorder_state_tensor_form(itpp::cvec vector,int which){ // {{{
 } // }}}
 // }}}
 // set manipulation and permutations {{{
+// itpp::Array<itpp::ivec> all_permutations(vec p){
+void all_permutations(int q){
+// for (int i=0, p.size(); i++){
+// p(i) concatenado con las permutaciones de p(sin la i)
+// }
+// https://stackoverflow.com/questions/32678349/all-permutations-c-with-vectorint-and-backtracking
+ int myints[] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19};
+
+//         vector<int> v = { 1, 2, 3, 4 };
+//   std::sort (myints,myints+3);
+
+//   std::cout << "The 3! possible permutations with 3 elements:\n";
+  do {
+//     std::cout << myints << '\n';
+    for (int i=0; i<q; i++){
+      std::cout << myints[i] <<" " ;
+    } 
+    std::cout << std::endl;
+//     std::cout << myints[0] << ' ' << myints[1] << ' ' << myints[2] << '\n';
+  } while ( std::next_permutation(myints,myints+q) );
+
+  std::cout << "After loop: " << myints[0] << ' ' << myints[1] << ' ' << myints[2] << '\n';
+
+//   itpp::ivec v="1 2 3";
+// //     std::vector<int> v = {1,2,3};
+//     do {
+// //         print(v);
+// 
+// 
+//     std::cout << v << std::endl;
+// //     for (int e : v) {
+// //         std::cout << " " << e;
+// //     }
+// //     std::cout << std::endl;
+// 
+//     } while (std::next_permutation(v.begin(), v.end()));
+return;
+}
 template <class Num_T> void interchange_permutations_2line(itpp::Vec<Num_T>& b, const itpp::ivec &p){ // {{{
   // This routine makes a permutation on vector b, coded with vector p. 
   // If 
@@ -316,21 +356,12 @@ template <class Num_T> void interchange_permutations_2line(itpp::Vec<Num_T>& b, 
   Num_T temp;
   itpp::ivec q=p;
   int qtmp;
-
   for (int k = 0; k < q.size(); k++) {
-//     std::cout << "k=" << k << " q=" << q  <<std::endl;
     while (q(k) != k){
       qtmp=q(k);
       swap(q,k,qtmp);
       swap(b,k,qtmp);
-//       std::cout << "(i) q=" << q  << ", k=" << k << ", q(k)=" << q(k) << std::endl;
-//       std::cout << "(f) q=" << q  << ", k=" << k << ", q(k)=" << q(k) << std::endl;
-//       std::cout << "(f) b=" << b  <<  std::endl;
-//       abort();
     }
-//     temp = b(k);    // k=0, temp=0
-//     b(k) = b(p(k)); // b(0) = b(p(5))=b(4) = 4
-//     b(p(k)) = temp; // b(4) = 0
   }
 } 
 // }}}
@@ -350,20 +381,25 @@ template <class Num_T> void interchange_permutations_cycle(itpp::Vec<Num_T>& b, 
 //   itpp::ivec q=p;
 //   int qtmp;
   itpp::Vec<Num_T> b_sub=b.get(c);
-//   std::cout << "b_sub=" << b_sub <<std::endl;
   b_sub.shift_right(b_sub(b_sub.size()-1)) ;
-//   std::cout << "b_sub=" << b_sub <<std::endl;
   for (int k=0; k<c.size(); k++){
     b(c(k))=b_sub(k);
   }
-//   std::cout << "b=" << b <<std::endl;
-//   std::cout << "b_sub=" << b_sub.shift_right(1) <<std::endl;
-//   std::cout << "b_sub=" << shift_right(b_sub) <<std::endl;
-//   for (int k = 0; k < q.size(); k++) {
-//     std::cout << "k=" << k << " q=" << q  <<std::endl;
-//     temp = b(k);    // k=0, temp=0
-//     b(k) = b(p(k)); // b(0) = b(p(5))=b(4) = 4
-//     b(p(k)) = temp; // b(4) = 0
+} 
+// }}}
+int interchange_bits_2line(const int& n_in, const itpp::ivec &p){ // {{{
+  // See documentaiton for 
+  // void interchange_permutations_2line 
+  // and for 
+  // interchange_bits_cycle
+  int n = n_in;
+  itpp::Vec<bool> nbits=int_to_bool(n, p.size());
+//   std::cout << "Control 1 " << nbits << ", " << c << std::endl;
+  interchange_permutations_2line(nbits, p);
+//   std::cout << "Control 2 " << std::endl;
+  n = bvec_to_int(nbits);
+//   std::cout << "Control 3 " << std::endl;
+  return n;
 } 
 // }}}
 int interchange_bits_cycle(const int& n_in, const itpp::ivec &c){ // {{{
