@@ -300,7 +300,52 @@ itpp::cmat Reorder_state_tensor_form(itpp::cvec vector,int which){ // {{{
 // }}}
 // set manipulation and permutations {{{
 // itpp::Array<itpp::ivec> all_permutations(vec p){
-void all_permutations(int q){
+itpp::ivec next_permutation(const itpp::ivec& v){ // {{{
+
+  int n = v.size();
+  itpp::ivec w(n);
+  int myints[n];
+  for (int i=0; i<n; i++){
+      myints[i] = v(i);
+  } 
+  std::next_permutation(myints,myints+n);
+  for (int i=0; i<n; i++){
+      w(i)=myints[i];
+  } 
+
+return w;
+} // }}}
+itpp::Array<itpp::ivec> ChangeNotationPermutation(const itpp::ivec& cycle){ // {{{
+  // https://www.youtube.com/watch?v=MpKG6FmcIHk
+  // el algoritmo comienza por 
+//   cout << "En la rutina jodida  ChangeNotationPermutation cycle=" << cycle <<endl; 
+  int q=cycle.size();
+  itpp::Array<itpp::ivec> permutation_cycle_notation(0);
+  itpp::Vec<bool> checked(q);
+  checked = false;
+  int current_position=0;
+
+  itpp::ivec current_cycle;
+
+//   cout << "2 En la rutina jodida  ChangeNotationPermutation " <<endl; 
+  while ( current_position <q){
+    current_cycle.set_size(0);
+//     cout << "En el while. current_position=" << current_position << endl;
+    while (!checked(current_position)){
+      current_cycle = concat(current_cycle,current_position);
+      checked(current_position) = true;
+      current_position = cycle(current_position);
+//       cout << "En el while while. current_position=" << current_position << endl;
+    }
+//     cout << "Sali del while interno. current_cycle=" << current_cycle<< endl;
+    if(current_cycle.size()>1){
+      permutation_cycle_notation = concat(permutation_cycle_notation, current_cycle);
+    }
+    current_position++;
+  }
+  return permutation_cycle_notation;
+} // }}}
+void all_permutations(int q){ // {{{
 // for (int i=0, p.size(); i++){
 // p(i) concatenado con las permutaciones de p(sin la i)
 // }
@@ -336,7 +381,7 @@ void all_permutations(int q){
 // 
 //     } while (std::next_permutation(v.begin(), v.end()));
 return;
-}
+} // }}}
 template <class Num_T> void interchange_permutations_2line(itpp::Vec<Num_T>& b, const itpp::ivec &p){ // {{{
   // This routine makes a permutation on vector b, coded with vector p. 
   // If 
