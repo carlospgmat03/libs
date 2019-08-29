@@ -315,6 +315,11 @@ itpp::ivec next_permutation(const itpp::ivec& v){ // {{{
 
 return w;
 } // }}}
+itpp::Array<itpp::ivec> SingleTwoPermutation(int i, int j){ // {{{
+  itpp::Array<itpp::ivec> permutation(1);
+  permutation(0)=itpp::vec_2(i,j);
+  return permutation;
+} // }}}
 itpp::Array<itpp::ivec> ChangeNotationPermutation(const itpp::ivec& cycle){ // {{{
   // https://www.youtube.com/watch?v=MpKG6FmcIHk
   // el algoritmo comienza por 
