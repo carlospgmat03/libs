@@ -28,6 +28,28 @@ namespace itppextmath{ // {{{
     return tmp;
   } // }}}
   // number theoretical
+template <class Num_T> int counter_elements_close_fixed_value(itpp::Vec<Num_T> v, Num_T x, double epsilon){ //{{{
+int counter=0;
+for (int i=0; i< v.size(); i++){
+  if( abs(v(i)-x) < epsilon) counter++;
+}
+return counter;
+
+} // }}}
+template <class Num_T> itpp::bmat zero_non_zero(itpp::Mat<Num_T> m, double epsilon){ //{{{
+  int mr =  m.rows();
+  int mc =  m.cols();
+  itpp::bmat z(mr,mc);
+  z=1;
+//   std::cout << "hola (mr,mc)=(" << mr << "," << mc << ")" << std::endl;
+  for (int i=0; i< mr; i++){
+    for (int j=0; j< mc; j++){
+//       std::cout << "hola " << i << ", " << j << std::endl;
+      if(abs(m(i,j))< epsilon) z(i,j)=0;
+    }
+  }
+return z;
+} // }}}
 // Inquiry {{{
 template <class Num_T> int locateLargestAbs(const itpp::Vec<Num_T>& e){ // {{{
   int position=0;
@@ -1141,6 +1163,17 @@ itpp::ivec IntegerDigits(int n,int base=2, int length=0){// {{{
     result(counter) = number%base;
     number=(number - result(counter))/base;
     counter ++;
+  }
+  return result;
+}// }}} Matrix=
+itpp::ivec IntegerDigits(const int n, itpp::ivec base){// {{{
+  int number=n;
+  itpp::ivec result(base.size());
+  result=0;
+
+  for (int counter=0; counter<base.size(); counter++){
+    result(counter) = number%(base(counter));
+    number=(number - result(counter))/base(counter);
   }
   return result;
 }// }}} Matrix=
