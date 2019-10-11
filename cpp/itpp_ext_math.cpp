@@ -102,6 +102,27 @@ bool DoTheyIntersect(const itpp::Array< itpp::ivec >& Array1, const itpp::Array<
   } 
   return false;
 } //}}}
+double test_similar_complex_list(itpp::cvec& z1, itpp::cvec& z2){ // {{{
+  if (z1.size() != z2.size()){
+    std::cerr << "En test_similar_complex_list, tamaños diferentes" << std::endl;
+    return z1.size() + z2.size();
+  }
+  double error=0., e;
+  int dim = z1.size(), min_pos; 
+  itpp::cvec zt = z2;
+  itpp::Vec<bool> checked(dim);
+  itpp::vec errors;
+  for (int i=0; i<dim; i++){
+    errors = abs(zt-z1(i));
+//     min_index(errors);
+    error += min(errors, min_pos);
+//     error+=e;
+    zt.del(min_pos);
+  }
+// std::complex<double> z;
+  return error;
+
+} // }}}
 template <class Num_T> bool AreEqual_modulo_order(const itpp::Array<Num_T >& a1, const itpp::Array<Num_T >& a2){// {{{
 //! Routine to check if two arrays are equal. 
 /*! It must be superseeded by the operator ==, but I still dont know how
