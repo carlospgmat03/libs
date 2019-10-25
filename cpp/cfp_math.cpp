@@ -12,7 +12,6 @@
 #endif  
 
 namespace cfpmath{// {{{
-
   bool even_number_of_ones_base_2(const int );
 }// }}}
 namespace cfpmath{// {{{
@@ -348,110 +347,107 @@ int reverse_bits(int number_in, int size_register){ // {{{
 int factorial(int n) { // {{{
   return (n == 1 || n == 0) ? 1 : factorial(n - 1) * n;
 } // }}}
-  int maximum_prime_power_divisor(const int number, const int base){// {{{
-    int power=0;
-    while (number%integer_pow(base,power)==0){
-      power++;
-//       std::cout << "base="<< base << ", number="<< number << ", integer_pow(base,power)=" << integer_pow(base,power) << std::endl;
-    }
-    return power-1;
-  }// }}}
-  bool is_integer_power(unsigned i){ // {{{
-    // http://www.cprogramming.com/snippets/show.php?tip=10&count=30&page=0
-    return !((i-1) & i); 
-  }// }}}
-  int coarse_grain(const int number, const int coarse_grain_parameter){// {{{
-    return number - number%coarse_grain_parameter;
-  }// }}}
-  int integer_pow(const int base, const int power){// {{{
-    if (power==0 && base == 0){
-      std::cout << "Algun lio en integer_pow weuwrtafds\n"; abort();
-    }
-    if (power < 0){
-      std::cout << "Algun lio en integer_pow 385oosdiur\n"; abort();
-    }
-    int tmp=1;
-    for (int i=0; i<power; i++){
-      tmp*=base;
-    }
-    return tmp;
-  }// }}}
-  bool test_int_log(const int base, const int n){// {{{
-    //! Test if an integer is a power of another. 
-    /*! Check if \f$ n=base^{m} \f$ with \f$ m \f$ some   element of lhe even and odd lists are identical. 
-     * 000,010. This elements are even (e) and odd(o). So the structure is completly determined by this 
-     * par even odd.  * so the element we must consider is the upper corner, namely 0000,0101. The reduced elements are
-     * 000,010. This elements are even (e) and odd(o). So the structure is completly determined by this 
-     * par even odd. The following table documents the structure
-     *
-     *  \param position the position of the new qubit. 
-     */
-    int test=1, result=0;
-    for (; test < n; test = base*test){ result++; }
-    return (test==n);
-//     if (test ==n){
-//       return true;
-//     } else {
-//       return false;
-//     }
-  }// }}}
-  int integer_part_log(const int base, const int n){// {{{
-    int test=1, result=0;
-//     std::cout << "integer_part_log " << base << ", " << n << std::endl;
-    for (; test <= n; test = base*test){  result++ ; }
+int maximum_prime_power_divisor(const int number, const int base){// {{{
+  int power=0;
+  while (number%integer_pow(base,power)==0){
+    power++;
+    //       std::cout << "base="<< base << ", number="<< number << ", integer_pow(base,power)=" << integer_pow(base,power) << std::endl;
+  }
+  return power-1;
+}// }}}
+bool is_integer_power(unsigned i){ // {{{
+  // http://www.cprogramming.com/snippets/show.php?tip=10&count=30&page=0
+  return !((i-1) & i); 
+}// }}}
+int coarse_grain(const int number, const int coarse_grain_parameter){// {{{
+  return number - number%coarse_grain_parameter;
+}// }}}
+int integer_pow(const int base, const int power){// {{{
+  if (power==0 && base == 0){
+    std::cout << "Algun lio en integer_pow weuwrtafds\n"; abort();
+  }
+  if (power < 0){
+    std::cout << "Algun lio en integer_pow 385oosdiur\n"; abort();
+  }
+  int tmp=1;
+  for (int i=0; i<power; i++){
+    tmp*=base;
+  }
+  return tmp;
+}// }}}
+bool test_int_log(const int base, const int n){// {{{
+  //! Test if an integer is a power of another. 
+  /*! Check if \f$ n=base^{m} \f$ with \f$ m \f$ some   element of lhe even and odd lists are identical. 
+   * 000,010. This elements are even (e) and odd(o). So the structure is completly determined by this 
+   * par even odd.  * so the element we must consider is the upper corner, namely 0000,0101. The reduced elements are
+   * 000,010. This elements are even (e) and odd(o). So the structure is completly determined by this 
+   * par even odd. The following table documents the structure
+   *
+   *  \param position the position of the new qubit. 
+   */
+  int test=1, result=0;
+  for (; test < n; test = base*test){ result++; }
+  return (test==n);
+  //     if (test ==n){
+  //       return true;
+  //     } else {
+  //       return false;
+  //     }
+}// }}}
+int integer_part_log(const int base, const int n){// {{{
+  int test=1, result=0;
+  //     std::cout << "integer_part_log " << base << ", " << n << std::endl;
+  for (; test <= n; test = base*test){  result++ ; }
+  return result;
+}// }}}
+int int_log(const int base, const int n){// {{{
+  int test=1, result=0;
+  for (; test < n; test = base*test){ result++; }
+  if (test ==n){
     return result;
-  }// }}}
-  int int_log(const int base, const int n){// {{{
-    int test=1, result=0;
-    for (; test < n; test = base*test){ result++; }
-    if (test ==n){
-      return result;
+  } else {
+    std::cerr << "Error en int_log. base=" << base << ", n=" << n << std::endl;
+    abort();
+  }
+}// }}}
+int translate_coupled_base_to_decoupled(const int &number_in){// {{{
+
+  //     return number_in /2; 
+  return number_in >> 1; 
+}// }}}
+long isqrt (long x){// {{{
+  /* Integer square root by Halleck's method, with Legalize's speedup */
+  /* from: http://home.utah.edu/~nahaj/factoring/isqrt.c.html*/
+  long   squaredbit, remainder, root;
+
+  if (x<1) return 0;
+
+  /* Load the binary constant 01 00 00 ... 00, where the number
+   * of zero bits to the right of the single one bit
+   * is even, and the one bit is as far left as is consistant
+   * with that condition.)
+   */
+  squaredbit  = (long) ((((unsigned long) ~0L) >> 1) & 
+      ~(((unsigned long) ~0L) >> 2));
+  /* This portable load replaces the loop that used to be 
+   * here, and was donated by  legalize@xmission.com 
+   */
+
+  /* Form bits of the answer. */
+  remainder = x;  root = 0;
+  while (squaredbit > 0) {
+    if (remainder >= (squaredbit | root)) {
+      remainder -= (squaredbit | root);
+      root >>= 1; root |= squaredbit;
     } else {
-      std::cerr << "Error en int_log. base=" << base << ", n=" << n << std::endl;
-      abort();
+      root >>= 1;
     }
-  }// }}}
-  int translate_coupled_base_to_decoupled(const int &number_in){// {{{
+    squaredbit >>= 2; 
+  }
 
-//     return number_in /2; 
-    return number_in >> 1; 
-  }// }}}
-  long isqrt (long x){// {{{
-    /* Integer square root by Halleck's method, with Legalize's speedup */
-    /* from: http://home.utah.edu/~nahaj/factoring/isqrt.c.html*/
-    long   squaredbit, remainder, root;
-
-    if (x<1) return 0;
-
-    /* Load the binary constant 01 00 00 ... 00, where the number
-     * of zero bits to the right of the single one bit
-     * is even, and the one bit is as far left as is consistant
-     * with that condition.)
-     */
-    squaredbit  = (long) ((((unsigned long) ~0L) >> 1) & 
-        ~(((unsigned long) ~0L) >> 2));
-    /* This portable load replaces the loop that used to be 
-     * here, and was donated by  legalize@xmission.com 
-     */
-
-    /* Form bits of the answer. */
-    remainder = x;  root = 0;
-    while (squaredbit > 0) {
-      if (remainder >= (squaredbit | root)) {
-        remainder -= (squaredbit | root);
-        root >>= 1; root |= squaredbit;
-      } else {
-        root >>= 1;
-      }
-      squaredbit >>= 2; 
-    }
-
-    return root;
-  }// }}}
-// double mod_1(double x){
-//  return x - floor(x);
-// }
-double my_mod(double x, double y){ // El modulo de x/y, con el numero en  [0, y)
+  return root;
+}// }}}
+double my_mod(double x, double y){ // {{{ El modulo de x/y, con el numero en  [0, y)
  double r = x - y*floor(x/y);
  double epsilon  =0.0000000000001;
  if (r< -epsilon || r>y+epsilon){
@@ -459,10 +455,10 @@ double my_mod(double x, double y){ // El modulo de x/y, con el numero en  [0, y)
    abort();
   }
  return r;
-}
-double my_mod(double x){ // La parte fraccional de x  [0, y)
+} // }}}
+double my_mod(double x){ // {{{ La parte fraccional de x  [0, y)
  return my_mod(x,1.);
-}
+} // }}}
 // }}}
 }// }}}
 #endif // CFP_MATH_VARIOUS

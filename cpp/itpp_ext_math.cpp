@@ -1241,21 +1241,21 @@ itpp::ivec all_bit_rotations(int n, int size_register){ //{{{
 } // }}}
 // }}}
 // Functional Element manipulation, on all elements {{{
-template <class Num_T> Num_T  Chop(const Num_T& A, double epsilon=1e-12){
+template <class Num_T> Num_T  Chop(const Num_T& A, double epsilon=1e-12){ // {{{
   if (abs(A)<epsilon){
     return 0;
   } else {
     return A;
   }
-}
-template <class Num_T> itpp::Vec<Num_T > Chop(const itpp::Vec<Num_T>& A, double epsilon=1e-12){
+} // }}}
+template <class Num_T> itpp::Vec<Num_T > Chop(const itpp::Vec<Num_T>& A, double epsilon=1e-12){ // {{{
   itpp::Vec<Num_T > tmp(A.size());
   for (int i=0; i<A.size(); i++){
     tmp(i)=Chop(A(i));
   }
   return tmp;
-}
-template <class Num_T> itpp::Mat<Num_T > Chop(const itpp::Mat<Num_T>& A, double epsilon=1e-12){
+} // }}}
+template <class Num_T> itpp::Mat<Num_T > Chop(const itpp::Mat<Num_T>& A, double epsilon=1e-12){ // {{{
   itpp::Mat<Num_T > tmp(A.rows(),A.cols());
   for (int r=0; r<A.rows(); r++){
     for (int c=0; c<A.cols(); c++){
@@ -1263,29 +1263,29 @@ template <class Num_T> itpp::Mat<Num_T > Chop(const itpp::Mat<Num_T>& A, double 
     }
   }
   return tmp;
-}
-template <class Num_T, class Cosa> itpp::Array<Num_T > ElementwiseAddInFirstElement(const Cosa joda, const itpp::Array<Num_T>& A){
+} // }}}
+template <class Num_T, class Cosa> itpp::Array<Num_T > ElementwiseAddInFirstElement(const Cosa joda, const itpp::Array<Num_T>& A){ // {{{
   itpp::Array<Num_T> tmp(A.size());
   for (int i=0; i<A.size(); i++){
     tmp(i)=itpp::concat(joda, A(i));
   }
   return tmp;
-}
-template <class Num_T> itpp::Array<Num_T > ElementwiseRemoveFirstElement(const itpp::Array<Num_T>& A){
+} // }}}
+template <class Num_T> itpp::Array<Num_T > ElementwiseRemoveFirstElement(const itpp::Array<Num_T>& A){ // {{{
   itpp::Array<Num_T > tmp(A.size());
   for (int i=0; i<A.size(); i++){
     tmp(i)=A(i)(1,A(i).size()-1);
   }
   return tmp;
-}
-template <class Num_T> itpp::Array<Num_T > Elementwiseconcat(const Num_T& A, const itpp::Array<Num_T >& B){
+} // }}}
+template <class Num_T> itpp::Array<Num_T > Elementwiseconcat(const Num_T& A, const itpp::Array<Num_T >& B){ // {{{
   itpp::Array<Num_T > tmp(B.size());
   for (int i=0; i<B.size(); i++){
     tmp(i)=itpp::concat(A,B(i));
   }
   return tmp;
-}
-itpp::ivec Modulize(const itpp::ivec& intvec,const itpp::ivec n){
+} // }}}
+itpp::ivec Modulize(const itpp::ivec& intvec,const itpp::ivec n){ // {{{
   itpp::Vec<int> tmp(intvec.size());
   for (int i =0;i<intvec.size();i++){
     tmp(i)=intvec(i)%n(i);
@@ -1294,8 +1294,8 @@ itpp::ivec Modulize(const itpp::ivec& intvec,const itpp::ivec n){
     }
   }
   return tmp;
-}
-itpp::ivec Modulize(const itpp::ivec& intvec,const int n){
+} // }}}
+itpp::ivec Modulize(const itpp::ivec& intvec,const int n){ // {{{
   itpp::Vec<int> tmp(intvec.size());
   for (int i =0;i<intvec.size();i++){
     tmp(i)=intvec(i)%n;
@@ -1304,57 +1304,57 @@ itpp::ivec Modulize(const itpp::ivec& intvec,const int n){
     }
   }
   return tmp;
-}
-itpp::Array<itpp::ivec> Modulize(const itpp::Array<itpp::ivec>& intvec,const itpp::ivec n){
+} // }}}
+itpp::Array<itpp::ivec> Modulize(const itpp::Array<itpp::ivec>& intvec,const itpp::ivec n){ // {{{
   itpp::Array<itpp::ivec> tmp(intvec.size());
   for (int i =0;i<intvec.size();i++){
     tmp(i)=Modulize(intvec(i), n);
   }
   return tmp;
-}
-itpp::Array<itpp::ivec> Modulize(const itpp::Array<itpp::ivec>& intvec,const int n){
+} // }}}
+itpp::Array<itpp::ivec> Modulize(const itpp::Array<itpp::ivec>& intvec,const int n){ // {{{
   itpp::Array<itpp::ivec> tmp(intvec.size());
   for (int i =0;i<intvec.size();i++){
     tmp(i)=Modulize(intvec(i), n);
   }
   return tmp;
-}
-itpp::Mat<int> Modulize(const itpp::Mat<int>& set_of_vectors,const int n){
+} // }}}
+itpp::Mat<int> Modulize(const itpp::Mat<int>& set_of_vectors,const int n){ // {{{
   itpp::Mat<int> tmp(set_of_vectors.rows() ,set_of_vectors.cols() );
   for (int i=0; i < set_of_vectors.rows(); i++){
     tmp.set_row(i,Modulize(set_of_vectors.get_row(i),n) );
   }
   return tmp;
-}
-itpp::Array<itpp::ivec> DeScale(const itpp::Array<itpp::ivec>& set_of_vectors,const int scale_factor){
+} // }}}
+itpp::Array<itpp::ivec> DeScale(const itpp::Array<itpp::ivec>& set_of_vectors,const int scale_factor){ // {{{
   itpp::Array<itpp::ivec> tmp(set_of_vectors.size());
   for (int i=0; i < set_of_vectors.size(); i++){
     tmp(i)=set_of_vectors(i)/scale_factor;
   }
   return tmp;
-}
-itpp::Array<itpp::ivec> Scale(const itpp::Array<itpp::ivec>& set_of_vectors,const int scale_factor){
+} // }}}
+itpp::Array<itpp::ivec> Scale(const itpp::Array<itpp::ivec>& set_of_vectors,const int scale_factor){ // {{{
   itpp::Array<itpp::ivec> tmp(set_of_vectors.size());
   for (int i=0; i < set_of_vectors.size(); i++){
     tmp(i)=scale_factor*set_of_vectors(i);
   }
   return tmp;
-}
-itpp::Array<itpp::ivec> Displace(const itpp::Array<itpp::ivec>& set_of_vectors,const itpp::ivec displacement_vector){
+} // }}}
+itpp::Array<itpp::ivec> Displace(const itpp::Array<itpp::ivec>& set_of_vectors,const itpp::ivec displacement_vector){ // {{{
   itpp::Array<itpp::ivec> tmp(set_of_vectors.size());
   for (int i=0; i < set_of_vectors.size(); i++){
     tmp(i)=set_of_vectors(i)+displacement_vector;
   }
   return tmp;
-}
-itpp::Mat<int> Displace(const itpp::Mat<int>& set_of_vectors,const itpp::Vec<int> displacement_vector){
+} // }}}
+itpp::Mat<int> Displace(const itpp::Mat<int>& set_of_vectors,const itpp::Vec<int> displacement_vector){ // {{{
   itpp::Mat<int> tmp(set_of_vectors.rows() ,set_of_vectors.cols() );
   for (int i=0; i < set_of_vectors.rows(); i++){
     tmp.set_row(i,set_of_vectors.get_row(i)+displacement_vector);
   }
   return tmp;
-}
-itpp::Array<itpp::ivec> DisplaceScaleModulize( const itpp::Array<itpp::ivec>& set_of_vectors,const itpp::ivec displacement_vector, const int scale_factor, const int n){
+} // }}}
+itpp::Array<itpp::ivec> DisplaceScaleModulize( const itpp::Array<itpp::ivec>& set_of_vectors,const itpp::ivec displacement_vector, const int scale_factor, const int n){ // {{{
   itpp::Array<itpp::ivec> tmp(set_of_vectors.size());
   for (int i=0; i < set_of_vectors.size(); i++){
     tmp(i)=set_of_vectors(i);
@@ -1364,15 +1364,15 @@ itpp::Array<itpp::ivec> DisplaceScaleModulize( const itpp::Array<itpp::ivec>& se
   }
   return tmp;
 
-}
-template <class Num_T> itpp::Array<Num_T*> to_pointers_1(itpp::Array<Num_T>& v){
+} // }}}
+template <class Num_T> itpp::Array<Num_T*> to_pointers_1(itpp::Array<Num_T>& v){ // {{{
   itpp::Array<Num_T*> result(v.size());
   for (int i=0; i<v.size(); i++){
     result(i)=&(v(i));
   }
   return result;
-}
-template <class Num_T> itpp::Array<itpp::Array<Num_T*> > to_pointers_2(itpp::Array<itpp::Array<Num_T> >& v){
+} // }}}
+template <class Num_T> itpp::Array<itpp::Array<Num_T*> > to_pointers_2(itpp::Array<itpp::Array<Num_T> >& v){ // {{{
   itpp::Array<itpp::Array<Num_T*> > result(v.size());
   for (int i=0; i<v.size(); i++){
     result(i).set_size(v(i).size());
@@ -1381,7 +1381,7 @@ template <class Num_T> itpp::Array<itpp::Array<Num_T*> > to_pointers_2(itpp::Arr
     }
   }
   return result;
-}
+} // }}}
 // }}}
 // 2D grid specialized functions {{{
 itpp::ivec GetBlock(const itpp::Array<itpp::ivec>& positions, const int length_cell, const int length_grid){
