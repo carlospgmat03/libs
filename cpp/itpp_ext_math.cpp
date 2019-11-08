@@ -1708,6 +1708,41 @@ itpp::cvec RandomState(unsigned int dim){ // {{{
   itpp::cvec tmp=itpp::randn_c(dim);
   return tmp/norm(tmp);
 } // }}}
+itpp::cvec RandomSeparableState(unsigned int q){ // {{{
+//   std::cout << "entrando a RandomSeparableState, q= " << q <<std::endl;
+  int dim=cfpmath::pow_2(q);
+  itpp::cmat z=itpp::randn_c(q,2);
+//   z(0,0)=0;
+//   z(0,1)=1;
+//   z(1,1)=0;
+//   z(2,1)=0;
+//   z(3,1)=0;
+//   z(1,0)=0;
+//   z(2,0)=0;
+//   z(3,0)=1;
+  itpp::cvec psi(dim);
+  std::complex<double> c;
+//   std::cout << "z=" << z << std::endl;
+
+  for (int i=0; i< dim; i++){
+    c=1;
+//     std::cout << "i=" << i << std::endl;
+    for (int b=0; b<q; b++){
+//        std::cout << "test result:" << cfpmath::test_bit(i,b) << std::endl;
+      if (cfpmath::test_bit(i,b)){
+        c*=z(b,0);
+//         std::cout << "In 0 " << b << std::endl;
+      } else {
+        c*=z(b,1);
+//         std::cout << "In 1 " << b << std::endl;
+      }
+    }
+    psi(i)=c;
+  }
+//   psi= psi/norm(psi);
+//   std::cout << "norma = " << norm(psi) << std::endl;
+  return psi/norm(psi);
+} // }}}
 itpp::cvec BasisState(unsigned int dim, unsigned int basis_number){ // {{{
   itpp::cvec tmp(dim);
   tmp.zeros();

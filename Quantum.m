@@ -122,6 +122,7 @@ EvolvGate::usage="EvolvGate[Gate_, steps_, env_, state_]... Evoluciona cualquier
 MakeQuantumChannel::usage="MakeQuantumChannel[Gate_, steps_, env_] Donde Gate va de la forma Gate[#, otherparameters_]  donde debe ponerse # en el lugar donde Gate toma el estado"
 SumPositiveDerivatives::usage="SumPositiveDerivatives[list_] Suma todas las contribuciones list(max)-list(min) sucesivos cuando la derivada es positiva"
 GHZ::usage="GHZ[qu_] Creates a GHZ state, |000000\[RightAngleBracket]+|111111\[RightAngleBracket]"
+Wstate::usage="Wstate[n_] Creates a W state, (|10...0>+|010...0>+...+|0...01>)/sqrt{n}"
 RandomMixedState::usage="RandomMixedState[n_,combinations_], Constructs a Random mixed state of diemnsion n with random uniform combinations of pure states wti Haar measure."
 GellMann::usage = "GellMann[n_] Generalized Gell-Mann matrices from https://blog.suchideas.com/2016/04/sun-gell-mann-matrices-in-mathematica/ For example
 for n=2 it gives Pauli matrices, don't forget to add identity by yourself in need a complete basis."
@@ -610,8 +611,11 @@ sum=sum+list[[i+1]]-list[[i]];
 {i,1,Length[list]-1}];
 sum]
 (* }}} *)
-(* {{{ *)
+(* {{{  GHZ *)
 GHZ[qu_]:=1/Sqrt[2]Table[If[i==0||i==2^qu-1,1,0],{i,0,2^qu-1}]
+(* }}} *)
+(* {{{  W state *)
+Wstate[n_] := Sum[BasisState[Power[2, m], Power[2, n]], {m, 0, n - 1}]/Sqrt[n]
 (* }}} *)
 (* }}} *)
 (*{{{*)ArbitratyPartialTrace[hilbertdimrem_, hilbertdimkeep_, M_] := 

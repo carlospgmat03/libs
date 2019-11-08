@@ -68,7 +68,10 @@ inline int set_bit(const int a, const int bit){// {{{
   return (a | pow_2(bit));// debo usar el or
 }// }}}
 inline bool test_bit(const int a, const int bit){// {{{
-  return (a & pow_2(bit));// debo usar el or
+  bool r=(a & pow_2(bit));
+//   std::cout << "(a,bit)=(" <<a << "," <<bit<< "); " ;
+//   std::cout << "test_bit(a,bit)=" << r<< std::endl;
+  return r;// debo usar el or
 }// }}}
 inline int remove_bit(const int n, const int bit_position){// {{{
   int n_first_bits = n & (pow_2(bit_position)-1);
