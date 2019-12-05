@@ -130,6 +130,7 @@ ApplySwap::usage= "ApplySwap[State,Target1,Target2] Applies Swap map betwen the 
 ApplySwapPure::usage = "Leaves the state in ket form if pure"
 ApplyLocalNoiseChain::usage = "ApplyLocalNoiseChain[State,p] Applies the map that transforoms the density matrix State into the assessible density matrix when local noise is present using fuzzy measurements."
 ApplyNoiseChain::usage = "ApplyNoiseChain[State,p] Applies the map that transforoms the density matrix State into the assessible density matrix when non-local noise is present using fuzzy measurements."
+PermutationMatrices::usgae = "Argument is the number of particles to permute, output is a list of matrices."
 (* }}} *)
 (* }}} *)
 Begin["Private`"] 
@@ -701,6 +702,7 @@ ApplyNoiseChain[State_?VectorQ,p_]:=Module[{qubits},
 qubits=IntegerPart[Log2[Dimensions[State][[1]]]];
 p Proyector[State]+2(1-p)/(qubits(qubits-1))(Sum[ApplySwap[State,i,j],{i,1,qubits},{j,i+1,qubits}])
 ];
+PermutationMatrices[n_]:=PermutationMatrix/@Permutations[Range[n]];
 (*}}}*)
 (*}}}*)
 End[] 
