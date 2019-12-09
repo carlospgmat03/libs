@@ -8,8 +8,12 @@ LIBS=`itpp-config --static --libs`
 NVCCFLAGS= -arch=sm_13
 INCLUDES := -I. -I ../
 
+default:: clean test_spins
+
+all:: clean documentation test_spins test_spins_fast test_memory_time test_spins2d test_rmt basic_libs.tgz testing test_dev_random
+
 documentation ::
-	doxygen
+	@doxygen ./Doxyfile
 # register:: register.cpp
 # 	$(CXX) -I../ $(CXXFLAGS) -o $@ $@.cpp $(LIBS)
 
@@ -27,16 +31,20 @@ test_spins2d:: test_spins2d.cpp
 	$(CXX) -I../  $(CXXFLAGS) $< -Wall -o $@ $(LIBS)
 
 test_spins_fast :: test_spins.cpp
-	$(CXX) -O3  -march=corei7-avx -mtune=corei7-avx -fomit-frame-pointer -I../ -I . $(INCLUDETCLAP) $(CXXFLAGS) -o $@ test_spins.cpp $(LIBS)
+	$(CXX) -O3  -march=native -fomit-frame-pointer -I../ -I . $(INCLUDETCLAP) $(CXXFLAGS) -o $@ test_spins.cpp $(LIBS)
 
 test_spins:: test_spins.cpp
 	$(CXX)  -Wall -I../ -I . $(INCLUDETCLAP) $(CXXFLAGS) -o $@ $@.cpp $(LIBS)
 
-test_dev_random_kanbalam :: test_dev_random
-	bsub  -oo salida -eo error -q pruebas -n 5 srun ./test_dev_random
+test_dev_random:: test_dev_random.cpp
+	$(CXX)  -Wall -I../ -I . $(INCLUDETCLAP) $(CXXFLAGS) -o $@ $@.cpp $(LIBS)
 
-testing :: testing.cpp ../cpp/cfp_math.cpp $(MYCPP)/cpp/itpp_ext_math.cpp
-	$(CXX)  -o $@ -I $(MYCPP) -litpp $@.cpp
+#test_dev_random_kanbalam :: test_dev_random
+#	bsub  -oo salida -eo error -q pruebas -n 5 srun ./test_dev_random
+
+testing :: testing.cpp cfp_math.cpp itpp_ext_math.cpp
+	$(CXX) -I../ -I . -o $@ $@.cpp $(LIBS)
+	#$(CXX)  -o $@ -I $(MYCPP) -litpp $@.cpp
 
 % :: %.cpp
 	$(CXX) $< -Wall -o $@ -I $(MYCPP) -litpp
@@ -46,3 +54,17 @@ test_rmt:: test_rmt.cpp
 
 basic_libs.tgz :: cfp_math.cpp cfp_math.h dev_random.cpp itpp_ext_math.cpp itpp_ext_math.h purity_RMT.cpp purity_RMT.h RMT.cpp RMT.h spinchain.cpp
 	tar -cvzf $@ $^
+
+.PHONY: clean
+
+clean::
+	rm -f test_spins
+	rm -f test_spins2d
+	rm -f test_memory_time
+	rm -f test_rmt
+	rm -f test_spins_fast
+	rm -f testing
+	rm -f test_dev_random
+	rm -f basic_libs.tgz
+	rm -rf doc
+	echo Clean done

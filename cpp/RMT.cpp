@@ -4,7 +4,7 @@
 
 #include <itpp/itbase.h>
 #include <itpp/stat/misc_stat.h>
-#include <cpp/itpp_ext_math.cpp> 
+#include "itpp_ext_math.cpp" 
 #include "RMT.h"
 namespace RMT{ // {{{ Headers
   itpp::mat RandomGOEDeltaOne(int const );
