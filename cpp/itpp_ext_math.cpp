@@ -3,6 +3,8 @@
 #define ITPP_EXT_MATH_VARIOUS
 #include "itpp_ext_math.h"
 #include "cfp_math.cpp"
+#include <algorithm>    // std::next_permutation, std::sort
+
 // #include <purity_RMT.cpp>
 #include <itpp/itbase.h>
 #include <itpp/stat/misc_stat.h>
@@ -26,6 +28,28 @@ namespace itppextmath{ // {{{
     return tmp;
   } // }}}
   // number theoretical
+template <class Num_T> int counter_elements_close_fixed_value(itpp::Vec<Num_T> v, Num_T x, double epsilon){ //{{{
+int counter=0;
+for (int i=0; i< v.size(); i++){
+  if( abs(v(i)-x) < epsilon) counter++;
+}
+return counter;
+
+} // }}}
+template <class Num_T> itpp::bmat zero_non_zero(itpp::Mat<Num_T> m, double epsilon){ //{{{
+  int mr =  m.rows();
+  int mc =  m.cols();
+  itpp::bmat z(mr,mc);
+  z=1;
+//   std::cout << "hola (mr,mc)=(" << mr << "," << mc << ")" << std::endl;
+  for (int i=0; i< mr; i++){
+    for (int j=0; j< mc; j++){
+//       std::cout << "hola " << i << ", " << j << std::endl;
+      if(abs(m(i,j))< epsilon) z(i,j)=0;
+    }
+  }
+return z;
+} // }}}
 // Inquiry {{{
 template <class Num_T> int locateLargestAbs(const itpp::Vec<Num_T>& e){ // {{{
   int position=0;
@@ -78,6 +102,27 @@ bool DoTheyIntersect(const itpp::Array< itpp::ivec >& Array1, const itpp::Array<
   }
   return false;
 } //}}}
+double test_similar_complex_list(itpp::cvec& z1, itpp::cvec& z2){ // {{{
+  if (z1.size() != z2.size()){
+    std::cerr << "En test_similar_complex_list, tamaños diferentes" << std::endl;
+    return z1.size() + z2.size();
+  }
+  double error=0., e;
+  int dim = z1.size(), min_pos; 
+  itpp::cvec zt = z2;
+  itpp::Vec<bool> checked(dim);
+  itpp::vec errors;
+  for (int i=0; i<dim; i++){
+    errors = abs(zt-z1(i));
+//     min_index(errors);
+    error += min(errors, min_pos);
+//     error+=e;
+    zt.del(min_pos);
+  }
+// std::complex<double> z;
+  return error;
+
+} // }}}
 template <class Num_T> bool AreEqual_modulo_order(const itpp::Array<Num_T >& a1, const itpp::Array<Num_T >& a2){// {{{
 //! Routine to check if two arrays are equal.
 /*! It must be superseeded by the operator ==, but I still dont know how
@@ -95,6 +140,12 @@ template <class Num_T> int total_elements_depth_2(const itpp::Array<Num_T >& v){
 } //}}}
 template <class Num_T> Num_T Last(const itpp::Array<Num_T >& v){// {{{
   return v(v.length()-1);
+} //}}}
+template <class Num_T> int Position_FirstIntersection(const itpp::Vec<Num_T >& v, const Num_T& e){// {{{
+  for (int i=0; i<v.size();i++){ if (e==v(i)) return i; }
+  std::cerr << "Not found in Position_FirstIntersection\n";
+  abort();
+  return -1;
 } //}}}
 template <class Num_T> int Position_FirstIntersection(const itpp::Array<Num_T >& v, const Num_T& e){// {{{
   for (int i=0; i<v.size();i++){ if (e==v(i)) return i; }
@@ -241,11 +292,13 @@ template <class Num_T> itpp::Array<Num_T > Shuffle(const itpp::Array<Num_T >& vc
   for (int i=1; i<v.size(); i++){ v.swap(i,itpp::randi(0,i)); }
   return v;
 } //}}}
-template <class Num_T> void swap(itpp::Vec<Num_T >& v, int& p1, int& p2){ // {{{
+template <class Num_T> void swap(itpp::Vec<Num_T >& v, const int p1, const int p2){ // {{{
+//   std::cout << "Entrando en el swap. v=" << v << ", p1=" << p1 << ", p2=" << p2 << std::endl;
   Num_T x;
   x=v(p1);
   v(p1)=v(p2);
   v(p2)=x;
+//   std::cout << "saliendo  del swap. v=" << v << ", p1=" << p1 << ", p2=" << p2 << std::endl;
   return ;
 } //}}}
 template <class Num_T> itpp::Array<Num_T > CircularRotateRight(const itpp::Array<Num_T >& v){ // {{{
@@ -288,8 +341,396 @@ itpp::cmat Reorder_state_tensor_form(itpp::cvec vector,int which){ // {{{
   return out;
 } // }}}
 // }}}
+// set manipulation and permutations {{{
+// itpp::Array<itpp::ivec> all_permutations(vec p){
+itpp::ivec next_permutation(const itpp::ivec& v){ // {{{
+
+  int n = v.size();
+  itpp::ivec w(n);
+  int myints[n];
+  for (int i=0; i<n; i++){
+      myints[i] = v(i);
+  } 
+  std::next_permutation(myints,myints+n);
+  for (int i=0; i<n; i++){
+      w(i)=myints[i];
+  } 
+
+return w;
+} // }}}
+itpp::Array<itpp::ivec> SingleTwoPermutation(int i, int j){ // {{{
+  itpp::Array<itpp::ivec> permutation(1);
+  permutation(0)=itpp::vec_2(i,j);
+  return permutation;
+} // }}}
+itpp::Array<itpp::ivec> ChangeNotationPermutation(const itpp::ivec& cycle){ // {{{
+  // https://www.youtube.com/watch?v=MpKG6FmcIHk
+  // el algoritmo comienza por 
+//   cout << "En la rutina jodida  ChangeNotationPermutation cycle=" << cycle <<endl; 
+  int q=cycle.size();
+  itpp::Array<itpp::ivec> permutation_cycle_notation(0);
+  itpp::Vec<bool> checked(q);
+  checked = false;
+  int current_position=0;
+
+  itpp::ivec current_cycle;
+
+//   cout << "2 En la rutina jodida  ChangeNotationPermutation " <<endl; 
+  while ( current_position <q){
+    current_cycle.set_size(0);
+//     cout << "En el while. current_position=" << current_position << endl;
+    while (!checked(current_position)){
+      current_cycle = concat(current_cycle,current_position);
+      checked(current_position) = true;
+      current_position = cycle(current_position);
+//       cout << "En el while while. current_position=" << current_position << endl;
+    }
+//     cout << "Sali del while interno. current_cycle=" << current_cycle<< endl;
+    if(current_cycle.size()>1){
+      permutation_cycle_notation = concat(permutation_cycle_notation, current_cycle);
+    }
+    current_position++;
+  }
+  return permutation_cycle_notation;
+} // }}}
+void all_permutations(int q){ // {{{
+// for (int i=0, p.size(); i++){
+// p(i) concatenado con las permutaciones de p(sin la i)
+// }
+// https://stackoverflow.com/questions/32678349/all-permutations-c-with-vectorint-and-backtracking
+ int myints[] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19};
+
+//         vector<int> v = { 1, 2, 3, 4 };
+//   std::sort (myints,myints+3);
+
+//   std::cout << "The 3! possible permutations with 3 elements:\n";
+  do {
+//     std::cout << myints << '\n';
+    for (int i=0; i<q; i++){
+      std::cout << myints[i] <<" " ;
+    } 
+    std::cout << std::endl;
+//     std::cout << myints[0] << ' ' << myints[1] << ' ' << myints[2] << '\n';
+  } while ( std::next_permutation(myints,myints+q) );
+
+  std::cout << "After loop: " << myints[0] << ' ' << myints[1] << ' ' << myints[2] << '\n';
+
+//   itpp::ivec v="1 2 3";
+// //     std::vector<int> v = {1,2,3};
+//     do {
+// //         print(v);
+// 
+// 
+//     std::cout << v << std::endl;
+// //     for (int e : v) {
+// //         std::cout << " " << e;
+// //     }
+// //     std::cout << std::endl;
+// 
+//     } while (std::next_permutation(v.begin(), v.end()));
+return;
+} // }}}
+template <class Num_T> void interchange_permutations_2line(itpp::Vec<Num_T>& b, const itpp::ivec &p){ // {{{
+  // This routine makes a permutation on vector b, coded with vector p. 
+  // If 
+  // b = [45 89 22 31 23 76]
+  // and
+  // p = [5 3 2 1 0 4]
+  //
+  // Then the element b(0)=45 will go to position p(0)=5
+  // element b(1)=89 will go to position p(1)=3
+  // etc
+  // so the permuted b will be 
+  // b -> [23 31 22 89 76 45]
+  if(b.size() != p.size()){
+    std::cerr << "interchange_permutations() in cfpmath: dimension mismatch" << std::endl;
+    abort();
+  }
+  Num_T temp;
+  itpp::ivec q=p;
+  int qtmp;
+  for (int k = 0; k < q.size(); k++) {
+    while (q(k) != k){
+      qtmp=q(k);
+      swap(q,k,qtmp);
+      swap(b,k,qtmp);
+    }
+  }
+} 
+// }}}
+template <class Num_T> void interchange_permutations_cycle(itpp::Vec<Num_T>& b, const itpp::ivec &c){ // {{{
+  // This routine makes a permutation on vector b, coded with cycle c. 
+  // If 
+  // b = [45 89 22 31 23 76]
+  // and
+  // c = [4 1 2]
+  //
+  // b = [45 23 89 31 22 76]
+  // so that what is in position c(i) goes to position c(i+1)
+  // e.g. what is in position c(0)=4, that is p(c(0))=p(4) goes to position c(1)=1
+  // e.g. what is in position c(1)=1,  goes to position c(2)=2
+  // e.g. what is in position c(2)=2,  goes to position c(3)=c(0)=4
+//   Num_T temp;
+//   itpp::ivec q=p;
+//   int qtmp;
+  itpp::Vec<Num_T> b_sub=b.get(c);
+  b_sub.shift_right(b_sub(b_sub.size()-1)) ;
+  for (int k=0; k<c.size(); k++){
+    b(c(k))=b_sub(k);
+  }
+} 
+// }}}
+int interchange_bits_2line(const int& n_in, const itpp::ivec &p){ // {{{
+  // See documentaiton for 
+  // void interchange_permutations_2line 
+  // and for 
+  // interchange_bits_cycle
+  int n = n_in;
+  itpp::Vec<bool> nbits=int_to_bool(n, p.size());
+//   std::cout << "Control 1 " << nbits << ", " << c << std::endl;
+  interchange_permutations_2line(nbits, p);
+//   std::cout << "Control 2 " << std::endl;
+  n = bvec_to_int(nbits);
+//   std::cout << "Control 3 " << std::endl;
+  return n;
+} 
+// }}}
+int interchange_bits_cycle(const int& n_in, const itpp::ivec &c){ // {{{
+  // This routine makes a permutation on integer n, coded with cycle c. 
+  // If 
+  // n = 16 = 010000 = [0 0 0 0 1 0 0 ...]
+  // and
+  // c = [3 4 1 2]
+  //
+  // b = [0 1 0 0 0 ... ] = 00010 = 2
+  int n = n_in;
+  int size = cfpmath::integer_part_log(2,n);
+  if (max(c)+1 > size){ size=max(c)+1; 
+//     std::cout << size << std::endl; 
+  }
+  itpp::Vec<bool> nbits=int_to_bool(n, size);
+//   std::cout << "Control 1 " << nbits << ", " << c << std::endl;
+  interchange_permutations_cycle(nbits, c);
+//   std::cout << "Control 2 " << std::endl;
+  n = bvec_to_int(nbits);
+//   std::cout << "Control 3 " << std::endl;
+  return n;
+} 
+// }}}
+int interchange_bits_permutation(const int& n_in, const itpp::Array<itpp::ivec> &c){ // {{{
+  // This routine makes a permutation on integer n, coded with cycle c. 
+  // If 
+  // n = 16 = 010000 = [0 0 0 0 1 0 0 ...]
+  // and
+  // c = [3 4 1 2]
+  //
+  // b = [0 1 0 0 0 ... ] = 00010 = 2
+  int n = n_in;
+  for (int i=0; i< c.size(); i++){
+    n = interchange_bits_cycle(n, c(i));
+  }
+  return n;
+} 
+// }}}
+template <class Num_T> itpp::Mat<Num_T > ArrayToMatrix(const itpp::Array<itpp::Vec<Num_T> >& A){// {{{
+//   itpp::Mat<Num_T > tmp;
+  itpp::Mat<Num_T > tmp(A.size(),A(0).size());
+  for (int i=0; i<A.size(); i++){
+    tmp.set_row(i,A(i));
+  }
+  return tmp; 
+  
+}// }}}
+template <class Num_T> itpp::Mat<Num_T > OuterSum(const itpp::Vec<Num_T >& A, const itpp::Vec<Num_T >& B){// {{{
+  itpp::Mat<Num_T > tmp(A.size(), B.size());
+  for (int iA=0; iA<A.size(); iA++){
+    for (int iB=0; iB<A.size(); iB++){
+      tmp(iA, iB)=A(iA)+B(iB);
+    }
+  }
+  return tmp; 
+}// }}}
+template <class Num_T> itpp::Array<Num_T > Outer(const itpp::Array<Num_T >& A, const itpp::Array<Num_T >& B){// {{{
+  itpp::Array<Num_T > tmp(0);
+  for (int i=0; i<A.size(); i++){
+    tmp=itpp::concat(tmp, Elementwiseconcat(A(i),B));
+  }
+  return tmp; 
+  
+}// }}}
+template <class Num_T> bool unique_elements(const Num_T & A){// {{{
+  return A.size() == Union(A).size();
+}// }}}
+template <class Num_T> Num_T Union(const Num_T & A){// {{{
+  if (A.size() == 0){
+    return A;
+  }
+  Num_T tmp(1);
+  tmp(0) = A(0);
+  for (int i = 1; i< A.size(); i++){
+    if (!Contains(tmp, A(i))){ tmp = itpp::concat(tmp, A(i)); }
+  }
+  return tmp;
+}// }}}
+template <class Num_T> itpp::Array<Num_T > Union(const itpp::Array<Num_T >& A, const itpp::Array<Num_T >& B){// {{{
+  if (A.size() == 0){
+    return Union(B);
+  }
+  itpp::Array<Num_T > tmp;
+  tmp.set_size(1); 
+  tmp(0) = A(0);
+  for (int i = 1; i< A.size(); i++){
+    if (!Contains(tmp, A(i))){ tmp = itpp::concat(tmp, A(i)); }
+  }
+  for (int i = 0; i< B.size(); i++){
+    if (!Contains(tmp, B(i))){ tmp = itpp::concat(tmp, B(i)); }
+  }
+  return tmp;
+}// }}}
+template <class Num_T> itpp::Array<Num_T > del(const itpp::Array<Num_T >& A, const int i){// {{{
+  int sA = A.size();
+  if (i==0){
+    if (sA==1){
+      itpp::Array<Num_T > tmp(0);
+      return tmp;
+    } else {
+      return A(1,sA-1);
+    }
+  } else if (i==sA -1) {
+    return A(0,i-1);
+  } else {
+    return itpp::concat(A(0,i-1),A(i+1,sA-1));
+  }
+}// }}}
+template <class Num_T> itpp::Array<Num_T > minus(const itpp::Array<Num_T >& A, const Num_T & B){// {{{
+  itpp::Array<Num_T > A_Union=Union(A);
+  if (!Contains(A_Union,B)){ 
+    return A_Union;
+  } else {
+    int pi=Position_FirstIntersection(A_Union,B);
+    return del(A_Union,pi);
+  }
+}// }}}
+template <class Num_T> itpp::Array<Num_T > minus(const itpp::Array<Num_T >& A, const itpp::Array<Num_T >& B){// {{{
+  itpp::Array<Num_T > A_union=Union(A), tmp;
+  for (int i = 0; i< A_union.size(); i++){
+    if (!Contains(B, A_union(i))){ tmp = itpp::concat(tmp, A_union(i)); }
+  }
+  return tmp ;
+}// }}}
+bool EmptyIntersection(const itpp::Array< itpp::ivec >& Array1, const itpp::Array< itpp::ivec >& Array2){// {{{
+//! Stablish if 2 Arrays have an intersection
+/*! It treat them as sets.  
+ */
+  for (int i=0; i<Array1.size(); i++){
+    if ( itppextmath::Contains(Array2, Array1(i) )){
+      return false;
+    }
+  } 
+  return true;
+}// }}}
+itpp::Array< itpp::ivec > Intersection(const itpp::Array< itpp::ivec >& Array1, const itpp::Array< itpp::ivec >& Array2){// {{{
+//! Get intersection of two arrays. 
+/*! It treat them as sets.  
+ */
+  itpp::Array<itpp::ivec> tmp; 
+  for (int i=0; i<Array1.size(); i++){
+    if ( itppextmath::Contains(Array2, Array1(i) )){
+      tmp=itpp::concat(tmp,Array1(i));
+    }
+  } 
+  return Union(tmp);
+}// }}}
+template <class Num_T> itpp::Array<Num_T > RemoveItem(const itpp::Array<Num_T >& v, const int index){// {{{
+  if (index < 0 || index > v.size()-1){
+    std::cerr << "Something wrong in RemoveItem\n";
+    abort();
+  }
+  if (v.size()==1){return itpp::Array<Num_T >(0);}
+  if (index == 0){ return v( 1, v.size()-1);}
+  if (index == v.size()-1){ return v(0, v.size()-2);}
+  return itpp::concat(v(0, index -1), v(index + 1, v.size()-1));
+}// }}}
+template <class Num_T> itpp::Array<Num_T > RemoveItem(const itpp::Array<Num_T >& v, const itpp::ivec& indices){// {{{
+  itpp::Array<Num_T > tmp = v;
+  itpp::ivec indices_sorted = indices;
+  itpp::sort(indices_sorted);
+  for (int i =indices.size()-1; i>=0; i--){ tmp=RemoveItem(tmp,indices(i)); }
+  return tmp;
+}// }}}
+itpp::Mat<int>  BulkPositionUnion2PositionSets(const itpp::Mat<int>& A, const itpp::Mat<int>& B){// {{{
+  return itpp::concat_vertical(A,B);
+}// }}}
+// }}}
 // Linear Algebra {{{
-// Traces and Partial traces
+// Vectorization of density matrices. 
+itpp::vec vectorization_density_matrix(const itpp::cmat& rho){ // {{{
+  // We use the gell man matrices, ordered as in https://blog.suchideas.com/2016/04/sun-gell-mann-matrices-in-mathematica/
+  int dim=rho.cols();
+  itpp::vec rho_vec(dim*dim-1);
+//   itpp::vec rho_vec(dim*dim);
+  int vector_index=0;
+  for (int i=1; i<dim; i++){
+    for (int j=0; j<i; j++){
+      rho_vec(vector_index)=2*real(rho(j,i));
+      rho_vec(vector_index+(dim*(dim-1)/2))=-2*imag(rho(j,i));
+//       cout << vector_index << ", " <<vector_index+(dim*(dim-1)/2) <<  endl;
+      vector_index++;
+    }
+  }
+  itpp::vec rho_diag = real(itpp::diag(rho));
+  double x,y;
+
+  y=sqrt((2.*(dim))/(dim+1));
+  for (int k=1; k<dim; k++){
+    y=-sqrt((2.*k)/(k+1));
+    x=-y/k;
+//     reconstruyendo 
+//     std::cout << "k="<<k<<";  x="<<x<<";    y="<<y<<std::endl;
+    rho_vec(k+dim*(dim-1)-1) = x*sum(rho_diag.get(0,k-1)) + rho_diag(k)*y;
+  }
+//   rho_vec(dim*dim-1)=
+  return rho_vec;
+
+} // }}}
+itpp::cmat devectorization_density_matrix(const itpp::vec& rho_vec){ // {{{
+  // We use the gell man matrices, ordered as in https://blog.suchideas.com/2016/04/sun-gell-mann-matrices-in-mathematica/
+  int dim=cfpmath::isqrt(rho_vec.size()+1);
+  std::complex<double> Im(0.,1.);
+  itpp::cmat rho(dim,dim);
+//   itpp::vec rho_vec(dim*dim);
+  int vector_index=0;
+  for (int i=1; i<dim; i++){
+    for (int j=0; j<i; j++){
+      rho(j,i)=(rho_vec(vector_index) - Im*rho_vec(vector_index+(dim*(dim-1)/2)))/2.;
+      rho(i,j)=conj(rho(j,i));
+//       rho_vec(vector_index)=2*real(rho(j,i));
+//       rho_vec(vector_index+(dim*(dim-1)/2))=2*imag(rho(j,i));
+//       cout << vector_index << ", " <<vector_index+(dim*(dim-1)/2) <<  endl;
+      vector_index++;
+    }
+  }
+//   itpp::vec rho_diag = real(itpp::diag(rho));
+  double y, x, rho_parcial=0.;
+  int r_index;
+
+  for (int k=dim-1; k > 0;  k--){
+    r_index = dim*dim - (dim-k)-1;
+    x = sqrt(2./(k*k+k));
+    y = -k*x;
+//     std::cout << "k="<<k<<";  x="<<x<<";    y="<<y<<std::endl;
+    rho(k,k) = (rho_vec(r_index) - x*( 1- rho_parcial))/(y-x);
+    rho_parcial += real(rho(k,k));
+//     std::cout << "r_index =" << r_index << std::endl;
+//     rho_vec(k+dim*(dim-1)) = (sum(rho_diag.get(0,k)) - rho_diag(k+1))*y;
+  }
+  rho(0,0)=1-rho_parcial;
+//   rho_vec(dim*dim-1)=
+  return rho;
+
+} // }}}
+//
+// Traces and Partial traces 
 itpp::cmat partial_trace(const itpp::cvec& state, int dim_leave){ // {{{
   // This partial trace allows to leave a space of arbitrary dimension. Let
   // H = H_a H_b be th ehilbert space. "i" labels H_a and "j" the H_b
@@ -830,6 +1271,9 @@ template <class Num_T> itpp::Vec<Num_T> get_column(const itpp::Array<itpp::Vec<N
   return tmp;
 } //}}}
 // Multiplication
+std::complex<double> expected_value(const itpp::cmat& A, const itpp::cvec& psi){ // {{{
+  return itpp::dot(conj(psi), A*psi);
+} // }}}
 template <class Num_T> itpp::Mat<Num_T> AtimesDiagB(const itpp::Mat<Num_T>& A, const itpp::Vec<Num_T>& B){ // {{{
   itpp::Mat<Num_T> tmp(A.cols(),A.rows());
   for (int i=0; i<tmp.cols(); i++){
@@ -844,7 +1288,7 @@ template <class Num_T> itpp::Mat<Num_T> AtimesDiagB(const itpp::Mat<Num_T>& A, c
 // } // }}}
 // }}}
 // Reporting {{{
-void PrintCompactHermitian(itpp::Mat<std::complex<double> >& rho){
+void PrintCompactHermitian(itpp::Mat<std::complex<double> >& rho){ // {{{
 	int dim=rho.cols();
 	std::cout <<" ";
 	for (int i =0; i< dim;i++){
@@ -854,9 +1298,30 @@ void PrintCompactHermitian(itpp::Mat<std::complex<double> >& rho){
 			std::cout <<real(rho(i,j))<<" "<<imag(rho(i,j)) << " ";
 		}
 	}
-}
+} // }}}
 // }}}
 // Bit manipulation {{{
+itpp::Array< itpp::vec> numbers_sorted_by_bits_on(int number_of_bits){ // {{{
+  int q=number_of_bits;
+  itpp::Array< itpp::vec> numeros_por_bits_on(q+1);
+  itpp::ivec entradas_metidas(q+1);
+  entradas_metidas=0;
+  int size_i, bits_on;
+  int dim=cfpmath::pow_2(q);
+  // Calculo de numeros con k qubits
+  for (int i=0; i<=q; i++){
+    size_i = cfpmath::factorial(q)/(cfpmath::factorial(i)*cfpmath::factorial(q-i));
+    numeros_por_bits_on(i).set_size(size_i);
+//         cout << i<<", "<< size_i << ", " << dim << endl;
+  }
+  for (int i=0; i<dim; i++){
+    bits_on = cfpmath::BitCount(i);
+//         cout << i<<", "<< bits_on << endl;
+    numeros_por_bits_on(bits_on)(entradas_metidas(bits_on)) = i;
+    entradas_metidas(bits_on)++;
+  }
+  return numeros_por_bits_on;
+}// }}}
 itpp::ivec IntegerDigits(int n,int base=2, int length=0){// {{{
   int number=n;
   int size=length;
@@ -874,7 +1339,18 @@ itpp::ivec IntegerDigits(int n,int base=2, int length=0){// {{{
   }
   return result;
 }// }}} Matrix=
-int bvec_to_int(itpp::bvec bool_array){// {{{
+itpp::ivec IntegerDigits(const int n, itpp::ivec base){// {{{
+  int number=n;
+  itpp::ivec result(base.size());
+  result=0;
+
+  for (int counter=0; counter<base.size(); counter++){
+    result(counter) = number%(base(counter));
+    number=(number - result(counter))/base(counter);
+  }
+  return result;
+}// }}} Matrix=
+int bvec_to_int(itpp::Vec<bool> bool_array){// {{{
   int tmp=0;
   for (int i=0; i<bool_array.size(); i++){
     if (bool_array(i)){
@@ -1048,21 +1524,21 @@ itpp::Mat<int>  BulkPositionUnion2PositionSets(const itpp::Mat<int>& A, const it
 }// }}}
 // }}}
 // Functional Element manipulation, on all elements {{{
-template <class Num_T> Num_T  Chop(const Num_T& A, double epsilon=1e-12){
+template <class Num_T> Num_T  Chop(const Num_T& A, double epsilon=1e-12){ // {{{
   if (abs(A)<epsilon){
     return 0;
   } else {
     return A;
   }
-}
-template <class Num_T> itpp::Vec<Num_T > Chop(const itpp::Vec<Num_T>& A, double epsilon=1e-12){
+} // }}}
+template <class Num_T> itpp::Vec<Num_T > Chop(const itpp::Vec<Num_T>& A, double epsilon=1e-12){ // {{{
   itpp::Vec<Num_T > tmp(A.size());
   for (int i=0; i<A.size(); i++){
     tmp(i)=Chop(A(i));
   }
   return tmp;
-}
-template <class Num_T> itpp::Mat<Num_T > Chop(const itpp::Mat<Num_T>& A, double epsilon=1e-12){
+} // }}}
+template <class Num_T> itpp::Mat<Num_T > Chop(const itpp::Mat<Num_T>& A, double epsilon=1e-12){ // {{{
   itpp::Mat<Num_T > tmp(A.rows(),A.cols());
   for (int r=0; r<A.rows(); r++){
     for (int c=0; c<A.cols(); c++){
@@ -1070,29 +1546,29 @@ template <class Num_T> itpp::Mat<Num_T > Chop(const itpp::Mat<Num_T>& A, double 
     }
   }
   return tmp;
-}
-template <class Num_T, class Cosa> itpp::Array<Num_T > ElementwiseAddInFirstElement(const Cosa joda, const itpp::Array<Num_T>& A){
+} // }}}
+template <class Num_T, class Cosa> itpp::Array<Num_T > ElementwiseAddInFirstElement(const Cosa joda, const itpp::Array<Num_T>& A){ // {{{
   itpp::Array<Num_T> tmp(A.size());
   for (int i=0; i<A.size(); i++){
     tmp(i)=itpp::concat(joda, A(i));
   }
   return tmp;
-}
-template <class Num_T> itpp::Array<Num_T > ElementwiseRemoveFirstElement(const itpp::Array<Num_T>& A){
+} // }}}
+template <class Num_T> itpp::Array<Num_T > ElementwiseRemoveFirstElement(const itpp::Array<Num_T>& A){ // {{{
   itpp::Array<Num_T > tmp(A.size());
   for (int i=0; i<A.size(); i++){
     tmp(i)=A(i)(1,A(i).size()-1);
   }
   return tmp;
-}
-template <class Num_T> itpp::Array<Num_T > Elementwiseconcat(const Num_T& A, const itpp::Array<Num_T >& B){
+} // }}}
+template <class Num_T> itpp::Array<Num_T > Elementwiseconcat(const Num_T& A, const itpp::Array<Num_T >& B){ // {{{
   itpp::Array<Num_T > tmp(B.size());
   for (int i=0; i<B.size(); i++){
     tmp(i)=itpp::concat(A,B(i));
   }
   return tmp;
-}
-itpp::ivec Modulize(const itpp::ivec& intvec,const itpp::ivec n){
+} // }}}
+itpp::ivec Modulize(const itpp::ivec& intvec,const itpp::ivec n){ // {{{
   itpp::Vec<int> tmp(intvec.size());
   for (int i =0;i<intvec.size();i++){
     tmp(i)=intvec(i)%n(i);
@@ -1101,8 +1577,8 @@ itpp::ivec Modulize(const itpp::ivec& intvec,const itpp::ivec n){
     }
   }
   return tmp;
-}
-itpp::ivec Modulize(const itpp::ivec& intvec,const int n){
+} // }}}
+itpp::ivec Modulize(const itpp::ivec& intvec,const int n){ // {{{
   itpp::Vec<int> tmp(intvec.size());
   for (int i =0;i<intvec.size();i++){
     tmp(i)=intvec(i)%n;
@@ -1111,57 +1587,57 @@ itpp::ivec Modulize(const itpp::ivec& intvec,const int n){
     }
   }
   return tmp;
-}
-itpp::Array<itpp::ivec> Modulize(const itpp::Array<itpp::ivec>& intvec,const itpp::ivec n){
+} // }}}
+itpp::Array<itpp::ivec> Modulize(const itpp::Array<itpp::ivec>& intvec,const itpp::ivec n){ // {{{
   itpp::Array<itpp::ivec> tmp(intvec.size());
   for (int i =0;i<intvec.size();i++){
     tmp(i)=Modulize(intvec(i), n);
   }
   return tmp;
-}
-itpp::Array<itpp::ivec> Modulize(const itpp::Array<itpp::ivec>& intvec,const int n){
+} // }}}
+itpp::Array<itpp::ivec> Modulize(const itpp::Array<itpp::ivec>& intvec,const int n){ // {{{
   itpp::Array<itpp::ivec> tmp(intvec.size());
   for (int i =0;i<intvec.size();i++){
     tmp(i)=Modulize(intvec(i), n);
   }
   return tmp;
-}
-itpp::Mat<int> Modulize(const itpp::Mat<int>& set_of_vectors,const int n){
+} // }}}
+itpp::Mat<int> Modulize(const itpp::Mat<int>& set_of_vectors,const int n){ // {{{
   itpp::Mat<int> tmp(set_of_vectors.rows() ,set_of_vectors.cols() );
   for (int i=0; i < set_of_vectors.rows(); i++){
     tmp.set_row(i,Modulize(set_of_vectors.get_row(i),n) );
   }
   return tmp;
-}
-itpp::Array<itpp::ivec> DeScale(const itpp::Array<itpp::ivec>& set_of_vectors,const int scale_factor){
+} // }}}
+itpp::Array<itpp::ivec> DeScale(const itpp::Array<itpp::ivec>& set_of_vectors,const int scale_factor){ // {{{
   itpp::Array<itpp::ivec> tmp(set_of_vectors.size());
   for (int i=0; i < set_of_vectors.size(); i++){
     tmp(i)=set_of_vectors(i)/scale_factor;
   }
   return tmp;
-}
-itpp::Array<itpp::ivec> Scale(const itpp::Array<itpp::ivec>& set_of_vectors,const int scale_factor){
+} // }}}
+itpp::Array<itpp::ivec> Scale(const itpp::Array<itpp::ivec>& set_of_vectors,const int scale_factor){ // {{{
   itpp::Array<itpp::ivec> tmp(set_of_vectors.size());
   for (int i=0; i < set_of_vectors.size(); i++){
     tmp(i)=scale_factor*set_of_vectors(i);
   }
   return tmp;
-}
-itpp::Array<itpp::ivec> Displace(const itpp::Array<itpp::ivec>& set_of_vectors,const itpp::ivec displacement_vector){
+} // }}}
+itpp::Array<itpp::ivec> Displace(const itpp::Array<itpp::ivec>& set_of_vectors,const itpp::ivec displacement_vector){ // {{{
   itpp::Array<itpp::ivec> tmp(set_of_vectors.size());
   for (int i=0; i < set_of_vectors.size(); i++){
     tmp(i)=set_of_vectors(i)+displacement_vector;
   }
   return tmp;
-}
-itpp::Mat<int> Displace(const itpp::Mat<int>& set_of_vectors,const itpp::Vec<int> displacement_vector){
+} // }}}
+itpp::Mat<int> Displace(const itpp::Mat<int>& set_of_vectors,const itpp::Vec<int> displacement_vector){ // {{{
   itpp::Mat<int> tmp(set_of_vectors.rows() ,set_of_vectors.cols() );
   for (int i=0; i < set_of_vectors.rows(); i++){
     tmp.set_row(i,set_of_vectors.get_row(i)+displacement_vector);
   }
   return tmp;
-}
-itpp::Array<itpp::ivec> DisplaceScaleModulize( const itpp::Array<itpp::ivec>& set_of_vectors,const itpp::ivec displacement_vector, const int scale_factor, const int n){
+} // }}}
+itpp::Array<itpp::ivec> DisplaceScaleModulize( const itpp::Array<itpp::ivec>& set_of_vectors,const itpp::ivec displacement_vector, const int scale_factor, const int n){ // {{{
   itpp::Array<itpp::ivec> tmp(set_of_vectors.size());
   for (int i=0; i < set_of_vectors.size(); i++){
     tmp(i)=set_of_vectors(i);
@@ -1171,15 +1647,15 @@ itpp::Array<itpp::ivec> DisplaceScaleModulize( const itpp::Array<itpp::ivec>& se
   }
   return tmp;
 
-}
-template <class Num_T> itpp::Array<Num_T*> to_pointers_1(itpp::Array<Num_T>& v){
+} // }}}
+template <class Num_T> itpp::Array<Num_T*> to_pointers_1(itpp::Array<Num_T>& v){ // {{{
   itpp::Array<Num_T*> result(v.size());
   for (int i=0; i<v.size(); i++){
     result(i)=&(v(i));
   }
   return result;
-}
-template <class Num_T> itpp::Array<itpp::Array<Num_T*> > to_pointers_2(itpp::Array<itpp::Array<Num_T> >& v){
+} // }}}
+template <class Num_T> itpp::Array<itpp::Array<Num_T*> > to_pointers_2(itpp::Array<itpp::Array<Num_T> >& v){ // {{{
   itpp::Array<itpp::Array<Num_T*> > result(v.size());
   for (int i=0; i<v.size(); i++){
     result(i).set_size(v(i).size());
@@ -1188,7 +1664,7 @@ template <class Num_T> itpp::Array<itpp::Array<Num_T*> > to_pointers_2(itpp::Arr
     }
   }
   return result;
-}
+} // }}}
 // }}}
 // 2D grid specialized functions {{{
 itpp::ivec GetBlock(const itpp::Array<itpp::ivec>& positions, const int length_cell, const int length_grid){
@@ -1518,6 +1994,10 @@ itpp::Mat<std::complex<double> > Werner(const double alpha){// {{{
 	return tmp;
 }// }}}
 
+itpp::cvec StatisticallyNormalRandomState(unsigned int dim){ // {{{
+  itpp::cvec tmp=itpp::randn_c(dim);
+  return tmp/sqrt(dim);
+} // }}}
 /**
  * \brief Generates a random state.
  *
@@ -1531,7 +2011,41 @@ itpp::cvec RandomState(unsigned int dim){ // {{{
   itpp::cvec tmp=itpp::randn_c(dim);
   return tmp/norm(tmp);
 } // }}}
+itpp::cvec RandomSeparableState(unsigned int q){ // {{{
+//   std::cout << "entrando a RandomSeparableState, q= " << q <<std::endl;
+  int dim=cfpmath::pow_2(q);
+  itpp::cmat z=itpp::randn_c(q,2);
+//   z(0,0)=0;
+//   z(0,1)=1;
+//   z(1,1)=0;
+//   z(2,1)=0;
+//   z(3,1)=0;
+//   z(1,0)=0;
+//   z(2,0)=0;
+//   z(3,0)=1;
+  itpp::cvec psi(dim);
+  std::complex<double> c;
+//   std::cout << "z=" << z << std::endl;
 
+  for (int i=0; i< dim; i++){
+    c=1;
+//     std::cout << "i=" << i << std::endl;
+    for (int b=0; b<q; b++){
+//        std::cout << "test result:" << cfpmath::test_bit(i,b) << std::endl;
+      if (cfpmath::test_bit(i,b)){
+        c*=z(b,0);
+//         std::cout << "In 0 " << b << std::endl;
+      } else {
+        c*=z(b,1);
+//         std::cout << "In 1 " << b << std::endl;
+      }
+    }
+    psi(i)=c;
+  }
+//   psi= psi/norm(psi);
+//   std::cout << "norma = " << norm(psi) << std::endl;
+  return psi/norm(psi);
+} // }}}
 /**
  * \brief Generates a basis state.
  *
@@ -1542,6 +2056,7 @@ itpp::cvec RandomState(unsigned int dim){ // {{{
  *
  * \return generated basis state within a vector [itpp::cvec].
 */
+
 itpp::cvec BasisState(unsigned int dim, unsigned int basis_number){ // {{{
   itpp::cvec tmp(dim);
   tmp.zeros();
@@ -1791,6 +2306,18 @@ void apply_swap(itpp::cvec& state, int position1, int position2){// {{{
   }
   return;
 } // }}}
+void apply_swap(itpp::cmat& rho, int position1, int position2){// {{{
+  int mask = cfpmath::pow_2(position1) + cfpmath::pow_2(position2);
+  int n1, n2;
+  for (int j=0; j<rho.cols()/4; j++){
+    n1=cfpmath::merge_two_numbers(2, j, mask); 
+    n2=cfpmath::merge_two_numbers(1, j, mask); 
+    rho.swap_rows(n1, n2);
+    rho.swap_cols(n1, n2);
+//     swap(state, n1, n2);
+  }
+  return;
+} // }}}
 void apply_cnot(itpp::cvec& state, int control, int target){// {{{
   int mask = cfpmath::pow_2(control) + cfpmath::pow_2(target);
   int n1, n2;
@@ -1902,7 +2429,6 @@ double Purity(const itpp::Mat<std::complex<double> >& rho){// {{{
 	}
 	return P;
 }// }}}
-
 /**
  * \brief Calculates the purity.
  *
@@ -2277,13 +2803,39 @@ template <class Num_T> itpp::ivec waist(const itpp::Array<Num_T >& A){// {{{
 }// }}}
 // }}}
 // Pretty printing {{{
-void pretty_printing_1(itpp::cvec& c){
+void standard_printing(itpp::cvec& c){ // {{{
+
+  for (int i=0; i<c.size(); i++){
+    std::cout <<  real(c(i)) << std::endl;
+    std::cout <<  imag(c(i)) << std::endl;
+  }
+  return;
+} // }}}
+void standard_printing(itpp::cmat& c){ // {{{
+
+  for (int i=0; i<c.rows(); i++){
+    for (int j=0; j<c.cols(); j++){
+      std::cout <<  real(c(i,j)) << std::endl;
+      std::cout <<  imag(c(i,j)) << std::endl;
+    }
+  }
+  return;
+} // }}}
+void standard_printing(itpp::vec& c){ // {{{
+
+  for (int i=0; i<c.size(); i++){
+    std::cout <<  c(i) << std::endl;
+//     std::cout << i << "  " <<  c(i) << std::endl;
+  }
+  return;
+} // }}}
+void pretty_printing_1(itpp::cvec& c){ // {{{
 
   for (int i=0; i<c.size(); i++){
     std::cout << i << " " << c(i) << std::endl;
   }
   return;
-}
+} // }}}
 // }}}
 } // }}}
 #endif // ITPP_EXT_MATH_VARIOUS

@@ -1,6 +1,7 @@
 (* ::Package:: *)
 
 (* {{{ *) BeginPackage["Quantum2`",{"Carlos`", "Quantum`"}]
+exportarSilvestre::usage = "lo que dice. sin argumentos."
 Isingterm::usage = "Isingterm[i_,j_,N_]"
 IsingChain::usage = "IsingChain[J_,N_]"
 Hallvsall::usage = "Hallvsall[J_,N_]"
@@ -63,7 +64,7 @@ DecompositionOfChannelsInSO31::usage = "Performs decomposition in orthochronus L
 LorentzMatrixQ::usage = "LorentzMatrixQ[matrix_] returns if the given matrix is a valid Lorentz transformation with the signature +---."
 ForceSameSignatureForLorentz::usage = "ForceSameSignatureForLorentz[matrix_] Forces or fixes the signature of the given Lorentz transformation."
 QuantumMaptoR::usage = "QuantumMaptoR[channel_] Representation of Jamiolokowski state in \[Sigma]iotimes \[Sigma]j basis."
-DiagonalMatrixQ::usage = "DiagonalMatrixQ[matrix_] Works similar to the other matrix tests of mathematica."
+diagonalMatrixQ::usage = "diagonalMatrixQ[matrix_] Works similar to the other matrix tests of mathematica."
 PositiveSemidefiniteMatrixCustomQ::usage = "Mathematica test gives strange results, this routine check such test hunred times."
 PositiveSemidefiniteMatrixCustom2Q::usage = "Custom check."
 PositiveSemidefiniteMatrixCustom3Q::usage = "By eigenvalues of the hermitian part"
@@ -90,6 +91,17 @@ function can be also called as LRegion[\[Lambda],\[Tau]] and LRegion[\[Lambda]],
 
 
 Begin["Private`"] 
+{shift, clock} = {
+  {{0, 0, 1}, {1, 0, 0}, {0, 1, 0}},
+  {{1, 0, 0}, {0, Exp[(2 \[Pi] I)/3], 0}, {0, 0,
+    Exp[(2 \[Pi] I)/3]^2}}};
+silvester =
+  MatrixPower[shift, #1].MatrixPower[clock, #2] & @@@
+   Tuples[{0, 1, 2}, {2}];
+silvester = 
+  Permute[silvester, FindPermutation[{2, 3, 4, 7, 5, 9, 6, 8}]];
+silvester = 
+  Permute[silvester, FindPermutation[{2, 3, 4, 7, 5, 9, 6, 8}]];
 
 Isingterm[i_,j_,N_]:=Module[{list},
 list=Table[If[k==i||k==j,PauliMatrix[3],IdentityMatrix[2]],{k,0,N-1}];
@@ -614,7 +626,7 @@ Exp[-3lol]
 UnitalChannelInPauliBasis[x_,y_,z_]:=DiagonalMatrix[(1-x-y-z){1,1,1,1}+x{1,1,-1,-1}+y{1,-1,1,-1}+z{1,-1,-1,1}];
 UnitalChannelInPauliBasis[vec_]:=UnitalChannelInPauliBasis[vec[[1]],vec[[2]],vec[[3]]];
 
-DiagonalMatrixQ[matrix_]:=If[Total[Abs[Flatten[DiagonalMatrix[Diagonal[matrix]]-matrix]]]==0,True,False];
+diagonalMatrixQ[matrix_]:=If[Total[Abs[Flatten[DiagonalMatrix[Diagonal[matrix]]-matrix]]]==0,True,False];
 
 InfinitySupressor[lista_,infinity_]:=Module[{list},
 list=lista;
@@ -711,6 +723,8 @@ PhasesEliminator[basis_]:=Module[{len},
 len=Length[basis];
 ReplaceAll[basis,Table[\[Phi][i][0]->0,{i,0,len-1}]]
 ];
+
+exportarSilvestre[]:=silvester
  
 EndPackage[]
 
