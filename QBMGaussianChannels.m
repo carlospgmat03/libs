@@ -47,14 +47,12 @@ ComputeTN\[Epsilon]list::usage = "ComputeTN\[Epsilon]list[listcorr_]"
 ComputeFHandlingAsymptoticLimit::usage = "listFHandlingAsymptoticLimit[listcorr_,epsilon_:0.0001]"
 \[CapitalLambda]::usage = "Matrix to get rid of the units."
 TimeScaleCorrector::usage = "TimeScaleCorrector[factor_,list_]."
-TimeScaleCorrectorAndEpsilon::usage = "TimeScaleCorrectorAndEpsilon[factor_,paso_,list_]"
+PDivTest::usage = "PDivTest[list_], the input is a correlation list, it gives several quantities to characterize
+P-div of QBM."
 
 
 (* ::Input::Initialization:: *)
-TimeScaleCorrector[factor_,list_]:=Module[{},
-Map[{factor #[[1]],#[[2]]}&,list]
-];
-TimeScaleCorrectorAndEpsilon[factor_,paso_,list_]:=Module[{},({factor #1[[1]],#1[[2]]/paso}&)/@list];
+TimeScaleCorrector[factor_,paso_,list_]:=Module[{},({#1[[1]]paso,#1[[2]]factor}&)/@list];
 \[CapitalOmega]={{0,1},{-1,0}};
 matrixTstandAlone[A_,DA_,DDA_]:={{-((2 M DA)/hbar),(2 A)/hbar},{(2 M^2 DDA)/hbar,-((2 M DA)/hbar)}}//Chop;
 matrixNstandAlone[A_,DA_,DDA_,S_,DS_,DDS_,qsq_,psq_]:={{qsq+(4 A (psq A-hbar M DS))/hbar^2-S^2/qsq,-((2 M (A (-2 psq DA+hbar M DDS)+hbar M DA DS))/hbar^2)-(M DS S)/qsq},{-((2 M (A (-2 psq DA+hbar M DDS)+hbar M DA DS))/hbar^2)-(M DS S)/qsq,psq+M^2 ((4 DA (psq DA-hbar M DDS))/hbar^2-DS^2/qsq)}}//Chop;
@@ -91,7 +89,7 @@ a=CustomPseudoInverse[A[[1]],d];
 {a,-a.A[[2]].Transpose[a]}*)
 ]
 cptpCondition[A_]:=PositiveSemidefiniteMatrixCustom2Q[cptpMatrix[A]];
-cptpMatrix[A_]:=Chop[\[CapitalLambda].A[[2]].\[CapitalLambda]-0.5*I*\[CapitalOmega]+0.5*I*\[CapitalLambda].A[[1]].\[CapitalOmega].Transpose[A[[1]]].\[CapitalLambda]];
+cptpMatrix[A_]:=Chop[\[CapitalLambda].A[[2]].\[CapitalLambda]-0.5*I*\[CapitalOmega]+ hbar 0.5*I*\[CapitalLambda].A[[1]].\[CapitalOmega].Transpose[A[[1]]].\[CapitalLambda]];
 ComputeF[A_]:=Module[{list},
 list=Re[Chop[Eigenvalues[cptpMatrix[A]]]];
 0.5*Total[Abs[list]-list]
@@ -207,6 +205,22 @@ vinv=SparseArray[{i_, i_}:>If[v[[i,i]]>tolerance,1/v[[i,i]],f=True;0],Length[v]]
 (*Para quitar unidades*)
 q0=Sqrt[hbar/(M \[Omega]0)];p0=Sqrt[hbar M \[Omega]0];
 \[CapitalLambda]:=DiagonalMatrix[{q0,p0}]//Inverse;
+(*Souza*)
+PDivTest[list_]:=Module[{TN,fundquant,DdetT,DInvTNT,DTrN,DT,\[Kappa],\[Epsilon],\[Delta],indicatorfunction,discreteindicator,times,\[Mu]},
+TN=ComputeTN[listcorr];times=Take[Transpose[TN][[1]],Length[TN]-5];step=times[[2]]-times[[1]];
+fundquant=Map[{(*1*)#[[1]],(*2*)Det[#[[2]]],(*3*)Inverse[#[[2]]].#[[3]].Transpose[Inverse[#[[2]]]],(*4*)Tr[#[[3]]],(*5*)#[[2]],(*6*)Inverse[#[[2]]].#[[3]]}&,TN];
+DdetT=ForwardNumericalDifferenceForTimeSeries[Transpose[fundquant][[2]],5]/step//Chop;
+DInvTNT=ForwardNumericalDifferenceForTimeSeries[Transpose[fundquant][[3]],5]/step//Chop;
+DTrN=ForwardNumericalDifferenceForTimeSeries[Transpose[fundquant][[4]],5]/step//Chop;
+DT=ForwardNumericalDifferenceForTimeSeries[Transpose[fundquant][[5]],5]/step//Chop;
+\[Kappa]={times,Table[DTrN[[i]]-2 Tr[DT[[i]].fundquant[[i]][[6]]],{i,Length[TN]-5}]}//Transpose;
+\[Epsilon]={times,Table[0.5 DdetT[[i]] (fundquant[[i]][[2]])^(-1),{i,Length[TN]-5}]}//Transpose;
+\[Delta]={times,Table[fundquant[[i]][[2]]^2 Det[DInvTNT[[i]]],{i,Length[TN]-5}]}//Transpose;
+indicatorfunction={times,Table[If[\[Kappa][[i]][[2]]>=0,\[Delta][[i]][[2]]-0.25(Abs[\[Epsilon][[i]][[2]]]-\[Epsilon][[i]][[2]])^2,0],{i,Length[TN]-5}]}//Transpose;
+discreteindicator={times,Table[If[\[Kappa][[i]][[2]]>=0 &&\[Delta][[i]][[2]]-0.25(Abs[\[Epsilon][[i]][[2]]]-\[Epsilon][[i]][[2]])^2>=0,1,0],{i,Length[TN]-5}]}//Transpose;
+\[Mu]={times,Table[If[\[Delta][[i]][[2]]>=0, Sign[\[Kappa][[i]][[2]]]*Sqrt[\[Delta][[i]][[2]]],-Sqrt[Abs[\[Delta][[i]][[2]]]]],{i,Length[TN]-5}]}//Transpose;
+{\[Mu],discreteindicator,indicatorfunction,\[Epsilon],\[Delta],\[Kappa]}
+];
 
 
 (* ::Subsubsubsection::Closed:: *)

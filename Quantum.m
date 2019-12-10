@@ -122,7 +122,15 @@ EvolvGate::usage="EvolvGate[Gate_, steps_, env_, state_]... Evoluciona cualquier
 MakeQuantumChannel::usage="MakeQuantumChannel[Gate_, steps_, env_] Donde Gate va de la forma Gate[#, otherparameters_]  donde debe ponerse # en el lugar donde Gate toma el estado"
 SumPositiveDerivatives::usage="SumPositiveDerivatives[list_] Suma todas las contribuciones list(max)-list(min) sucesivos cuando la derivada es positiva"
 GHZ::usage="GHZ[qu_] Creates a GHZ state, |000000\[RightAngleBracket]+|111111\[RightAngleBracket]"
+Wstate::usage="Wstate[n_] Creates a W state, (|10...0>+|010...0>+...+|0...01>)/sqrt{n}"
 RandomMixedState::usage="RandomMixedState[n_,combinations_], Constructs a Random mixed state of diemnsion n with random uniform combinations of pure states wti Haar measure."
+GellMann::usage = "GellMann[n_] Generalized Gell-Mann matrices from https://blog.suchideas.com/2016/04/sun-gell-mann-matrices-in-mathematica/ For example
+for n=2 it gives Pauli matrices, don't forget to add identity by yourself in need a complete basis."
+ApplySwap::usage= "ApplySwap[State,Target1,Target2] Applies Swap map betwen the two target qubits, the input can be a state vector or a density matrix."
+ApplySwapPure::usage = "Leaves the state in ket form if pure"
+ApplyLocalNoiseChain::usage = "ApplyLocalNoiseChain[State,p] Applies the map that transforoms the density matrix State into the assessible density matrix when local noise is present using fuzzy measurements."
+ApplyNoiseChain::usage = "ApplyNoiseChain[State,p] Applies the map that transforoms the density matrix State into the assessible density matrix when non-local noise is present using fuzzy measurements."
+PermutationMatrices::usgae = "Argument is the number of particles to permute, output is a list of matrices."
 (* }}} *)
 (* }}} *)
 Begin["Private`"] 
@@ -604,8 +612,11 @@ sum=sum+list[[i+1]]-list[[i]];
 {i,1,Length[list]-1}];
 sum]
 (* }}} *)
-(* {{{ *)
+(* {{{  GHZ *)
 GHZ[qu_]:=1/Sqrt[2]Table[If[i==0||i==2^qu-1,1,0],{i,0,2^qu-1}]
+(* }}} *)
+(* {{{  W state *)
+Wstate[n_] := Sum[BasisState[Power[2, m], Power[2, n]], {m, 0, n - 1}]/Sqrt[n]
 (* }}} *)
 (* }}} *)
 (*{{{*)ArbitratyPartialTrace[hilbertdimrem_, hilbertdimkeep_, M_] := 
@@ -627,7 +638,73 @@ statelist=Table[Proyector[RandomState[n]],{combinations}];
 p=RandomReal[{0,1.0},combinations];
 p=p/Total[p];
 p.statelist//Chop
-];(*}}}*)
+];
+GellMann[n_] :=
+ GellMann[n] = Flatten[Table[
+   (* Symmetric case *)
+   SparseArray[{{ j, k} -> 1, { k, j} -> 1}, {n, n}]
+  , {k, 2, n}, {j, 1, k - 1}], 1]~
+  Join~Flatten[Table[
+   (* Antisymmetric case *)
+   SparseArray[{{ j, k} -> -I, { k, j} -> +I}, {n, n}]
+  , {k, 2, n}, {j, 1, k - 1}], 1]~
+  Join~Table[
+   (* Diagonal case *)
+   Sqrt[2/l/(l + 1)] SparseArray[
+    Table[{j, j} -> 1, {j, 1, l}]~Join~{{l + 1, l + 1} -> -l}, {n, n}]
+  , {l, 1, n - 1}];
+ApplySwap[State_?VectorQ,Target1_,Target2_]:=Module[{Aux,digits,len,digits1,digits2},
+len=Length[State];
+Aux=ConstantArray[0,len];
+Table[digits=IntegerDigits[i-1,2,IntegerPart[Log2[len]]];
+digits1=digits;
+digits1[[{Target1,Target2}]]=digits[[{Target2,Target1}]];
+Aux[[i]]=State[[FromDigits[digits1,2]+1]];,{i,1,Length[State]}];
+Proyector[Aux]
+];
+ApplySwapPure[State_?VectorQ,Target1_,Target2_]:=Module[{Aux,digits,len,digits1,digits2},
+len=Length[State];
+Aux=ConstantArray[0,len];
+Table[digits=IntegerDigits[i-1,2,IntegerPart[Log2[len]]];
+digits1=digits;
+digits1[[{Target1,Target2}]]=digits[[{Target2,Target1}]];
+Aux[[i]]=State[[FromDigits[digits1,2]+1]];,{i,1,Length[State]}];
+Aux
+];
+ApplySwap[State_?MatrixQ,Target1_,Target2_]:=Module[{Aux,digits,dim,digits1,digits2,digits1p,digits2p},
+dim=Dimensions[State];
+Aux=ConstantArray[0,dim];
+Table[
+digits1=IntegerDigits[i-1,2,IntegerPart[Log2[dim[[1]]]]];
+digits2=IntegerDigits[j-1,2,IntegerPart[Log2[dim[[1]]]]];
+digits1p=digits1;
+digits2p=digits2;
+digits1p[[{Target1,Target2}]]=digits1[[{Target2,Target1}]];
+digits2p[[{Target1,Target2}]]=digits2[[{Target2,Target1}]];
+Aux[[i,j]]=State[[FromDigits[digits1p,2]+1,FromDigits[digits2p,2]+1]];,{i,1,dim[[1]]},{j,1,dim[[1]]}];
+Aux
+];
+(*Coarse Graining stuff*)
+(*{{{*)
+ApplyLocalNoiseChain[State_?MatrixQ,p_]:=Module[{qubits},
+qubits=IntegerPart[Log2[Dimensions[State][[1]]]];
+p State+(1-p)/(qubits)(Sum[ApplySwap[State,i,Mod[i+1,qubits,1]],{i,1,qubits}])
+];
+ApplyNoiseChain[State_?MatrixQ,p_]:=Module[{qubits},
+qubits=IntegerPart[Log2[Dimensions[State][[1]]]];
+p State+2(1-p)/(qubits(qubits-1))(Sum[ApplySwap[State,i,j],{i,1,qubits},{j,i+1,qubits}])
+];
+ApplyLocalNoiseChain[State_?VectorQ,p_]:=Module[{qubits},
+qubits=IntegerPart[Log2[Dimensions[State][[1]]]];
+p Proyector[State]+(1-p)/(qubits)(Sum[ApplySwap[State,i,Mod[i+1,qubits,1]],{i,1,qubits}])
+];
+ApplyNoiseChain[State_?VectorQ,p_]:=Module[{qubits},
+qubits=IntegerPart[Log2[Dimensions[State][[1]]]];
+p Proyector[State]+2(1-p)/(qubits(qubits-1))(Sum[ApplySwap[State,i,j],{i,1,qubits},{j,i+1,qubits}])
+];
+PermutationMatrices[n_]:=PermutationMatrix/@Permutations[Range[n]];
+(*}}}*)
+(*}}}*)
 End[] 
 EndPackage[]
 (* }}} *)
