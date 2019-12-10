@@ -42,7 +42,7 @@ namespace spinchain{ // {{{
     // uniformely to all members
     //     *   *
     //  *         *
-    //       *     
+    //       *
     //  *         *
     //     *   *
     apply_ising_star_most(state, J, J_interaction);
@@ -54,7 +54,7 @@ namespace spinchain{ // {{{
     // uniformely to all members
     //     *   *
     //  *         *
-    //       *     
+    //       *
     //  *         *
     //     *   *
     apply_ising_star(state, J, J_interaction);
@@ -62,19 +62,19 @@ namespace spinchain{ // {{{
     return;
   } //}}}
   void apply_star_double(itpp::cvec& state, double J, itpp::vec magnetic_field, double Jcoupling1,double Jcoupling2, itpp::vec local_magnetic_field,int qubits_env1){// {{{
-   
+
     apply_ising_star_double(state, J, Jcoupling1,Jcoupling2,qubits_env1);
     apply_kick_star(state, magnetic_field, local_magnetic_field);
     return;
   } //}}}
   void apply_star_double_closed(itpp::cvec& state, double J, itpp::vec magnetic_field, double Jcoupling1,double Jcoupling2, itpp::vec local_magnetic_field,int qubits_env1){// {{{
-   
+
     apply_ising_star_double_closed(state, J, Jcoupling1,Jcoupling2,qubits_env1);
     apply_kick_star(state, magnetic_field, local_magnetic_field);
     return;
   } //}}}
   void apply_dephasing_chain(itpp::cvec& state, double Jenv, itpp::vec magnetic_field_env,  double  J_interaction_qubit_env, double Delta){// {{{
-// ApplyDephasingChain[psi0_, Delta_, Jenv_, benv_, Jinteraction_] 
+// ApplyDephasingChain[psi0_, Delta_, Jenv_, benv_, Jinteraction_]
 //  statenew = ApplyMagnetickKick[statenew, {0, 0, Delta/2}, 0];
 //  statenew = ApplyMagnetickKickStarEnvironment[statenew, benv];
 //  (*U2 interno del env, las ising y la interaccion con el medio*)
@@ -124,6 +124,30 @@ namespace spinchain{ // {{{
     apply_magnetic_kick(state, magnetic_field);
     return;
   } //}}}
+
+  /**
+   * \brief Applies the magnetic ising model to a state.
+   *
+   * Applies the magnetic ising model to the topology of a chain of spins that
+   * form an environment and a pair of quits that define the central system,
+   * each of these is located on each of the two edges of the chain with an
+   * interaction with the environment given by `Jcoupling`. The force of
+   * interaction between elements of the environment is indicated in `Jenv`.
+   *
+   * \code{.cpp}
+   *        *  *
+   *     *        O
+   *    *
+   *    *          O
+   *     *        *
+   *        *  *
+   *\endcode
+   *
+   * \param state [itpp::cvec] state in the form of complex vector.
+   * \param Jenv [double] coupling strength between elements of the environment.
+   * \param Jcoupling [double] coupling strength between the central system and the environment.
+   * \param magnetic_field [itpp::vec] magnetic field with specified strength for each dimension.
+  */
   void apply_common_environment_chain(itpp::cvec& state, double Jenv, double Jcoupling, itpp::vec magnetic_field){// {{{
     apply_magnetic_kick(state, magnetic_field);
     apply_ising_z_common_environment_chain(state, Jenv, Jcoupling);
@@ -136,8 +160,8 @@ namespace spinchain{ // {{{
       std::cerr << "Not an even chain, qubits="<<qubits<<" must be an even number" << std::endl;
       abort();
     }
-    itpp::vec J(qubits); 
-    J=Jenv; 
+    itpp::vec J(qubits);
+    J=Jenv;
     //     J(0)=1.;
     //     J(1)=0.;
     //     J(2)=1.;
@@ -149,8 +173,8 @@ namespace spinchain{ // {{{
   void apply_ising_z_spectator(itpp::cvec& state, double Jenv, double Jcoupling){// {{{
     //   std::cout << "la j es " << J <<" y la constante es " << expmij << std::endl;
     int qubits=cfpmath::log_base_2(state.size());
-    itpp::vec J(qubits); 
-    J=Jenv; 
+    itpp::vec J(qubits);
+    J=Jenv;
     J(0)=0.; J(1)=Jcoupling; J(qubits-1)=0.;
     apply_ising_z(state, J);
     return;
@@ -165,11 +189,33 @@ namespace spinchain{ // {{{
     return;
   } // }}}
 
+  /**
+   * \brief Applies the magnetic ising model to a state.
+   *
+   * Applies the magnetic ising model to the topology of a chain of spins that
+   * form an environment and a pair of quits that define the central system,
+   * each of these is located on each of the two edges of the chain with an
+   * interaction with the environment given by `Jcoupling`. The force of
+   * interaction between elements of the environment is indicated in `Jenv`.
+   *
+   * \code{.cpp}
+   *        *  *
+   *     *        O
+   *    *
+   *    *          O
+   *     *        *
+   *        *  *
+   *\endcode
+   *
+   * \param state [itpp::cvec] state in the form of complex vector.
+   * \param Jenv [double] coupling strength between elements of the environment.
+   * \param Jcoupling [double] coupling strength between the central system and the environment.
+  */
   void apply_ising_z_common_environment_chain(itpp::cvec& state, double Jenv, double Jcoupling){// {{{
     //   std::cout << "la j es " << J <<" y la constante es " << expmij << std::endl;
     int qubits=cfpmath::log_base_2(state.size());
-    itpp::vec J(qubits); 
-    J=Jenv; 
+    itpp::vec J(qubits);
+    J=Jenv;
     J(0)=0.; J(1)=Jcoupling; J(qubits-1)=Jcoupling;
     //     std::cerr << J << std::endl;
     apply_ising_z(state, J);
@@ -201,7 +247,7 @@ namespace spinchain{ // {{{
   void apply_kick_spectator_double_chain(itpp::cvec& state, itpp::vec magnetic_field_central,itpp::vec magnetic_field_env1,
 itpp::vec magnetic_field_env2, int qubits_env1){// {{{
     int qubits=cfpmath::log_base_2(state.size());
-    
+
     // Kick in the central system: a Bell pair
     apply_magnetic_kick(state,magnetic_field_central,0);
     apply_magnetic_kick(state,magnetic_field_central,1);
@@ -216,6 +262,18 @@ itpp::vec magnetic_field_env2, int qubits_env1){// {{{
 
     return;
   } // }}}
+
+  /**
+   * \brief Magnetic kick to a state.
+   *
+   * AApply a magnetic kick to each of the positions of an indicated state,
+   * with a `magnetic_field` (or b) strength, which contains the values in
+   * the required dimensions.
+   *
+   *
+   * \param state [itpp::cvec] in the form of complex vector.
+   * \param magnetic_field [itpp::vec] magnetic field with specified strength for each dimension.
+  */
   void apply_magnetic_kick(itpp::cvec& state, itpp::vec magnetic_field){// {{{
     int qubits=cfpmath::log_base_2(state.size());
     for (int Position=0; Position<qubits; Position++){
@@ -223,6 +281,7 @@ itpp::vec magnetic_field_env2, int qubits_env1){// {{{
     }
     return;
   } // }}}
+
   void apply_ising_star_most(itpp::cvec& state, double J, double J_interaction){// {{{
 //     std::cout << "En apply_ising_star_most J_interaction="<<J_interaction << std::endl;
     int qubits=cfpmath::log_base_2(state.size());
@@ -257,11 +316,11 @@ itpp::vec magnetic_field_env2, int qubits_env1){// {{{
     return;
   } // }}}
   void apply_ising_star_double(itpp::cvec& state, double J, double Jcoupling1,double Jcoupling2, int qubits_env1){// {{{
-   
+
     int qubits=cfpmath::log_base_2(state.size());
-    
+
       apply_ising_z(state, Jcoupling1, 0, 1);
-  
+
     for (int Position=1; Position<qubits-1; Position++){
 
 
@@ -290,21 +349,21 @@ itpp::vec magnetic_field_env2, int qubits_env1){// {{{
 //     std::cout << "Step 3 " << state << std::endl;
     apply_ising_z(state, J, qubits_env1-1, 1);
 //     std::cout << "Step 4 " << state << std::endl;
-   
+
     for (int Position=1; Position<qubits-qubits_env1; Position++){
 //       std::cout << "Apply J_interaction between " <<  itpp::vec_2(0, Position) << std::endl ;
       apply_ising_z(state, Jcoupling2, Position, Position+qubits_env1);
     }
-    
+
     for (int Position=qubits_env1+1; Position<qubits-qubits_env1-1; Position++){
 //       std::cout << "Apply J  between " <<  itpp::vec_2(Position, (Position+1)%qubits) << std::endl ;
       apply_ising_z(state, J, Position, (Position+1)%qubits);
 
     }
-    
+
     apply_ising_z(state, J, qubits-1, qubits_env1+1);
 //     std::cout << "Step 4 " << state << std::endl;
-   
+
 
 
  return;
@@ -346,7 +405,7 @@ void apply_ising_allvsall(itpp::cvec& state, double J){//{{{
 	for(int Position2=1+Position1; Position2<qubits; Position2++){
 	apply_ising_z(state, J, Position1, Position2);
 	}
-      
+
 	}
 }//}}}
   void apply_ising_z(itpp::cvec& state, double J){// {{{
@@ -361,7 +420,7 @@ void apply_ising_allvsall(itpp::cvec& state, double J){//{{{
     int qubits=cfpmath::log_base_2(state.size());
     for (int i=0; i<qubits; i++){
       apply_ising_z(state, J(i), i, (i+1)%qubits);
-    } 
+    }
     return;
   } // }}}
   // }}}
@@ -372,23 +431,23 @@ void apply_ising_allvsall(itpp::cvec& state, double J){//{{{
       int k; //Sector of the symmetry
       int qubits; //Sector of the symmetry
       bool degenerate;
-      bool sign; // 
+      bool sign; //
       // We have a generator, |n>, to which we apply P_k.
-      // This should not be a ket with zero length. 
+      // This should not be a ket with zero length.
       // Consider product
       // x=<n|R P_k |n> (R is the external reflection operator, R |ijkl> = |lkji>)
-      // 
-      // if x=0, the generator is degenerate, (and the boolean has 
-      // a true value) and we use both 
+      //
+      // if x=0, the generator is degenerate, (and the boolean has
+      // a true value) and we use both
       // P_k |n> \pm K R P_k |n> (K is the antiunitary symmetry)
-      // 
+      //
       // if x \ne 0, then on of the P_k |n> \pm K R P_k |n>
-      // is not null and can be the basis. 
+      // is not null and can be the basis.
       // The sign is + if sign=true and - if sign=false
 
   }; // }}}
   std::ostream &operator<<(std::ostream &os, const CompactSymmetricBaseMember &psi){ // {{{
-    os << "(Generator " << psi.generator << "; symmetry sector " << psi.k << "; qubits " 
+    os << "(Generator " << psi.generator << "; symmetry sector " << psi.k << "; qubits "
       << psi.qubits << "; degenerate " << psi.degenerate << ", sign " << psi.sign << ")" ;
     return os;
   } // }}}
@@ -405,7 +464,7 @@ void apply_ising_allvsall(itpp::cvec& state, double J){//{{{
     int J;
     for (int n=0; n<dim; n++){
 //       std::cout <<"studying n=" << n<< std::endl;
-      J=cfpmath::primitive_period_bit_rotation(n, qubits); 
+      J=cfpmath::primitive_period_bit_rotation(n, qubits);
       if (sector*J%qubits!=0){
         Consider(n)=false;
 //         std::cout << "faaaaaaaaaaaalse" << std::endl;
@@ -439,7 +498,7 @@ void apply_ising_allvsall(itpp::cvec& state, double J){//{{{
           }
 //           abort();
           basis_states = itpp::concat(basis_states,basis_state);
-//           std::cout <<"Just added " << basis_state.generator << std::endl; 
+//           std::cout <<"Just added " << basis_state.generator << std::endl;
         } // }}}
         else {// entonces <n|R P_k |n> == 0 // {{{
           basis_state.degenerate=false;
@@ -466,8 +525,8 @@ void apply_ising_allvsall(itpp::cvec& state, double J){//{{{
   itpp::cvec DecodeCompactRotationallySymetricBasisState(CompactSymmetricBaseMember encoded_state){ // {{{
     int q=encoded_state.qubits, n=encoded_state.generator, k=encoded_state.k;
 //     std::cout << "Decoding the state given by q="<<q<<", n="<<n<<", k="<<k
-//       << ", degenerate=" <<encoded_state.degenerate 
-//       << ", sign=" <<encoded_state.sign 
+//       << ", degenerate=" <<encoded_state.degenerate
+//       << ", sign=" <<encoded_state.sign
 //       << std::endl;
     //     if (CompactSymmetricBaseMember.degenerate){
     //     if (true ){
@@ -481,7 +540,7 @@ void apply_ising_allvsall(itpp::cvec& state, double J){//{{{
     } else {
       itpp::cvec state=state_tmp-conj(apply_external_reflection(state_tmp));
 //       std::cout << "norma de estado (y) " << norm(state) << std::endl;
-//       abort(); 
+//       abort();
       return state/norm(state);
     }
   } // }}}
@@ -490,7 +549,7 @@ void apply_ising_allvsall(itpp::cvec& state, double J){//{{{
     // R|i_0 i_1 i_2 ... i_{n-1}> = |i_{n-1} ... i_1 i_0>
     itpp::Vec<bool> reflected(state_in.size());
     itpp::cvec state=state_in;
-    int n_reflected; 
+    int n_reflected;
     std::complex<double> tmp;
     reflected=false;
     int qubits=cfpmath::log_base_2(state.size());
@@ -509,7 +568,7 @@ void apply_ising_allvsall(itpp::cvec& state, double J){//{{{
   itpp::cvec apply_rotation(itpp::cvec& state_in, int power){ // {{{
     // The operator is defined as
     // R^k|i_{n-1}  ... i_1 i_0> = |i_{k-1} ... i_0 i_{n-1} ... i_k>
-    // i. e. is a rotation to the right of the bits. 
+    // i. e. is a rotation to the right of the bits.
     int d=state_in.size();
     itpp::cvec state(d);
     int qubits=cfpmath::log_base_2(d);
@@ -521,7 +580,7 @@ void apply_ising_allvsall(itpp::cvec& state, double J){//{{{
   itpp::cvec apply_rotation(itpp::cvec& state_in){ // {{{
     // The operator is defined as
     // R|i_{n-1}  ... i_1 i_0> = |i_0 i_{n-1} ... i_1>
-    // i. e. is a rotation to the right of the bits. 
+    // i. e. is a rotation to the right of the bits.
     int d=state_in.size();
     itpp::cvec state(d);
     int qubits=cfpmath::log_base_2(d);
@@ -531,27 +590,27 @@ void apply_ising_allvsall(itpp::cvec& state, double J){//{{{
     return state;
   } // }}}
   itpp::cvec project_base_state(int k, int base_state, int qubits){ // {{{
-    // la idea es que agarro un n particular Veo si lo debo considerar. 
+    // la idea es que agarro un n particular Veo si lo debo considerar.
     // luego entonces marco los que no debo considerar porque son ciclos del man
-    // luego reviso si proyecta a 0. 
-    int J=cfpmath::primitive_period_bit_rotation(base_state, qubits); 
-    itpp::cvec state(cfpmath::pow_2(qubits)); 
+    // luego reviso si proyecta a 0.
+    int J=cfpmath::primitive_period_bit_rotation(base_state, qubits);
+    itpp::cvec state(cfpmath::pow_2(qubits));
     state=0.;
-    if (k*J%qubits!=0){ 
-      return state; 
+    if (k*J%qubits!=0){
+      return state;
     }
 
 //     std::complex<double> Imag=std::complex<double>(0,1);
     int n_rotated=base_state;
     for (int j=0; j<J; j++){
       state(n_rotated)=exp(-std::complex<double>(0,1)*2.*itpp::pi*double(j*k)/double(qubits));
-      n_rotated=cfpmath::rotate_bits(n_rotated, qubits); 
+      n_rotated=cfpmath::rotate_bits(n_rotated, qubits);
     }
-    return state/norm(state); 
+    return state/norm(state);
     //Evalute if the state is cero
   } // }}}
   itpp::cvec project_state(int k, itpp::cvec& state_in){ // {{{
-    // Creo que la formula general es 
+    // Creo que la formula general es
     // P_k = \sum_{j=0}^L \varphi_{j,k} T^j
     int d=state_in.size();
     int q=cfpmath::log_base_2(d);
@@ -563,7 +622,7 @@ void apply_ising_allvsall(itpp::cvec& state, double J){//{{{
 //       state+= exp(-2*itpp::pi*Imag*k*i/double(q)) * apply_rotation(state_in, i);
 //       state+= exp(*k*i/double(q)) * apply_rotation(state_in, i);
     }
-    return state/norm(state); 
+    return state/norm(state);
     //Evalute if the state is cero
   } // }}}
   // }}}
@@ -572,11 +631,11 @@ void apply_ising_allvsall(itpp::cvec& state, double J){//{{{
     public:
       // This are the equivalents to the generators. The provide
       // the basic elements of the total wave function
-      itpp::Array<CompactSymmetricBaseMember*> generators; 
+      itpp::Array<CompactSymmetricBaseMember*> generators;
       // Symmetry Sector in the vertical direction
       int k_v;
       // Sign, to see if we consider P_k |n> \pm K R P_k |n>
-      bool sign; 
+      bool sign;
       int vertical_dimension( ){ // {{{
         return generators.size();
       } // }}}
@@ -603,14 +662,14 @@ void apply_ising_allvsall(itpp::cvec& state, double J){//{{{
     int nv=q/nh;
 //     std::cout << "CreateCompactSymmetric2DBaseMemberFromGenerator nh, nv= " << nh << ", " << nv << std::endl;
 //     abort();
-      
-    CompactSymmetric2DBaseMember basis_2d_state; 
+
+    CompactSymmetric2DBaseMember basis_2d_state;
     basis_2d_state.generators.set_size(nv);
     int mask, basis_number;
     itpp::ivec  horizontal_basis_state_numbers(nv);
 //     std::cout <<  "In CreateCompactSymmetric2DBaseMemberFromGenerator jklaljkdfa\n" ;
     for (int i_row=0; i_row < nv; i_row++){
-      mask = ((cfpmath::pow_2(nh)-1)<<(nh*i_row)); 
+      mask = ((cfpmath::pow_2(nh)-1)<<(nh*i_row));
       basis_number = (g.generator & mask) >> (nh*i_row);
       basis_2d_state.generators(i_row)=&basis_states_horizontal(basis_number);
     } // cout << "Smaller generators = " << horizontal_basis_state_numbers << endl;
@@ -618,7 +677,7 @@ void apply_ising_allvsall(itpp::cvec& state, double J){//{{{
     basis_2d_state.k_v  = g.k%(nv);
 
 //     std::cout <<  "Getting out CreateCompactSymmetric2DBaseMemberFromGenerator\n" ;
-    return basis_2d_state; 
+    return basis_2d_state;
 
   } // }}}
   void build_rotationally_symmetric_2D_base(int nh, int nv, itpp::Mat<itpp::Array<CompactSymmetric2DBaseMember> >& AllMatrixElements, itpp::Array<CompactSymmetricBaseMember>& basis_states_horizontal){ //{{{
@@ -627,7 +686,7 @@ void apply_ising_allvsall(itpp::cvec& state, double J){//{{{
     itpp::Array<CompactSymmetricBaseMember> basis_states_2d;
     basis_states_horizontal=build_rotationally_symmetric_base_states_compact(nh);
     basis_states_2d=build_rotationally_symmetric_base_states_compact(q);
-    CompactSymmetric2DBaseMember basis_2d_state; 
+    CompactSymmetric2DBaseMember basis_2d_state;
     AllMatrixElements.set_size(nh, nv);
     int kv, kh;
     for (int i=0; i< d; i++){
@@ -638,7 +697,7 @@ void apply_ising_allvsall(itpp::cvec& state, double J){//{{{
 //       itpp::cvec state2d = DecodeCompactSymmetric2DBaseMember(basis_2d_state);
     }
     return;
-    
+
   } // }}}
   itpp::cvec DecodeCompactSymmetric2DBaseMember(CompactSymmetric2DBaseMember g){ // {{{
 //     std::cout << "Gettin in DecodeCompactSymmetric2DBaseMember" << std::endl;
@@ -647,12 +706,12 @@ void apply_ising_allvsall(itpp::cvec& state, double J){//{{{
 //     std::cout << "DecodeCompactSymmetric2DBaseMember " << nh << ", " << nv << std::endl;
     itpp::Array<CompactSymmetricBaseMember> basis_states;
     basis_states=build_rotationally_symmetric_base_states_compact(nh);
- 
+
     itpp::Array<itpp::cvec> statesbasic;
     statesbasic.set_size(nv);
     for (int  i_row=0; i_row < nv; i_row++){
       statesbasic(i_row)=DecodeCompactRotationallySymetricBasisState(*g.generators(i_row));
-//       total_k_horizontal += basis_states(horizontal_basis_state_numbers(i_row)).k; 
+//       total_k_horizontal += basis_states(horizontal_basis_state_numbers(i_row)).k;
     }
 //     std::cout << "DecodeCompactSymmetric2DBaseMember 094832" << std::endl;
     itpp::cvec prestate, KRprestate;
@@ -679,7 +738,7 @@ void apply_ising_allvsall(itpp::cvec& state, double J){//{{{
     // 0   1   2   3
     //
     // In this case, horizontal dimension is 4.
-    // The above state gets transformed into 
+    // The above state gets transformed into
     //
     // 4   5   6   7
     // 0   1   2   3
@@ -703,18 +762,18 @@ void apply_ising_allvsall(itpp::cvec& state, double J){//{{{
     // 0   1   2   3
     //
     // In this case, horizontal dimension is 4.
-    // The above state gets transformed into 
+    // The above state gets transformed into
     //
-    // 11  8   9  10 
-    //  7  4   5   6 
-    //  3  0   1   2 
+    // 11  8   9  10
+    //  7  4   5   6
+    //  3  0   1   2
     //
-    // 9  10  11   8   
-    // 5   6   7   4   
-    // 1   2   3   0   
+    // 9  10  11   8
+    // 5   6   7   4
+    // 1   2   3   0
     //
     // For example for a  3x2 |3> goes into |5> :
-    // 0 0 0   => 0 0 0 
+    // 0 0 0   => 0 0 0
     // 1 1 0   => 1 0 1
     int d=state_in.size();
     itpp::cvec state(d);
@@ -738,7 +797,7 @@ void apply_ising_allvsall(itpp::cvec& state, double J){//{{{
     return state;
   } // }}}
   itpp::cvec project_state_horizontal_momentum(int k, itpp::cvec& state_in, int horizontal_dimension){ // {{{
-    // Creo que la formula general es 
+    // Creo que la formula general es
     // P_k = \sum_{j=0}^L \varphi_{j,k} T^j
     itpp::cvec state;
     state=state_in;
@@ -748,7 +807,7 @@ void apply_ising_allvsall(itpp::cvec& state, double J){//{{{
 //       std::cout << i << ", " << phase << ", " << double(i*k)/double(q) << std::endl;
       state+= phase*apply_horizontal_rotation(state_in, horizontal_dimension, i);
     }
-    return state/norm(state); 
+    return state/norm(state);
   } // }}}
   itpp::cvec apply_vertical_rotation(itpp::cvec& state_in, int horizontal_dimension, int power){ // {{{
     // the bits are ordered as follows
@@ -769,14 +828,14 @@ void apply_ising_allvsall(itpp::cvec& state, double J){//{{{
 //     std::cout << "In apply_vertical_external_reflection 0" << std::endl;
     itpp::Vec<bool> reflected(state_in.size());
     itpp::cvec state=state_in;
-    int n_reflected; 
+    int n_reflected;
     std::complex<double> tmp;
     reflected=false;
     int qubits=cfpmath::log_base_2(state.size());
     for (int n=0; n<state.size(); n++){
 //       n_reflected=cfpmath::reverse_bits(n, qubits);
       n_reflected = cfpmath::apply_vertical_external_reflection(n, qubits, horizontal_dimension);
-//       std::cout << "In apply_vertical_external_reflection n=" << n 
+//       std::cout << "In apply_vertical_external_reflection n=" << n
 //         <<", n_reflected=" << n_reflected << std::endl;
       if (!reflected(n_reflected)){
         tmp=state(n);
@@ -790,7 +849,7 @@ void apply_ising_allvsall(itpp::cvec& state, double J){//{{{
     return state;
   } // }}}
   itpp::cvec project_state_vertical_momentum(int k, itpp::cvec& state_in, int horizontal_dimension){ // {{{
-    // Creo que la formula general es 
+    // Creo que la formula general es
     // P_k = \sum_{j=0}^L \varphi_{j,k} T^j
 //     std::cout << "Entrando a project_state_vertical_momentum" << std::endl;
     itpp::cvec state;
@@ -808,7 +867,7 @@ void apply_ising_allvsall(itpp::cvec& state, double J){//{{{
     }
 //     std::cout << "Saliendo de project_state_vertical_momentum" << std::endl;
 
-    return state/norm(state); 
+    return state/norm(state);
   } // }}}
   // }}}
   // Matrices for different evolution operators{{{
@@ -895,6 +954,20 @@ void apply_ising_allvsall(itpp::cvec& state, double J){//{{{
     }
     return;
   } // }}}
+
+  /**
+   * \brief Magnetic kick to a position of a state.
+   *
+   * Apply a magnetic kick to the position of the indicated state, with a
+   * `magnetic_field` (or b) strength, which contain the values in the required
+   * dimensions.
+   *
+   * exp(-i b sigma) * state[position]
+   *
+   * \param state [itpp::cvec] in the form of complex vector.
+   * \param magnetic_field [itpp::vec] magnetic field with specified strength for each dimension.
+   * \param position [int] of state.
+  */
   void apply_magnetic_kick(itpp::cvec& state, itpp::vec magnetic_field, int position){// {{{
     itpp::ivec pos(2);
     itpp::cvec moco(2);
@@ -909,6 +982,7 @@ void apply_ising_allvsall(itpp::cvec& state, double J){//{{{
     return;
   } // }}}
   // }}}
+
   // Testing routines {{{
   itpp::cmat MatrixForIsingZ(int i, int j, int total){// {{{
     int mini=std::min(i,j), maxi=std::max(i,j);
@@ -926,11 +1000,11 @@ void apply_ising_allvsall(itpp::cvec& state, double J){//{{{
     tmp=itppextmath::TensorProduct(tmp,itpp::eye_c(cfpmath::pow_2(total-maxi-1)));
     //     std::cout << "hola papi 5 "<< tmp.rows()<<" isingZ\n";
 
-    // 
+    //
     //     std::cout << "hola papi isingZ xx \n";
     //     std::cout << "min="<<mini<<", max="<<maxi<<"\n";
     // //     return TensorProduct(itpp::eye_c(pow_2( min(i,j) )))
-    return tmp; 
+    return tmp;
   } // }}}
   itpp::cmat MatrixForIsing_open_chain(double J, int total){// {{{
     itpp::cmat tmp(cfpmath::pow_2(total),cfpmath::pow_2(total));
@@ -961,6 +1035,6 @@ void apply_ising_allvsall(itpp::cvec& state, double J){//{{{
   //   itpp::cmat h= hamiltonian(MagenticField,Ising, Dimension, type_h);
   //   return eig_sym(h);
   // } // }}}
-  // Unsorted 
+  // Unsorted
 } // }}}
 #endif // SPIN_CHAIN

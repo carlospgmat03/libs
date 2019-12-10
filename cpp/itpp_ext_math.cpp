@@ -80,7 +80,7 @@ template <class Num_T> bool Contains(const itpp::Vec<Num_T >& v, const Num_T& e)
   return false;
 } //}}}
 template <class Num_T> bool AreEqual(const itpp::Array<Num_T >& a1, const itpp::Array<Num_T >& a2){// {{{
-//! Routine to check if two arrays are equal. 
+//! Routine to check if two arrays are equal.
 /*! It must be superseeded by the operator ==, but I still dont know how
  */
   if (a1.size() != a2.size()) return false;
@@ -94,12 +94,12 @@ template <class Num_T> bool AreAllEqual(const itpp::Vec<Num_T >& v){// {{{
   return true;
 } //}}}
 bool DoTheyIntersect(const itpp::Array< itpp::ivec >& Array1, const itpp::Array< itpp::ivec >& Array2){// {{{
-//! Do intersection of two arrays is empty. 
-/*! It treat them as sets.  
+//! Do intersection of two arrays is empty.
+/*! It treat them as sets.
  */
   for (int i=0; i<Array1.size(); i++){
     if ( itppextmath::Contains(Array2, Array1(i) )) {return true;}
-  } 
+  }
   return false;
 } //}}}
 double test_similar_complex_list(itpp::cvec& z1, itpp::cvec& z2){ // {{{
@@ -124,7 +124,7 @@ double test_similar_complex_list(itpp::cvec& z1, itpp::cvec& z2){ // {{{
 
 } // }}}
 template <class Num_T> bool AreEqual_modulo_order(const itpp::Array<Num_T >& a1, const itpp::Array<Num_T >& a2){// {{{
-//! Routine to check if two arrays are equal. 
+//! Routine to check if two arrays are equal.
 /*! It must be superseeded by the operator ==, but I still dont know how
  */
   if (a1.size() != a2.size()) return false;
@@ -154,19 +154,19 @@ template <class Num_T> int Position_FirstIntersection(const itpp::Array<Num_T >&
   return -1;
 } //}}}
 template <class Num_T> double compare(const itpp::Array<Num_T >& a1, const itpp::Array<Num_T >& a2){// {{{
-//! Routine to check if two arrays are equal. 
+//! Routine to check if two arrays are equal.
 /*! It must be superseeded by the operator ==, but I still dont know how
  */
   if (a1.size() != a2.size()) return -1;
   double x=0;
-  for (int i=0; i<a1.size();i++){ 
+  for (int i=0; i<a1.size();i++){
     x+= compare(a1(i),a2(i));
   }
   return x;
 } //}}}
 template <class Num_T> Num_T proportionality_constant(const itpp::Vec<Num_T >& a1, const itpp::Vec<Num_T >& a2){// {{{
 //! Attempt to get a proportionality constant between two vectors
-/*! 
+/*!
  */
   if (a1.size() != a2.size()){
     std::cerr << "Not even wrong" << std::endl;
@@ -176,19 +176,19 @@ template <class Num_T> Num_T proportionality_constant(const itpp::Vec<Num_T >& a
   return a1(position_largest)/a2(position_largest);
 } //}}}
 template <class Num_T> double proportionality_test(const itpp::Vec<Num_T >& a1, const itpp::Vec<Num_T >& a2, Num_T proportionality_constant){// {{{
-//! Routine to check if two vectors are proportional. 
-/*! 
+//! Routine to check if two vectors are proportional.
+/*!
  */
   if (a1.size() != a2.size()) return -1;
   return norm(a1-proportionality_constant*a2)/norm(a1);
 } //}}}
 template <class Num_T> double proportionality_test(const itpp::Vec<Num_T >& a1, const itpp::Vec<Num_T >& a2){// {{{
-//! Routine to check if two vectors are proportional. 
-/*! 
+//! Routine to check if two vectors are proportional.
+/*!
  */
   if (a1.size() != a2.size()) return -1;
   int position_largest = locateLargestAbs(a1);
-//   std::cout << "position_largest " << position_largest <<", a1(p)=" << a1(position_largest) << std::endl; 
+//   std::cout << "position_largest " << position_largest <<", a1(p)=" << a1(position_largest) << std::endl;
   Num_T proportionality_constant=a1(position_largest)/a2(position_largest);
   return proportionality_test(a1, a2, proportionality_constant);
 } //}}}
@@ -197,7 +197,7 @@ template <class Num_T> double proportionality_test(const itpp::Vec<Num_T >& a1, 
 itpp::cvec ReorderLastTwoSubsystems(itpp::cvec& psi, int n_middle, int n_last){ // {{{
   // the idea is to have a state psi_abc and to reorder it to get
   // the state psi_acb. n_middle is the dimension of the middle Hilbert space
-  // and n_last the dimension of the last Hilbert space 
+  // and n_last the dimension of the last Hilbert space
 
   itpp::cvec psi_reorderd(psi.size());
   std::complex<double> tmp;
@@ -205,15 +205,15 @@ itpp::cvec ReorderLastTwoSubsystems(itpp::cvec& psi, int n_middle, int n_last){ 
   int nb=n_middle, nc=n_last;
   int na=psi.size()/(nb*nc);
   int index_1, index_2;
-  for (int ia=0; ia<na; ia++){ for (int ib=0; ib<nb; ib++){ for (int ic=0; ic<nc; ic++){ 
-    
+  for (int ia=0; ia<na; ia++){ for (int ib=0; ib<nb; ib++){ for (int ic=0; ic<nc; ic++){
+
     index_1 = ia*nb*nc+ ib*nc+ ic;
     index_2 = ia*nb*nc+ ic*nb+ ib;
 //     std::cout << "["<<ia<<ib<<ic<<"] Poniendo el original "
 //     << index_1<<" en la posicion "<<index_2 << std::endl;
     psi_reorderd(index_2) = psi(index_1);
 //     psi(index_1)= psi(index_2);
-//     psi(index_2)= tmp; 
+//     psi(index_2)= tmp;
   } } }
   return psi_reorderd;
 } // }}}
@@ -233,7 +233,7 @@ bool vector_greater_than(const itpp::ivec& v, const itpp::ivec& w){ // {{{
         return true;
       } else if ( v(i)<w(i)) {
         return false;
-      } 
+      }
     }
     return false;
   }
@@ -280,9 +280,9 @@ itpp::Array<itpp::ivec> sort(const itpp::Array<itpp::ivec>& input){ // {{{
   return result;
 } //}}}
 template <class Num_T> itpp::Array<Num_T > Flatten(const itpp::Array<itpp::Array<Num_T > >& vct){ // {{{
-  itpp::Array<Num_T > tmp(0); 
-  for (int i=0; i<vct.size(); i++){ 
-    tmp=itpp::concat(tmp,vct(i)); 
+  itpp::Array<Num_T > tmp(0);
+  for (int i=0; i<vct.size(); i++){
+    tmp=itpp::concat(tmp,vct(i));
   }
   return tmp;
 } //}}}
@@ -303,11 +303,11 @@ template <class Num_T> void swap(itpp::Vec<Num_T >& v, const int p1, const int p
 } //}}}
 template <class Num_T> itpp::Array<Num_T > CircularRotateRight(const itpp::Array<Num_T >& v){ // {{{
   itpp::Array<Num_T > tmp=v;
-  tmp.shift_right(Last(tmp)); 
+  tmp.shift_right(Last(tmp));
   return tmp;
 } //}}}
 template <class Num_T> itpp::Array<Num_T > CircularRotateRight(const itpp::Array<Num_T >& v, const int n){ // {{{
-  int n_true=n%v.size(); 
+  int n_true=n%v.size();
   if (n_true == 0){return v;}
   if(n_true<0){n_true += v.size();}
   itpp::Array<Num_T > tmp=v;
@@ -316,23 +316,23 @@ template <class Num_T> itpp::Array<Num_T > CircularRotateRight(const itpp::Array
 } //}}}
 template <class Num_T> itpp::Array<Num_T > CircularRotateRight(const itpp::Array<Num_T >& v, const int i_left, const int i_right){ // {{{
   itpp::Array<Num_T > tmp=v(i_left, i_right);
-  tmp.shift_right(Last(tmp)); 
+  tmp.shift_right(Last(tmp));
   return tmp;
 } //}}}
 template <class Num_T> itpp::Array<Num_T > CircularRotateLeft(const itpp::Array<Num_T >& v){ // {{{
   itpp::Array<Num_T > tmp=v;
-  tmp.shift_left(v(0)); 
+  tmp.shift_left(v(0));
   return tmp;
 } //}}}
 itpp::cmat Reorder_state_tensor_form(itpp::cvec vector,int which){ // {{{
   //   std::cout << "@Reorder_state_tensor_form -2" << std::endl;
-  int dim1 = cfpmath::pow_2(cfpmath::BitCount(which)); 
+  int dim1 = cfpmath::pow_2(cfpmath::BitCount(which));
   //   std::cout << "@Reorder_state_tensor_form -1" << std::endl;
   int dim2 = vector.size()/dim1;
   //   std::cout << "@Reorder_state_tensor_form 0" << std::endl;
 //   int qubits=cfpmath::log_base_2(vector.size());
   itpp::cmat out(dim2,dim1); out=0.;
-  int col, row; 
+  int col, row;
   //   std::cout << "@Reorder_state_tensor_form 1" << std::endl;
   for (int j=0; j<vector.size(); j++){
     cfpmath::extract_digits(j,col,row,which);
@@ -732,7 +732,7 @@ itpp::cmat devectorization_density_matrix(const itpp::vec& rho_vec){ // {{{
 //
 // Traces and Partial traces 
 itpp::cmat partial_trace(const itpp::cvec& state, int dim_leave){ // {{{
-  // This partial trace allows to leave a space of arbitrary dimension. Let 
+  // This partial trace allows to leave a space of arbitrary dimension. Let
   // H = H_a H_b be th ehilbert space. "i" labels H_a and "j" the H_b
   // then
   // psi = \sum \alpha_ij |ij>
@@ -754,10 +754,29 @@ itpp::cmat partial_trace(const itpp::cvec& state, int dim_leave){ // {{{
   return rho_B;
 
 } // }}}
+
+/**
+ * \brief Partial trace of a complex state.
+ *
+ * Calculates the partial trace of the specified composite state, obtaining
+ * the subspace indicated with the second parameter.
+ *
+ * The position of the qubits that define the desired subspace is specified in
+ * binary form in the variable `which`, for example, `0000011`, with `00000`
+ * the elements of the environment and `11` are the elements of the desired
+ * subspace, the variable is written in its decimal value.
+ *
+ * rho^A = tr_B (rho^AB)
+ *
+ * \param state [itpp::cvec] composite state in the form of complex vector.
+ * \param which [int] position of desired subspace qubits, specified in binary, witten in decimal
+ *
+ * \return resulting matrix [itpp::cmat], with complex elements.
+*/
 itpp::cmat partial_trace_qubits(itpp::cvec state, int which){ // {{{
 //   std::cout << "@partial_trace_qubits 1" << std::endl;
   int size_rho=cfpmath::pow_2(cfpmath::BitCount(which));
-//   std::cout << "@partial_trace_qubits size_rho=" << size_rho 
+//   std::cout << "@partial_trace_qubits size_rho=" << size_rho
 //     << ", which = " << which << std::endl;
   itpp::cmat reordered_state = Reorder_state_tensor_form(state, which), rho(size_rho,size_rho );
 //   std::cout << "@partial_trace_qubits 2" << itpp::norm(reordered_state) <<std::endl;
@@ -771,6 +790,25 @@ itpp::cmat partial_trace_qubits(itpp::cvec state, int which){ // {{{
   return rho;
 
 } // }}}
+
+/**
+ * \brief Partial trace of a density complex matrix.
+ *
+ * Calculates the partial trace of the specified density matrix, obtaining
+ * the subspace indicated with the second parameter.
+ *
+ * The position of the qubits that define the desired subspace is specified in
+ * binary form in the variable `which`, for example, `0000011`, with `00000`
+ * the elements of the environment and `11` are the elements of the desired
+ * subspace, the variable is written in its decimal value.
+ *
+ * rho^A = tr_B (rho^AB)
+ *
+ * \param rho [itpp::cmat] density complex matrix.
+ * \param which [int] position of desired subspace qubits, specified in binary, witten in decimal
+ *
+ * \return resulting matrix [itpp::cmat], with complex elements.
+*/
 itpp::cmat partial_trace_qubits(const itpp::cmat& rho, int which){ // {{{
 //   std::cout << "@partial_trace_qubits 1" << std::endl;
   int DimensionB=cfpmath::pow_2(cfpmath::BitCount(which));
@@ -810,12 +848,12 @@ std::complex<double> trAB(const itpp::cmat& A, const itpp::cmat& B){ // {{{
   for (int i=0; i<ni; i++){
     for (int j=0; j<nj; j++){
       tr+=B(i,j)*A(j,i);
-//       std::cout << A(i,j)*B(j,i) << 
+//       std::cout << A(i,j)*B(j,i) <<
     }
   }
   return tr;
 } // }}}
-// Tensor Products 
+// Tensor Products
 template <class Num_T> itpp::Mat<Num_T> postpend_tensor_identity(const itpp::Mat<Num_T>& Matrix, const int dim_identity){ // {{{
   itpp::Mat<Num_T> tmp(Matrix.rows()*dim_identity, Matrix.cols()*dim_identity);
   tmp.zeros();
@@ -838,9 +876,9 @@ template <class Num_T> itpp::Mat<Num_T> extend_qubit_operator(const itpp::Mat<Nu
   int number_of_nontrivial_positions = cfpmath::BitCount(encoded_nontrivial_positions);
   int i_col_total, j_col_total;
   for (int i=0; i<cfpmath::pow_2(total_number_of_qubits-number_of_nontrivial_positions); i++) {
-    for (int i_col=0; i_col<cfpmath::pow_2(number_of_nontrivial_positions); i_col++){ 
+    for (int i_col=0; i_col<cfpmath::pow_2(number_of_nontrivial_positions); i_col++){
       i_col_total = cfpmath::merge_two_numbers(i_col, i, encoded_nontrivial_positions);
-      for (int j_col=0; j_col<cfpmath::pow_2(number_of_nontrivial_positions); j_col++){ 
+      for (int j_col=0; j_col<cfpmath::pow_2(number_of_nontrivial_positions); j_col++){
         j_col_total = cfpmath::merge_two_numbers(j_col, i, encoded_nontrivial_positions);
         tmp(i_col_total, j_col_total)=Matrix(i_col, j_col);
       }
@@ -874,9 +912,38 @@ template <class Num_T> itpp::Mat<Num_T> prepend_tensor_identity(const itpp::Mat<
   }
   return tmp;
 } // }}}
+
+/**
+ * \brief Tensor product of three matrices.
+ *
+ * Calculates the tensor product of three specified matrices, generating another
+ * matrix with the result.
+ *
+ * Matrix1 ⊗ Matrix2 ⊗ Matrix3
+ *
+ * \param Matrix1 [itpp::Mat<Num_T>] matrix 1 with data type elements Num_T.
+ * \param Matrix2 [itpp::Mat<Num_T>] matrix 2 with data type elements Num_T.
+ * \param Matrix3 [itpp::Mat<Num_T>] matrix 3 with data type elements Num_T.
+ *
+ * \return resulting matrix [itpp::Mat<Num_T>], with same data type as in the parameters.
+*/
 template <class Num_T> itpp::Mat<Num_T> TensorProduct(const itpp::Mat<Num_T>& Matrix1, const itpp::Mat<Num_T>& Matrix2, const itpp::Mat<Num_T>& Matrix3){ // {{{
-return TensorProduct(TensorProduct(Matrix1,Matrix2),Matrix3);
+  return TensorProduct(TensorProduct(Matrix1,Matrix2),Matrix3);
 } // }}}
+
+/**
+ * \brief Tensor product of two vectors.
+ *
+ * Calculates the tensor product of two specified vectors, generating another
+ * vector with the result.
+ *
+ * Vec1 ⊗ Vec2
+ *
+ * \param Vec1 [itpp::Vec<Num_T>] vector 1 with data type elements Num_T.
+ * \param Vec2 [itpp::Vec<Num_T>] vector 2 with data type elements Num_T.
+ *
+ * \return resulting vector [itpp::Vec<Num_T>], with same data type as in the parameters.
+*/
 template <class Num_T> itpp::Vec<Num_T> TensorProduct(const itpp::Vec<Num_T>& Vec1, const itpp::Vec<Num_T>& Vec2){ // {{{
   itpp::Vec<Num_T> tmp(Vec1.size()*Vec2.size());
   tmp.zeros();
@@ -890,6 +957,20 @@ template <class Num_T> itpp::Vec<Num_T> TensorProduct(const itpp::Vec<Num_T>& Ve
 //       std::cout << "Hola cabron " << std::endl;
   return tmp;
 } // }}}
+
+/**
+ * \brief Tensor product of given states.
+ *
+ * Calculates the tensor product of all the states specified in the array
+ * received, making the product in the order in which these states are found
+ * within the array.
+ *
+ * States(0) ⊗ States(1) ⊗ States(2) ⊗ ... ⊗ States(States.size())
+ *
+ * \param States [itpp::Array<itpp::Vec<Num_T>>] set of states in an array.
+ *
+ * \return resulting vector [itpp::Vec<Num_T>], with same data type as in the parameters.
+*/
 template <class Num_T> itpp::Vec<Num_T> TensorProduct(const itpp::Array<itpp::Vec<Num_T> >& States){ // {{{
   itpp::Vec<Num_T> tmp=States(0);
   for (int i=1; i<States.size(); i++){
@@ -897,12 +978,42 @@ template <class Num_T> itpp::Vec<Num_T> TensorProduct(const itpp::Array<itpp::Ve
   }
   return tmp;
 } // }}}
+
+/**
+ * \brief Tensor product of two vectors.
+ *
+ * Calculates the tensor product of two specified vectors, generating another
+ * vector with the result. First vector is of type itpp::cvec (complex),
+ * while the second is of type itpp::vec (double).
+ *
+ * Vec1 ⊗ Vec2
+ *
+ * \param Vec1 [itpp::cvec] vector 1 with data type elements complex<double>.
+ * \param Vec2 [itpp::vec] vector 2 with data type elements double.
+ *
+ * \return resulting vector [itpp::cvec], with data type complex<double>.
+*/
 itpp::cvec TensorProduct(const itpp::cvec& Vec1, const itpp::vec& Vec2){ // {{{
-return TensorProduct(Vec1, to_cvec(Vec2));
-// return Vec1;
+  return TensorProduct(Vec1, to_cvec(Vec2));
+  // return Vec1;
 } // }}}
+
+/**
+ * \brief Tensor product of two matrices.
+ *
+ * Calculates the tensor product of two specified matrices, generating another
+ * matrix with the result.
+ * Uses the itpp::kron method.
+ *
+ * Matrix1 ⊗ Matrix2
+ *
+ * \param Matrix1 [itpp::Mat<Num_T>] matrix 1 with data type elements Num_T.
+ * \param Matrix2 [itpp::Mat<Num_T>] matrix 2 with data type elements Num_T.
+ *
+ * \return resulting matrix [itpp::Mat<Num_T>], with same data type as in the parameters.
+*/
 template <class Num_T> itpp::Mat<Num_T> TensorProduct(const itpp::Mat<Num_T>& Matrix1, const itpp::Mat<Num_T>& Matrix2){ // {{{
-//   cerr << "There is the itpp::kron function that does exactly what I wanted here" << endl ; 
+//   cerr << "There is the itpp::kron function that does exactly what I wanted here" << endl ;
 //   abort();
 //   itpp::Mat<Num_T> tmp(Matrix1.rows()*Matrix2.rows(), Matrix1.cols()*Matrix2.cols());
 //   tmp.zeros();
@@ -913,6 +1024,20 @@ template <class Num_T> itpp::Mat<Num_T> TensorProduct(const itpp::Mat<Num_T>& Ma
 //   }
   return itpp::kron(Matrix1, Matrix2);
 } // }}}
+
+/**
+ * \brief Tensor product of given matrices.
+ *
+ * Calculates the tensor product of all the matrices specified in the array
+ * received, making the product in the order in which these matrices are found
+ * within the array.
+ *
+ * Matrices(0) ⊗ Matrices(1) ⊗ Matrices(2) ⊗ ... ⊗ Matrices(Matrices.size())
+ *
+ * \param Matrices [itpp::Array<itpp::Mat<Num_T>>] set of matrices in an array.
+ *
+ * \return resulting matrix [itpp::Mat<Num_T>], with same data type as in the parameters.
+*/
 template <class Num_T> itpp::Mat<Num_T> TensorProduct(const itpp::Array<itpp::Mat<Num_T> >& Matrices){ // {{{
   itpp::Mat<Num_T> tmp=Matrices(0);
   for (int i=1; i<Matrices.size(); i++){
@@ -920,22 +1045,49 @@ template <class Num_T> itpp::Mat<Num_T> TensorProduct(const itpp::Array<itpp::Ma
   }
   return tmp;
 } // }}}
+
+/**
+ * \brief Tensor power of given state (complex vector).
+ *
+ * Calculates the tensor product as many times as specified with the second argument.
+ *
+ * state ⊗ state ⊗ state ⊗ ... ⊗ state (`qub` times)
+ *
+ * \param state [itpp::cvec] state in the form of complex vector.
+ * \param qub [int] power, how many times the tensor product will be applied to the state.
+ *
+ * \return resulting vector [itpp::cvec], with complex elements.
+*/
 itpp::cvec TensorPow(const itpp::cvec state, int qub){ //{{{
-itpp::cvec newstate;
-newstate=state;
-for(int i=0;i<qub-1;i++){
-newstate=TensorProduct(newstate,state);
-}
-return newstate;
+  itpp::cvec newstate;
+  newstate=state;
+  for(int i=0;i<qub-1;i++){
+    newstate=TensorProduct(newstate,state);
+  }
+  return newstate;
 } //}}}
+
+/**
+ * \brief Tensor power of given complex matrix.
+ *
+ * Calculates the tensor product as many times as specified with the second argument.
+ *
+ * Matrix ⊗ Matrix ⊗ Matrix ⊗ ... ⊗ Matrix (`qub` times)
+ *
+ * \param state [itpp::cvec] matrix to calculate the tensor product.
+ * \param qub [int] power, how many times the tensor product will be applied to the matrix.
+ *
+ * \return resulting matrix [itpp::cmat], with complex elements.
+*/
 itpp::cmat TensorPow(const itpp::cmat Matrix, int qub){ //{{{
-itpp::cmat newMatrix;
-newMatrix=Matrix;
-for(int i=0;i<qub-1;i++){
-newMatrix=TensorProduct(newMatrix,Matrix);
-}
-return newMatrix;
+  itpp::cmat newMatrix;
+  newMatrix=Matrix;
+  for(int i=0;i<qub-1;i++){
+    newMatrix=TensorProduct(newMatrix,Matrix);
+  }
+  return newMatrix;
 } //}}}
+
 // Exponentiation
 itpp::mat exponentiate_real_symmetric(const itpp::mat& Matrix){ // {{{
 // template <class Num_T> itpp::Mat<Num_T> exponentiate(itpp::Mat<Num_T> Matrix){
@@ -946,7 +1098,7 @@ itpp::mat exponentiate_real_symmetric(const itpp::mat& Matrix){ // {{{
   bool exito = itpp::eig_sym(Matrix, eigenvalues, V);
   double how_symmetric = test_symmetry(Matrix);
   if (exito==false || how_symmetric > 10e-12){
-    std::cerr << "Algun pedo en exponentiate_real_symmetric\n"; 
+    std::cerr << "Algun pedo en exponentiate_real_symmetric\n";
     abort();
   }
   tmp = V*itpp::diag(itpp::exp(eigenvalues))* V.hermitian_transpose();
@@ -965,22 +1117,22 @@ itpp::cmat exponentiate(const itpp::cmat& Matrix){ // {{{
   itpp::cvec eigenvalues;
   itpp::cmat V;
   bool exito = itpp::eig(Matrix, eigenvalues, V);
-  double revision; 
+  double revision;
   revision = itpp::norm(Matrix -
       V*itpp::diag(eigenvalues)* V.hermitian_transpose())/itpp::norm(Matrix);
 //   std::cout << "@exponentiate, 50. Error es " << revision << std::endl;
   if (revision > 10e-12 || !exito){
-    std::cerr << "Matrix=" << Matrix << std::endl;  
-    std::cerr << "Eigenvalores=" << eigenvalues << std::endl;  
-    std::cerr << "Ortonormalidad de eigenvectores=" << itpp::norm(V*V.hermitian_transpose()-itpp::eye_c(Matrix.size())) << std::endl;  
-    std::cerr << "Ortonormalidad de eigenvectores, matriz completa=\n" << abs(V*V.hermitian_transpose()) << std::endl;  
+    std::cerr << "Matrix=" << Matrix << std::endl;
+    std::cerr << "Eigenvalores=" << eigenvalues << std::endl;
+    std::cerr << "Ortonormalidad de eigenvectores=" << itpp::norm(V*V.hermitian_transpose()-itpp::eye_c(Matrix.size())) << std::endl;
+    std::cerr << "Ortonormalidad de eigenvectores, matriz completa=\n" << abs(V*V.hermitian_transpose()) << std::endl;
     for (int i=0; i<Matrix.rows(); i++){
-      std::cerr << "Ecuacion de eigengectores sirve? i=" << i << ", " << norm(Matrix*V.get_col(i)-eigenvalues(i)*V.get_col(i)) << std::endl;  
+      std::cerr << "Ecuacion de eigengectores sirve? i=" << i << ", " << norm(Matrix*V.get_col(i)-eigenvalues(i)*V.get_col(i)) << std::endl;
     }
-    std::cerr << "Algun pedo en exponentiate! \nRevision=" << revision 
-      <<"Normas, "<<itpp::norm(Matrix) << ", " << exito << std::endl; 
+    std::cerr << "Algun pedo en exponentiate! \nRevision=" << revision
+      <<"Normas, "<<itpp::norm(Matrix) << ", " << exito << std::endl;
     std::cerr << "La rutina de lapack tiene pedos cuando esta muy sparse la matriz,\n"
-      <<"por ejemplo un elemento del modelo de free fermions con 2D en primeros vecinos" << std::endl; 
+      <<"por ejemplo un elemento del modelo de free fermions con 2D en primeros vecinos" << std::endl;
     abort();
   }
   tmp = V*itpp::diag(itpp::exp(eigenvalues))* V.hermitian_transpose();
@@ -1001,13 +1153,13 @@ itpp::cmat exponentiate_nonsym(const itpp::cmat& Matrix){ // {{{
   itpp::cmat invV;
   bool exito = itpp::eig(Matrix, eigenvalues, V);
   bool exito2 = itpp::inv(V,invV);
-  double revition; 
+  double revition;
   revition = itpp::norm(Matrix -
       (V*itpp::diag(eigenvalues)* invV));
   if (revition > 10e-12 || !exito || !exito2){
-    std::cerr << "Algun xxx pedo en exponentiate " << revition << ", " << exito << std::endl; 
+    std::cerr << "Algun xxx pedo en exponentiate " << revition << ", " << exito << std::endl;
     std::cerr << "La rutina de lapack tiene pedos cuando esta muy sparse la matriz,\n"
-      <<"por ejemplo un elemento del modelo de free fermions con 2D en primeros vecinos" << std::endl; 
+      <<"por ejemplo un elemento del modelo de free fermions con 2D en primeros vecinos" << std::endl;
     abort();
   }
   tmp = V*itpp::diag(itpp::exp(eigenvalues))* invV;
@@ -1025,13 +1177,13 @@ itpp::cmat exponentiate(const itpp::mat& Matrix){ // {{{
   itpp::cvec eigenvalues;
   itpp::cmat V;
   bool exito = itpp::eig(Matrix, eigenvalues, V);
-  double revition; 
+  double revition;
   revition = itpp::norm(Matrix -
       V*itpp::diag(eigenvalues)* V.hermitian_transpose());
   if (revition > 10e-12 || !exito){
-    std::cerr << "Algun pedo en exponentiate" << revition << ", " << exito << std::endl; 
+    std::cerr << "Algun pedo en exponentiate" << revition << ", " << exito << std::endl;
     std::cerr << "La rutina de lapack tiene pedos cuando esta muy sparse la matriz,\n"
-      <<"por ejemplo un elemento del modelo de free fermions con 2D en primeros vecinos" << std::endl; 
+      <<"por ejemplo un elemento del modelo de free fermions con 2D en primeros vecinos" << std::endl;
     abort();
   }
   tmp = V*itpp::diag(itpp::exp(eigenvalues))* V.hermitian_transpose();
@@ -1099,7 +1251,7 @@ template <class Num_T> itpp::Mat<Num_T> Proyector(const itpp::Vec<Num_T>& psi){ 
   return p;
 } // }}}
 template <class Num_T> itpp::Mat<Num_T> DirectSum(const itpp::Array<itpp::Mat<Num_T> >& Matrices){ // {{{
-  
+
   itpp::Mat<Num_T> tmp=Matrices(0);
   for (int i=1; i<Matrices.size(); i++){
     tmp=DirectSum(tmp, Matrices(i));
@@ -1239,6 +1391,137 @@ itpp::ivec all_bit_rotations(int n, int size_register){ //{{{
 //   return ;
   return tmp;
 } // }}}
+// }}}
+// set manipulation {{{
+template <class Num_T> itpp::Mat<Num_T > ArrayToMatrix(const itpp::Array<itpp::Vec<Num_T> >& A){// {{{
+//   itpp::Mat<Num_T > tmp;
+  itpp::Mat<Num_T > tmp(A.size(),A(0).size());
+  for (int i=0; i<A.size(); i++){
+    tmp.set_row(i,A(i));
+  }
+  return tmp;
+
+}// }}}
+template <class Num_T> itpp::Mat<Num_T > OuterSum(const itpp::Vec<Num_T >& A, const itpp::Vec<Num_T >& B){// {{{
+  itpp::Mat<Num_T > tmp(A.size(), B.size());
+  for (int iA=0; iA<A.size(); iA++){
+    for (int iB=0; iB<A.size(); iB++){
+      tmp(iA, iB)=A(iA)+B(iB);
+    }
+  }
+  return tmp;
+}// }}}
+template <class Num_T> itpp::Array<Num_T > Outer(const itpp::Array<Num_T >& A, const itpp::Array<Num_T >& B){// {{{
+  itpp::Array<Num_T > tmp(0);
+  for (int i=0; i<A.size(); i++){
+    tmp=itpp::concat(tmp, Elementwiseconcat(A(i),B));
+  }
+  return tmp;
+
+}// }}}
+template <class Num_T> bool unique_elements(const Num_T & A){// {{{
+  return A.size() == Union(A).size();
+}// }}}
+template <class Num_T> Num_T Union(const Num_T & A){// {{{
+  if (A.size() == 0){
+    return A;
+  }
+  Num_T tmp(1);
+  tmp(0) = A(0);
+  for (int i = 1; i< A.size(); i++){
+    if (!Contains(tmp, A(i))){ tmp = itpp::concat(tmp, A(i)); }
+  }
+  return tmp;
+}// }}}
+template <class Num_T> itpp::Array<Num_T > Union(const itpp::Array<Num_T >& A, const itpp::Array<Num_T >& B){// {{{
+  if (A.size() == 0){
+    return Union(B);
+  }
+  itpp::Array<Num_T > tmp;
+  tmp.set_size(1);
+  tmp(0) = A(0);
+  for (int i = 1; i< A.size(); i++){
+    if (!Contains(tmp, A(i))){ tmp = itpp::concat(tmp, A(i)); }
+  }
+  for (int i = 0; i< B.size(); i++){
+    if (!Contains(tmp, B(i))){ tmp = itpp::concat(tmp, B(i)); }
+  }
+  return tmp;
+}// }}}
+template <class Num_T> itpp::Array<Num_T > del(const itpp::Array<Num_T >& A, const int i){// {{{
+  int sA = A.size();
+  if (i==0){
+    if (sA==1){
+      itpp::Array<Num_T > tmp(0);
+      return tmp;
+    } else {
+      return A(1,sA-1);
+    }
+  } else if (i==sA -1) {
+    return A(0,i-1);
+  } else {
+    return itpp::concat(A(0,i-1),A(i+1,sA-1));
+  }
+}// }}}
+template <class Num_T> itpp::Array<Num_T > minus(const itpp::Array<Num_T >& A, const Num_T & B){// {{{
+  itpp::Array<Num_T > A_Union=Union(A);
+  if (!Contains(A_Union,B)){
+    return A_Union;
+  } else {
+    int pi=Position_FirstIntersection(A_Union,B);
+    return del(A_Union,pi);
+  }
+}// }}}
+template <class Num_T> itpp::Array<Num_T > minus(const itpp::Array<Num_T >& A, const itpp::Array<Num_T >& B){// {{{
+  itpp::Array<Num_T > A_union=Union(A), tmp;
+  for (int i = 0; i< A_union.size(); i++){
+    if (!Contains(B, A_union(i))){ tmp = itpp::concat(tmp, A_union(i)); }
+  }
+  return tmp ;
+}// }}}
+bool EmptyIntersection(const itpp::Array< itpp::ivec >& Array1, const itpp::Array< itpp::ivec >& Array2){// {{{
+//! Stablish if 2 Arrays have an intersection
+/*! It treat them as sets.
+ */
+  for (int i=0; i<Array1.size(); i++){
+    if ( itppextmath::Contains(Array2, Array1(i) )){
+      return false;
+    }
+  }
+  return true;
+}// }}}
+itpp::Array< itpp::ivec > Intersection(const itpp::Array< itpp::ivec >& Array1, const itpp::Array< itpp::ivec >& Array2){// {{{
+//! Get intersection of two arrays.
+/*! It treat them as sets.
+ */
+  itpp::Array<itpp::ivec> tmp;
+  for (int i=0; i<Array1.size(); i++){
+    if ( itppextmath::Contains(Array2, Array1(i) )){
+      tmp=itpp::concat(tmp,Array1(i));
+    }
+  }
+  return Union(tmp);
+}// }}}
+template <class Num_T> itpp::Array<Num_T > RemoveItem(const itpp::Array<Num_T >& v, const int index){// {{{
+  if (index < 0 || index > v.size()-1){
+    std::cerr << "Something wrong in RemoveItem\n";
+    abort();
+  }
+  if (v.size()==1){return itpp::Array<Num_T >(0);}
+  if (index == 0){ return v( 1, v.size()-1);}
+  if (index == v.size()-1){ return v(0, v.size()-2);}
+  return itpp::concat(v(0, index -1), v(index + 1, v.size()-1));
+}// }}}
+template <class Num_T> itpp::Array<Num_T > RemoveItem(const itpp::Array<Num_T >& v, const itpp::ivec& indices){// {{{
+  itpp::Array<Num_T > tmp = v;
+  itpp::ivec indices_sorted = indices;
+  itpp::sort(indices_sorted);
+  for (int i =indices.size()-1; i>=0; i--){ tmp=RemoveItem(tmp,indices(i)); }
+  return tmp;
+}// }}}
+itpp::Mat<int>  BulkPositionUnion2PositionSets(const itpp::Mat<int>& A, const itpp::Mat<int>& B){// {{{
+  return itpp::concat_vertical(A,B);
+}// }}}
 // }}}
 // Functional Element manipulation, on all elements {{{
 template <class Num_T> Num_T  Chop(const Num_T& A, double epsilon=1e-12){ // {{{
@@ -1390,7 +1673,7 @@ itpp::ivec GetBlock(const itpp::Array<itpp::ivec>& positions, const int length_c
     return itpp::vec_2(0,0);
   }
   if (positions.size() != 4){
-    std::cerr << "Something wrong in GetBlock sdlkjhflakshf, positions.size()="<< positions.size() 
+    std::cerr << "Something wrong in GetBlock sdlkjhflakshf, positions.size()="<< positions.size()
       << ", length_cell=" << length_cell<<"\n";
     abort();
   }
@@ -1417,7 +1700,7 @@ itpp::ivec GetBlock(const itpp::Array<itpp::ivec>& positions, const int length_c
       position_block(i)=las(0)/cell_size;
     }
   }
-  return position_block; 
+  return position_block;
 }
 void get_base_position_and_delta(const  itpp::Array<itpp::ivec > Positions, int& delta, itpp::ivec& base_position){
   int candidate_delta;
@@ -1428,18 +1711,18 @@ void get_base_position_and_delta(const  itpp::Array<itpp::ivec > Positions, int&
   }
   delta = -1;
   for (int i=0; i< Positions.size() ; i++){
-    candidate_delta= itpp::max(Positions(i)-base_position ); 	
+    candidate_delta= itpp::max(Positions(i)-base_position );
     if (candidate_delta > 0 && delta < 0) delta = candidate_delta;
     if (candidate_delta < delta)          delta = candidate_delta;
   }
-  return; 
+  return;
 }
 itpp::Array<itpp::ivec> rotationaly_order_vector_renormalized_lattices_3(const itpp::Array<itpp::ivec >& A, const int length_mera){
   // This routine identifies the canonical order of a set of points
-  // that me a valid set of points after a renormalization step in a 
-  // 3^n x 3^n or 2*3^n x 2*3^n lattice 
+  // that me a valid set of points after a renormalization step in a
+  // 3^n x 3^n or 2*3^n x 2*3^n lattice
   if (A.size() != 4){
-    std::cerr << "@rotationaly_order_vector_renormalized_lattices_3. Error, the size must be 4. Actual size: " 
+    std::cerr << "@rotationaly_order_vector_renormalized_lattices_3. Error, the size must be 4. Actual size: "
       << A.size() << std::endl;
     abort();
   }
@@ -1466,7 +1749,7 @@ itpp::Array<itpp::ivec> rotationaly_order_vector_renormalized_lattices_3(const i
   if (!AreEqual_modulo_order(DesiredPositions, A)){
     std::cerr << "@rotationaly_order_vector_renormalized_lattices_3. Error, las posiciones no coinciden:"
       << "DesiredPositions: " << DesiredPositions << std::endl
-      << "A: " << A << std::endl; 
+      << "A: " << A << std::endl;
   }
   return DesiredPositions;
 }
@@ -1480,11 +1763,11 @@ itpp::Array<itpp::ivec> rotational_order(const itpp::Array<itpp::ivec >& A){
   DesiredPositions(2) = base+itpp::vec_2(Delta,Delta);
   DesiredPositions(3) = base+itpp::vec_2(Delta,0) ;
   return DesiredPositions;
-} 
+}
 // }}}
 // Fermionic specialized functions {{{
 void UpDownMostIndexFermionicMatrix(itpp::cmat& MatrixEven, itpp::cmat& MatrixOdd, const std::string direction, const std::string position){
-  if ( (position != "most" && position != "least") || 
+  if ( (position != "most" && position != "least") ||
       (direction != "outgoing_to_incomming" && direction != "incomming_to_outgoing")){
     std::cerr << "Error in DownMostSignificantIndexFermionicMatrix, xuweor98\n"
       << "direction:"<< direction << "\n"
@@ -1501,60 +1784,60 @@ void UpDownMostIndexFermionicMatrix(itpp::cmat& MatrixEven, itpp::cmat& MatrixOd
   }
   itpp::cmat new_even, new_odd;
   if (direction == "outgoing_to_incomming"){
-    new_even.set_size(d_out/2,2*d_in); 
-    new_odd.set_size(d_out/2,2*d_in); 
+    new_even.set_size(d_out/2,2*d_in);
+    new_odd.set_size(d_out/2,2*d_in);
     if (position=="most"){
       new_even.set_submatrix(0,0, MatrixEven(0, d_out/2 -1, 0, d_in-1));
       new_even.set_submatrix(0,d_in, MatrixOdd(d_out/2, d_out -1, 0, d_in-1));
       new_odd.set_submatrix(0,0, MatrixOdd(0, d_out/2 -1, 0, d_in-1));
       new_odd.set_submatrix(0,d_in, MatrixEven(d_out/2, d_out -1, 0, d_in-1));
-    } 
+    }
     if (position=="least"){
       bool parity_i, parity_j;
       std::complex<double> matrix_element;
       for (int i=0; i < d_out; i++){
         for (int j=0; j < 2*d_in; j++){
-          parity_i = cfpmath::parity_sum_digits_base_2(i); 
-          parity_j = cfpmath::parity_sum_digits_base_2(j); 
-          if (parity_j == 0 ){ 
+          parity_i = cfpmath::parity_sum_digits_base_2(i);
+          parity_j = cfpmath::parity_sum_digits_base_2(j);
+          if (parity_j == 0 ){
             matrix_element = MatrixEven(i,j/2);
-          } else { 
-            matrix_element = MatrixOdd(i,j/2); 
+          } else {
+            matrix_element = MatrixOdd(i,j/2);
           }
-          if (parity_i == 0 ){ 
+          if (parity_i == 0 ){
             new_even(i/2,j) = matrix_element;
-          } else { 
-            new_odd(i/2,j) = matrix_element; 
+          } else {
+            new_odd(i/2,j) = matrix_element;
           }
         }
       }
     }
   }
   if (direction == "incomming_to_outgoing"){
-    new_even.set_size(d_out*2,d_in/2); 
-    new_odd.set_size(d_out*2,d_in/2); 
+    new_even.set_size(d_out*2,d_in/2);
+    new_odd.set_size(d_out*2,d_in/2);
     if (position=="most"){
       new_even.set_submatrix(0,0, MatrixEven(0, d_out -1, 0, d_in/2-1));
       new_even.set_submatrix(d_out, 0, MatrixOdd(0, d_out -1, d_in/2, d_in-1));
       new_odd.set_submatrix(0,0, MatrixOdd(0, d_out -1, 0, d_in/2 -1));
       new_odd.set_submatrix(d_out, 0, MatrixEven(0, d_out -1, d_in/2, d_in-1));
-    } 
+    }
     if (position=="least"){
       bool parity_i, parity_j;
       std::complex<double> matrix_element;
       for (int i=0; i < 2*d_out; i++){
         for (int j=0; j < d_in; j++){
-          parity_i = cfpmath::parity_sum_digits_base_2(i); 
-          parity_j = cfpmath::parity_sum_digits_base_2(j); 
-          if (parity_i == 0 ){ 
+          parity_i = cfpmath::parity_sum_digits_base_2(i);
+          parity_j = cfpmath::parity_sum_digits_base_2(j);
+          if (parity_i == 0 ){
             matrix_element = MatrixEven(i/2,j);
-          } else { 
-            matrix_element = MatrixOdd(i/2,j); 
+          } else {
+            matrix_element = MatrixOdd(i/2,j);
           }
-          if (parity_j == 0 ){ 
+          if (parity_j == 0 ){
             new_even(i,j/2) = matrix_element;
-          } else { 
-            new_odd(i,j/2) = matrix_element; 
+          } else {
+            new_odd(i,j/2) = matrix_element;
           }
         }
       }
@@ -1565,9 +1848,9 @@ void UpDownMostIndexFermionicMatrix(itpp::cmat& MatrixEven, itpp::cmat& MatrixOd
   return;
 }
 void UpDownMostIndexFermionicMatrix(itpp::cmat& MatrixEven, itpp::cmat& MatrixOdd, const int places_most, const int places_least){
-//! Routine to move the matrices so as to simulate moving an index up or down. 
-/*! This routine works at the level of matrices as for qubits I have not a good 
- * idea of what would mean when two fermions with the same name are comming 
+//! Routine to move the matrices so as to simulate moving an index up or down.
+/*! This routine works at the level of matrices as for qubits I have not a good
+ * idea of what would mean when two fermions with the same name are comming
  * in (or out). The positive sign indicates clockwise movement.
  */
   if (places_most>0){
@@ -1620,8 +1903,8 @@ itpp::cmat sigma(int i){ // {{{
     case 3:
       return itpp::to_cmat(itpp::mat_2x2(1, 0, 0, -1));
     default:
-      std::cout << "Sigma not found. i=" << i << "\n"; 
-      abort(); 
+      std::cout << "Sigma not found. i=" << i << "\n";
+      abort();
   }
 } // }}}
 itpp::cmat sigma(itpp::vec b){ // {{{
@@ -1629,7 +1912,7 @@ itpp::cmat sigma(itpp::vec b){ // {{{
     return b(0)*sigma(1)+b(1)*sigma(2)+ b(2)*sigma(3);
   } else {
     std::cout << "Sigma not found 89p790as7dfu.\n";
-    abort(); 
+    abort();
   }
 } // }}}
 itpp::cmat sigma(itpp::vec b, int position, int total){ // {{{
@@ -1643,7 +1926,7 @@ itpp::cmat sigma(itpp::vec b, int position, int total){ // {{{
     tmp=TensorProduct(itpp::eye_c(cfpmath::pow_2(total-position-1)),tmp);
   } else {
     std::cout << "Sigma not found asdfa \n";
-    abort(); 
+    abort();
   }
   return tmp;
 } // }}}
@@ -1683,7 +1966,7 @@ itpp::cmat control_u_matrix(itpp::cmat& u){// {{{
 itpp::ivec diagonal_sigma_z(int encoded_positions, int qubits){ // {{{
   itpp::ivec tmp(cfpmath::pow_2(qubits));
   tmp=1;
-//   std::cout << "Encoded positions = " << encoded_positions << std::endl; 
+//   std::cout << "Encoded positions = " << encoded_positions << std::endl;
   for (int i=0; i<cfpmath::pow_2(qubits); i++){
 //     std::cout << "i="<<i<<", i&encoded_positions = " << (i&encoded_positions) << std::endl;
     if (cfpmath::parity_sum_digits_base_2(i&encoded_positions)){
@@ -1692,6 +1975,16 @@ itpp::ivec diagonal_sigma_z(int encoded_positions, int qubits){ // {{{
   }
   return tmp;
 } // }}}
+
+/**
+ * \brief Generates a Werner state.
+ *
+ * Generates the density matrix of a werner state with a given alpha value.
+ *
+ * \param alpha [const double] value between 0 and 1.
+ *
+ * \return generated Werner state within a matrix [itpp::Mat].
+*/
 itpp::Mat<std::complex<double> > Werner(const double alpha){// {{{
 	itpp::Mat<std::complex<double>  > tmp(4,4);
  	tmp=0.;
@@ -1700,10 +1993,20 @@ itpp::Mat<std::complex<double> > Werner(const double alpha){// {{{
 	tmp(0,3)=tmp(3,0)=(1-alpha)/2;
 	return tmp;
 }// }}}
+
 itpp::cvec StatisticallyNormalRandomState(unsigned int dim){ // {{{
   itpp::cvec tmp=itpp::randn_c(dim);
   return tmp/sqrt(dim);
 } // }}}
+/**
+ * \brief Generates a random state.
+ *
+ * Given a specified dimension, it generates a normalized random state.
+ *
+ * \param dim [unsigned int] random state dimension.
+ *
+ * \return randomly generated state within a vector [itpp::cvec].
+*/
 itpp::cvec RandomState(unsigned int dim){ // {{{
   itpp::cvec tmp=itpp::randn_c(dim);
   return tmp/norm(tmp);
@@ -1743,12 +2046,33 @@ itpp::cvec RandomSeparableState(unsigned int q){ // {{{
 //   std::cout << "norma = " << norm(psi) << std::endl;
   return psi/norm(psi);
 } // }}}
+/**
+ * \brief Generates a basis state.
+ *
+ * Given a dimension and a position for the basis, it generates a basis state.
+ *
+ * \param dim [unsigned int] basis state dimension.
+ * \param basis_number [unsigned int] basis state dimension.
+ *
+ * \return generated basis state within a vector [itpp::cvec].
+*/
+
 itpp::cvec BasisState(unsigned int dim, unsigned int basis_number){ // {{{
   itpp::cvec tmp(dim);
   tmp.zeros();
   tmp(basis_number)=1;
   return tmp;
 } // }}}
+
+/**
+ * \brief Generates a bell state.
+ *
+ * Generates a bell state with specified dimension, default is 4.
+ *
+ * \param dim [int] bell state dimension.
+ *
+ * \return generated bell state within a vector [itpp::vec].
+*/
 itpp::vec BellState(int dim=4){// {{{
   itpp::vec tmp(dim);
   tmp.zeros();
@@ -1772,19 +2096,29 @@ itpp::vec BellState(double theta){// {{{
   tmp(dim-1)=sin(theta);
   return tmp;
 }// }}}
+
+/**
+ * \brief Applies the exponential function.
+ *
+ * From sakurai eq (3.2.44) we have that
+ * exp(- i \sigma \cdot n \phi/2) =
+ *  cos(\phi/2) \openone -  i sin(\phi/2) \sigma \cdot n
+ *
+ * exp(- i \sigma \cdot n \theta) =
+ *  cos(\theta) \openone -  i sin(\theta) \sigma \cdot n
+ *
+ * \param b [itpp::vec]
+ *
+ * \return [itpp::cmat].
+*/
 itpp::cmat exp_minus_i_b_sigma(itpp::vec b){// {{{
-  // From sakurai eq (3.2.44) we have that
-  // exp(- i \sigma \cdot n \phi/2) =
-  //  cos(\phi/2) \openone -  i sin(\phi/2) \sigma \cdot n
-  //
-  // exp(- i \sigma \cdot n \theta) =
-  //  cos(\theta) \openone -  i sin(\theta) \sigma \cdot n
   double theta=itpp::norm(b);
 //   std::cout << theta << std::endl;
   std::complex<double> I(0,1);
   itpp::vec n=b/theta;
   return cos(theta)*sigma(0)-I*sin(theta)*sigma(n);
 }// }}}
+
 itpp::cmat magnetic(itpp::vec b, int total){// {{{
   itpp::cmat tmp(cfpmath::pow_2(total),cfpmath::pow_2(total));
   tmp=0.;
@@ -1836,7 +2170,7 @@ template <class Num_T> void apply_sigma_z(itpp::Vec<Num_T>& state, int target_bi
 //   std::cout << "state" << state << "\n";
 }// }}}
 // void apply_sigma(itpp::cvec state, itpp::vec b, int PositionQubit){ // {{{
-// 
+//
 //  abort();
 // } // }}}
 void apply_sigma(itpp::cvec& state, int Pauli_i, int PositionQubit){ // {{{
@@ -1848,7 +2182,7 @@ void apply_sigma(itpp::cvec& state, int Pauli_i, int PositionQubit){ // {{{
   } else if (Pauli_i==3) {
 
     apply_sigma_z(state, PositionQubit);
-  } 
+  }
   return;
 } // }}}
 void apply_sum_sigma_x(itpp::cvec& state){ // {{{
@@ -1866,17 +2200,17 @@ void apply_sum_sigma_x(itpp::cvec& state){ // {{{
 void apply_gate(itpp::cvec& state, int nwhich, itpp::cmat gate){// {{{
   // This gate has to be applied with care. Notice for example that
   // with nwhich=3=11, the gate XY and YX are different. We are assuming
-  // that the user has taken care of ordering the incoming gate 
+  // that the user has taken care of ordering the incoming gate
   // carefully. For example, if you want to apply H in qubit 0 and
-  // Y gate in qubit 2, you sould set 
+  // Y gate in qubit 2, you sould set
   // nwhich = 1 0 1 = 5
   // and then set gate = YH
-  // since HY will give you an incorrect result. Moreover, if you want 
+  // since HY will give you an incorrect result. Moreover, if you want
   // to apply a controled gate, it is not good to put
   // 1 (oplus) U
   // if the control qubit is ?????? I dont know, but there is a correct
   // and an incorrect way of putting it. !! see the testing routine
-  // to set it up-. 
+  // to set it up-.
   //
   int qs=cfpmath::BitCount(nwhich);
   int qs2=cfpmath::pow_2(qs);
@@ -1901,7 +2235,7 @@ void apply_gate(itpp::cvec& state, int nwhich, itpp::cmat gate){// {{{
       state(pos(j))=moco(j);
     }
 //     std::cout << "state(pos)=" << state(pos) << std::endl;
-    
+
   }
 //   std::cout << "gate" << gate << std::endl;
 //   std::cout << "este deberia estar rotado" << state << std::endl;
@@ -1942,7 +2276,7 @@ if (sigma_label==1) {
 } else if (sigma_label==3) {
   B.set_submatrix(0  ,0, A.get_rows(0,n/2-1));
   B.set_submatrix(n/2,0,-A.get_rows(n/2,n-1));
-//   B(n/2,n-1,0,n-1)=-A.get_rows(n/2,n-1); 
+//   B(n/2,n-1,0,n-1)=-A.get_rows(n/2,n-1);
 //   B(0,n/2-1,0,n-1)=A.get_rows(0,n/2-1);
   return B;
 } else {
@@ -1957,7 +2291,7 @@ void apply_inverse_Rk(itpp::cvec& state, int k, int position1, int position2){//
   int mask = cfpmath::pow_2(position1) + cfpmath::pow_2(position2);
   int n;
   for (int j=0; j<state.size()/4; j++){
-    n=cfpmath::merge_two_numbers(3, j, mask); 
+    n=cfpmath::merge_two_numbers(3, j, mask);
     state(n)=phi*state(n);
   }
   return;
@@ -1966,8 +2300,8 @@ void apply_swap(itpp::cvec& state, int position1, int position2){// {{{
   int mask = cfpmath::pow_2(position1) + cfpmath::pow_2(position2);
   int n1, n2;
   for (int j=0; j<state.size()/4; j++){
-    n1=cfpmath::merge_two_numbers(2, j, mask); 
-    n2=cfpmath::merge_two_numbers(1, j, mask); 
+    n1=cfpmath::merge_two_numbers(2, j, mask);
+    n2=cfpmath::merge_two_numbers(1, j, mask);
     swap(state, n1, n2);
   }
   return;
@@ -1989,11 +2323,11 @@ void apply_cnot(itpp::cvec& state, int control, int target){// {{{
   int n1, n2;
   for (int j=0; j<state.size()/4; j++){
     if(control < target){
-      n1=cfpmath::merge_two_numbers(1, j, mask); 
-      n2=cfpmath::merge_two_numbers(3, j, mask); 
+      n1=cfpmath::merge_two_numbers(1, j, mask);
+      n2=cfpmath::merge_two_numbers(3, j, mask);
     } else if (control > target) {
-      n1=cfpmath::merge_two_numbers(2, j, mask); 
-      n2=cfpmath::merge_two_numbers(3, j, mask); 
+      n1=cfpmath::merge_two_numbers(2, j, mask);
+      n2=cfpmath::merge_two_numbers(3, j, mask);
     }
     swap(state, n1, n2);
   }
@@ -2006,11 +2340,11 @@ void apply_control_u(itpp::cvec& state, int control, int target, itpp::cmat& u){
   itpp::ivec pos(2);
   for (int j=0; j<state.size()/4; j++){
     if(control < target){
-      pos(0)=cfpmath::merge_two_numbers(1, j, mask); 
-      pos(1)=cfpmath::merge_two_numbers(3, j, mask); 
+      pos(0)=cfpmath::merge_two_numbers(1, j, mask);
+      pos(1)=cfpmath::merge_two_numbers(3, j, mask);
     } else if (control > target) {
-      pos(0)=cfpmath::merge_two_numbers(2, j, mask); 
-      pos(1)=cfpmath::merge_two_numbers(3, j, mask); 
+      pos(0)=cfpmath::merge_two_numbers(2, j, mask);
+      pos(1)=cfpmath::merge_two_numbers(3, j, mask);
     }
     moco=u*state(pos);
     for (int j=0; j<2; j++){
@@ -2028,7 +2362,23 @@ double InverseParticipationRatio(const itpp::cvec& psi){ // {{{
   return tmp;
 
 } // }}}
-double Concurrence(const itpp::Mat<std::complex<double>  > rho){ // {{{
+
+/**
+ * \brief Calculates the concurrence.
+ *
+ * Calculates the concurrence of the specified density matrix.
+ *
+ * C = max{0, L1, L2, L3, L4}
+ *
+ * where Li are the eigenvalues of
+ *
+ * sqrt(rho (sigma_y ⊗ sigma_y) rho* (sigma_y ⊗ sigma_y))
+ *
+ * \param rho [itpp::Mat<std::complex<double>] density matrix.
+ *
+ * \return resulting value [double], concurrence of the density matrix.
+*/
+double Concurrence(const itpp::Mat<std::complex<double>> rho){ // {{{
 	itpp::Mat<std::complex<double> > rho_tilde(4,4);
 	for (unsigned int i1=0;i1<4;i1++){
 		for (unsigned int i2=0;i2<4;i2++){
@@ -2060,6 +2410,18 @@ double vonNeumann(const itpp::cmat rho){// {{{
   itpp::Vec<double> eigenvalues=real(eig(rho));
   return vonNeumann(eigenvalues);
 } // }}}
+
+/**
+ * \brief Calculates the purity.
+ *
+ * Calculates the purity of the specified density matrix.
+ *
+ * P(rho) = Tr rho^2
+ *
+ * \param rho [itpp::Mat<std::complex<double>] density matrix.
+ *
+ * \return resulting value [double], purity of the density matrix.
+*/
 double Purity(const itpp::Mat<std::complex<double> >& rho){// {{{
 	double P=0;
 	for (int i =0; i< rho.rows(); i++){
@@ -2067,13 +2429,22 @@ double Purity(const itpp::Mat<std::complex<double> >& rho){// {{{
 	}
 	return P;
 }// }}}
-// double Fidelity(const itpp::cvec psi, const itpp::Mat<std::complex<double> >& rho){// {{{
-// // https://en.wikipedia.org/wiki/Fidelity_of_quantum_states#Definition
-// rho*psi;
-// }// }}}
+/**
+ * \brief Calculates the purity.
+ *
+ * Calculates the purity of the specified eigenvalues. Applying the dot product
+ * to the eigenvalues received
+ *
+ * eigenvalues (dot) eigenvalues
+ *
+ * \param eigenvalues [itpp::vec] in the form of a vector.
+ *
+ * \return resulting value [double], purity of the eigenvalues.
+*/
 double Purity(const itpp::vec& eigenvalues){// {{{
         return itpp::dot(eigenvalues,eigenvalues);
 }// }}}
+
 // Others
 itpp::mat LambdaMatrixQubitRight(itpp::cmat U){ // {{{ Quantum channel for a single qubit, slow
   itpp::mat Lambda(3,3);
@@ -2087,7 +2458,7 @@ itpp::mat LambdaMatrixQubitRight(itpp::cmat U){ // {{{ Quantum channel for a sin
     }
   }
 //   cout << Lambda(0,0) << endl;
-  return Lambda; 
+  return Lambda;
 } //}}}
 itpp::mat LambdaMatrixQubitLeft(itpp::cmat U){ // {{{ Quantum channel for a single qubit, slow
   itpp::mat Lambda(3,3);
@@ -2101,7 +2472,7 @@ itpp::mat LambdaMatrixQubitLeft(itpp::cmat U){ // {{{ Quantum channel for a sing
     }
   }
 //   cout << Lambda(0,0) << endl;
-  return Lambda; 
+  return Lambda;
 } //}}}
 itpp::mat LambdaMatrixQubitLeft(itpp::cmat H, double t){ // {{{ Quantum channel for a single qubit, slow
   itpp::cmat W, U;
@@ -2127,16 +2498,16 @@ itpp::mat LambdaMatrixQubitLeft(itpp::cmat W, itpp::vec E, double t){ // {{{Quan
     }
   }
 //   cout << Lambda(0,0) << endl;
-  return Lambda; 
+  return Lambda;
 } //}}}
 itpp::Array<itpp::cvec> PrepareInitialStatesForSingleQubitTomography(){ //{{{
 
     itpp::Array<itpp::cvec> InitialStates(4);
     InitialStates(0)=itpp::to_cvec(itpp::vec_2(1.,0.)); //|0>
     InitialStates(1)=itpp::to_cvec(itpp::vec_2(0,1)); //|1>
-    InitialStates(2)=itpp::to_cvec(itpp::vec_2(1,1))/sqrt(2); // |x+>=(|0>+|1>)/sqrt(2) 
+    InitialStates(2)=itpp::to_cvec(itpp::vec_2(1,1))/sqrt(2); // |x+>=(|0>+|1>)/sqrt(2)
     InitialStates(3)=itpp::vec_2(std::complex<double>(1.,0.),std::complex<double>(0.,1.))/sqrt(2); // |y+>=(|0>+i|1>)/sqrt(2)
-    return InitialStates; 
+    return InitialStates;
 } // }}}
 itpp::mat TomographySingleQubit(itpp::Array<itpp::cmat>& rhos_f){ // {{{
   // The idea is to get lambda. We must first get the vector form
@@ -2176,16 +2547,16 @@ itpp::cvec GetState(itpp::cmat& U, itpp::vec& eigenvalues, itpp::cvec& psi_0, do
   //   cout << "In GetState, norm(psi_0)=" <<  norm(psi_0) << endl;
   //   cout << "In GetState, norm(psi_0_prime)=" <<  norm(psi_0_prime) << endl;
   //   cout << "In GetState, norm(psi_t)=" <<  norm(psi_t) << endl;
-  //   abort(); 
+  //   abort();
   return psi_t;
 
 } // }}}
 itpp::cmat GetState(itpp::cmat& U, itpp::vec& eigenvalues, itpp::cvec& psi_0, double t, int dimension_central_system){ // {{{
   int d=eigenvalues.size();
   if ( U.cols()!= d || U.rows()!= d || psi_0.size() != d){
-    std::cerr << "Error en GetState (for mixed)\n" 
-      << "U.cols()=" << U.cols() << ", U.rows()=" << U.rows() 
-      << ", eigenvalues.size()="<< eigenvalues.size() << ", psi_0.size()=" << psi_0.size() 
+    std::cerr << "Error en GetState (for mixed)\n"
+      << "U.cols()=" << U.cols() << ", U.rows()=" << U.rows()
+      << ", eigenvalues.size()="<< eigenvalues.size() << ", psi_0.size()=" << psi_0.size()
       << std::endl;
     abort();
   }
@@ -2208,8 +2579,8 @@ template <class Num_T>  bool sorted(const itpp::Vec<Num_T > v){ // {{{ Test if i
   return true;
 } // }}}
 void test_GetState_pure(){ // {{{
-//   So the idea is to have a Hamiltonian, its eigenvectors and eigenvalues, 
-//   time and check if the evolution is good. 
+//   So the idea is to have a Hamiltonian, its eigenvectors and eigenvalues,
+//   time and check if the evolution is good.
   std::cout << "In test_GetState" << std::endl;
   int dim=50;
   double t=itpp::randu();
@@ -2231,7 +2602,7 @@ void test_GetState_pure(){ // {{{
   psi_slow = exponentiate(-I*t*H)*psi_0;
   eig_sym(H,lambda, eigenvectors);
   psi_fast = GetState(eigenvectors, lambda, psi_0, t);
-  std::cout << "1-Producto interior=" 
+  std::cout << "1-Producto interior="
     << 1.-itpp::dot(conj(psi_fast), psi_fast) << std::endl;
 //   std::cout << psi_slow << std::endl<< psi_fast << std::endl;
 
@@ -2240,8 +2611,8 @@ void test_GetState_pure(){ // {{{
 //  return itpp::norm(H-H.transpose() );
 } // }}}
 void test_GetState_mixed(){ // {{{
-//   So the idea is to have a Hamiltonian, its eigenvectors and eigenvalues, 
-//   time and check if the evolution is good. 
+//   So the idea is to have a Hamiltonian, its eigenvectors and eigenvalues,
+//   time and check if the evolution is good.
 //   std::cout << "In test_GetState_mixed" << std::endl;
   int dim_a=5, dim_b=2;
   int dim=dim_a*dim_b;
@@ -2272,27 +2643,27 @@ void test_GetState_mixed(){ // {{{
 //  return itpp::norm(H-H.transpose() );
 } // }}}
 double test_reality(const itpp::cmat& H){ // {{{
- return itpp::norm(itpp::imag(H)); 
+ return itpp::norm(itpp::imag(H));
 } // }}}
 double test_real_symmetric(const itpp::cmat H){ // {{{
  return test_symmetry(H) + test_reality(H);
 } // }}}
 double test_unit_matrix(const itpp::cmat U){ // {{{
-  if (!U.cols() == U.rows()){
+  if (U.cols() != U.rows()){
     std::cout << "La matriz no es cuadrada\n";
     abort();
     return -1;
   }
- return itpp::norm(U - itpp::eye_c(U.rows() )); 
+ return itpp::norm(U - itpp::eye_c(U.rows() ));
 } // }}}
 double test_unitarity(const itpp::cmat U){ // {{{
-  if (!U.cols() == U.rows()){
+  if (U.cols() != U.rows()){
     std::cout << "La matriz no es cuadrada\n";
     abort();
     return -1;
   }
  return itpp::norm(U*U.hermitian_transpose() - itpp::eye_c(U.rows() ))
-          + itpp::norm(U.hermitian_transpose()*U - itpp::eye_c(U.rows() )); 
+          + itpp::norm(U.hermitian_transpose()*U - itpp::eye_c(U.rows() ));
 } // }}}
 void  test_multiply_by_sigma_leftmost_qubit(){ // {{{
   int q=4;
@@ -2335,8 +2706,8 @@ void test_trAB(){ // {{{
   int n1=15, n2=8;
   itpp::cmat A, B; itpp::randn_c(n1, n2, A);itpp::randn_c(n2, n1, B);
 
-//   B=1;  
-//   A=3;  
+//   B=1;
+//   A=3;
   r1 = trAB(A, B);
   r2 = itpp::trace(A*B);
 //   std::cout << "Test result A*B " << A*B << std::endl;
@@ -2350,7 +2721,7 @@ template <class Num_T> itpp::Mat<Num_T > Array_to_Matrix(const itpp::Array<itpp:
 //   std::cout << "Lo que entra:" << v << std::endl;
   int n = v.length();
   itpp::Mat<Num_T > tmp(n, v(0).size());
-  for (int i=0; i<n; i++){ 
+  for (int i=0; i<n; i++){
     tmp.set_row(i,v(i));
   }
   return tmp;
@@ -2358,21 +2729,21 @@ template <class Num_T> itpp::Mat<Num_T > Array_to_Matrix(const itpp::Array<itpp:
 template <class Num_T> itpp::Array<itpp::Vec<Num_T> > Matrix_to_Array(const itpp::Mat<Num_T >& v){ // {{{
   int n = v.rows();
   itpp::Array<itpp::Vec<Num_T> > tmp(n);
-  for (int i=0; i<n; i++){ 
+  for (int i=0; i<n; i++){
     tmp(i) = v.get_row(i);
   }
   return tmp;
 } //}}}
 template <class Num_T> itpp::Vec<Num_T > my_mod(const itpp::Vec<Num_T >& v){ // {{{
 itpp::Vec<Num_T > tmp(v.size());
-  for (int i=0; i<v.size(); i++){ 
+  for (int i=0; i<v.size(); i++){
     tmp(i) = cfpmath::my_mod(v(i));
   }
   return tmp;
 } //}}}
 template <class Num_T> itpp::Array<Num_T > my_mod(const itpp::Array<Num_T >& v){ // {{{
 itpp::Array<Num_T > tmp(v.size());
-  for (int i=0; i<v.size(); i++){ 
+  for (int i=0; i<v.size(); i++){
     tmp(i) = cfpmath::my_mod(v(i));
   }
   return tmp;
@@ -2395,9 +2766,9 @@ itpp::Vec<std::string> split_string(std::string sentence){// {{{
   itpp::Vec<std::string> splitted(number_words);
   number_words=0;
   std::istringstream iss2(sentence);
-//   iss(sentence); 
+//   iss(sentence);
   while( iss2 >> word ){splitted(number_words)=word; number_words++;}
-  return splitted; 
+  return splitted;
 }// }}}
 itpp::Mat<std::complex<double> > Hermitian_From_Compact(const itpp::vec& compact_rho){// {{{
 	int dim=cfpmath::isqrt(compact_rho.size()), counter=0;
