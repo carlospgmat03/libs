@@ -702,6 +702,7 @@ ApplyNoiseChain[State_?VectorQ,p_]:=Module[{qubits},
 qubits=IntegerPart[Log2[Dimensions[State][[1]]]];
 p Proyector[State]+2(1-p)/(qubits(qubits-1))(Sum[ApplySwap[State,i,j],{i,1,qubits},{j,i+1,qubits}])
 ];
+PermutationMatrix[p_List]:=IdentityMatrix[Length[p]][[p]];
 PermutationMatrices[n_]:=PermutationMatrix/@Permutations[Range[n]];
 (*}}}*)
 (*}}}*)
