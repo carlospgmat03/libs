@@ -65,7 +65,7 @@ int main(int argc, char* argv[]){
       j=i;
       for (int digit=0; digit< qubits;digit++){ sigma_array(digit)=j%4; j=j>>2; }
       sigma_long = sigma(sigma_array);
-      coded_positions = bvec_to_int(sigma_array!=0);
+      //coded_positions = bvec_to_int(sigma_array!=0);
       sigma(sigma_array(sigma_array!=0));
       sigma_short = extend_qubit_operator(sigma(sigma_array(sigma_array!=0)), coded_positions, qubits);
       total_error+= norm(sigma_long-sigma_short) ;
