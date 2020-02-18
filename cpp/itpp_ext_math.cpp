@@ -107,7 +107,7 @@ double test_similar_complex_list(itpp::cvec& z1, itpp::cvec& z2){ // {{{
     std::cerr << "En test_similar_complex_list, tamaños diferentes" << std::endl;
     return z1.size() + z2.size();
   }
-  double error=0., e;
+  double error=0.;//, e;
   int dim = z1.size(), min_pos; 
   itpp::cvec zt = z2;
   itpp::Vec<bool> checked(dim);
@@ -446,7 +446,7 @@ template <class Num_T> void interchange_permutations_2line(itpp::Vec<Num_T>& b, 
     std::cerr << "interchange_permutations() in cfpmath: dimension mismatch" << std::endl;
     abort();
   }
-  Num_T temp;
+  //Num_T temp;
   itpp::ivec q=p;
   int qtmp;
   for (int k = 0; k < q.size(); k++) {
@@ -1899,7 +1899,7 @@ itpp::cvec RandomSeparableState(unsigned int q){ // {{{
   for (int i=0; i< dim; i++){
     c=1;
 //     std::cout << "i=" << i << std::endl;
-    for (int b=0; b<q; b++){
+    for (unsigned int b=0; b<q; b++){
 //        std::cout << "test result:" << cfpmath::test_bit(i,b) << std::endl;
       if (cfpmath::test_bit(i,b)){
         c*=z(b,0);

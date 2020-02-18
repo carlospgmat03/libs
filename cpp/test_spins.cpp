@@ -5,6 +5,8 @@
 // #include <purity_RMT.cpp>
 #include "itpp_ext_math.cpp"
 #include "spinchain.cpp"
+#include <chrono>
+#include <random>
 using namespace std;
 using namespace itpp;
 using namespace itppextmath;
@@ -22,12 +24,17 @@ using namespace spinchain;
   TCLAP::ValueArg<int> i3("","i3", "Integer parameter",false, 4,"int",cmd);
   TCLAP::ValueArg<int> position("","position", "The position of something",false, 1,"int",cmd);
   TCLAP::ValueArg<int> position2("","position2", "The position of something",false, 3,"int",cmd);
+  TCLAP::ValueArg<int> timeSteps("t","time", "Time steps to evolve a system",false, 1000,"int",cmd);
   TCLAP::ValueArg<double> Ising("","ising_z", "Ising interaction in the z-direction",false, 1.4,"double",cmd);
   TCLAP::ValueArg<double> coupling("","coupling", "Ising interaction for the coupling",false, 0.01,"double",cmd);
   TCLAP::ValueArg<double> Delta("","Delta", "Energy separation",false, 1,"double",cmd);
   TCLAP::ValueArg<double> bx("","bx", "Magnetic field in x direction",false, 1.4,"double",cmd);
   TCLAP::ValueArg<double> by("","by", "Magnetic field in y direction",false, 1.4,"double",cmd);
   TCLAP::ValueArg<double> bz("","bz", "Magnetic field in z direction",false, 1.4,"double",cmd);
+  TCLAP::ValueArg<double> coopShielding("","jcs", "Interaction for cooperative shielding",false, 1.0,"double",cmd);
+  TCLAP::ValueArg<double> alpha("","alpha", "Exponent for long/short range interaction",false, 0.5,"double",cmd);
+  TCLAP::ValueArg<double> B("B","B", "Transverse field constant component",false, 0.5,"double",cmd);
+  TCLAP::ValueArg<double> W("W","W", "Transverse field random part bounds [-W/2,W/2]",false, 1.0,"double",cmd);
 // }}}
 std::complex<double> Im(0,1);
 
@@ -46,6 +53,12 @@ const std::string currentDateTime() {
 void generateDataForFig(int q, int dim, int which, int time_steps, vec b, double J,
                         double J_interaction, int condiciones_iniciales,
                         std::string folderName, std::string fieName);
+
+void epr1CooperativeShieldingFig1(bool replica = false);
+
+vec randomUniformDistribution(double B, double W, int q);
+
+void progressBar(double progress);
 
 int main(int argc, char* argv[]) { //{{{
 // 	Random semilla_uran;
@@ -322,6 +335,13 @@ int main(int argc, char* argv[]) { //{{{
     generateDataForFig(q, dim, which, time_steps, b3, J, J_interaction,
                        initial_conditions, folderName, fileName3);
 
+  } else if(option=="test_prl1_cooperative_shielding_fig1") {
+
+    epr1CooperativeShieldingFig1();
+
+  } else if(option=="test_prl1_cooperative_shielding_fig1_replica") {
+
+    epr1CooperativeShieldingFig1(true);
 
   } else if(option=="test_MatrixForIsing_star") {// {{{
     int q=qubits.getValue();
@@ -701,4 +721,211 @@ void generateDataForFig(int q, int dim, int which, int time_steps, vec b, double
     }
   }
 
+}
+
+void epr1CooperativeShieldingFig1(bool replica){
+
+  auto startTime = chrono::high_resolution_clock::now();
+
+  cout << "Starting..." << endl;
+
+  int q = qubits.getValue();        //qubits quantity odd
+  int dim = pow_2(q);
+  int swap_pos= pow_2(q/2);
+
+  if(q%2 == 0) q = 13;
+
+  cvec state(dim);
+  short value = 1;
+  for(int pos = 0; pos < dim; pos++) {
+    state(pos) = value;
+    if((pos+1)%swap_pos == 0) {
+      value = value * -1;
+    }
+  }
+
+  //state = RandomState(dim);
+  state = state/norm(state);
+  //cout << "State : " << state << endl;
+
+  cout << "... state created (qubits = " << q << ")" << endl;
+
+
+  int tot = (q - 1)*(q)/2;
+  Array<cmat> sigmax_n_sigmax_m(tot);
+  ivec pos_sigma_x(q);
+  int count = 0;
+  for (int m = 1; m < q; m++){
+    for (int n = 0; n < m; n++){
+      pos_sigma_x.zeros();
+      pos_sigma_x(n) = 1;
+      pos_sigma_x(m) = 1;
+      cmat sigmax_nm = sigma(pos_sigma_x);
+      //cout << sigmax_nm << endl;
+      sigmax_n_sigmax_m(count++) = sigmax_nm;
+    }
+    progressBar((double)count/tot);
+  }
+
+  cout << endl << "... operators created (sigmax_n_sigmax_m)" << endl;
+
+  int time_steps = timeSteps.getValue();
+
+  double J = 1;                  //coupling between elements of the environment
+  double J_interaction = 0.03;   //coupling between the central system and the environment
+  double Jcs = 0.0;              //coupling between elements many-to-many (cooperative shielding)
+  double a = 0.5;                //exponent alpha defines long/short range interacion between elements
+
+  J = Ising.getValue();
+  J_interaction = coupling.getValue();
+  Jcs = coopShielding.getValue();
+  a = alpha.getValue();
+
+  std::string folderName = "../tests/epr1";
+
+  //** case: b_parallel(bz) = 1.4 (default) and b_perpendicular(bx) = 0
+  vec b(3);
+  b(0) = 0;
+  b(1) = 0.;
+  b(2) = bz.getValue();
+
+  double Be = B.getValue();
+  double We = W.getValue();
+
+  std::string fileName;
+  if(replica) {
+    fileName = "test_epr1_fig1_replica_B" + to_string(Be).substr(0,4) +
+                                     "_W" + to_string(We).substr(0,4) +
+                                    "_Jz" + to_string(J).substr(0,4) +
+                                   "_Jcs" + to_string(Jcs).substr(0,4) +
+                                     "_a" + to_string(a).substr(0,4) +
+                                     "_q" + to_string(q) +
+                                     "_t" + to_string(time_steps) +
+                                     "__" + to_string((chrono::duration_cast<chrono::minutes>(startTime.time_since_epoch())).count());
+  } else {
+    fileName = "test_epr1_fig1_bpa" + to_string(b(2)).substr(0,4) +
+                              "_Je" + to_string(J).substr(0,4) +
+                             "_Jce" + to_string(J_interaction).substr(0,4) +
+                             "_Jcs" + to_string(Jcs).substr(0,4) +
+                               "_a" + to_string(a).substr(0,4) +
+                               "_q" + to_string(q) +
+                               "_t" + to_string(time_steps) +
+                               "__" + to_string((chrono::duration_cast<chrono::minutes>(startTime.time_since_epoch())).count());
+  }
+  ofstream myfile;
+  int folderCreated = system(("mkdir -p " + folderName).c_str());
+
+  std::string myfileName = folderName + "/" + fileName + ".dat";
+
+  if(folderCreated == 0) {
+
+    myfile.open(myfileName.c_str());
+
+    cout << "... file created: " << myfileName << endl;
+
+    // save initial state as it was created
+    for(int pos_q = 0; pos_q < q; pos_q++){
+      //myfile << real(expected_value(sigmax_for_position(pos_q), state)) << " ";
+      cvec tmp(state);
+      apply_sigma_x(tmp, pos_q);
+      myfile << real(itpp::dot(itpp::conj(state), tmp)) << " ";
+    }
+    myfile << endl;
+
+    itpp::vec transverse_field(q);
+    if(replica) transverse_field = randomUniformDistribution(Be, We, q);
+
+    cout << "... evolving state" << endl;
+
+    for (int i_time = 1; i_time <= time_steps; i_time++){
+
+      progressBar((double)i_time/time_steps);
+
+      if(replica) {
+
+        apply_environment_epr1_cooperative_shielding(state,  J, transverse_field, Jcs, a, sigmax_n_sigmax_m);
+
+      } else {
+
+        apply_common_environment_chain_and_many_to_many(state, J, J_interaction, b, Jcs, a, sigmax_n_sigmax_m);
+        //apply_common_environment_chain(state, J, J_interaction, b);
+
+      }
+      //cout << "State : " << state << endl;
+
+      for(int pos_q = 0; pos_q < q; pos_q++){
+        //myfile << real(expected_value(sigmax_for_position(pos_q), state)) << " ";
+        cvec tmp(state);
+        apply_sigma_x(tmp, pos_q);
+        myfile << real(itpp::dot(itpp::conj(state), tmp)) << " ";
+      }
+      myfile << endl;
+
+    }
+  } else {
+    cout << "... error creating file: " << myfileName << " ... error code: " << folderCreated << endl;
+  }
+
+  cout << endl << "... finishing" << endl;
+
+  auto endTime = chrono::high_resolution_clock::now();
+  auto duration = chrono::duration_cast<chrono::seconds>(endTime - startTime);
+  cout << "Excecution time: " << duration.count()/60 << " min " << duration.count()%60 << " sec" << endl;
+
+
+}
+
+/**
+ * \brief Generates random numbers with a uniform distribution.
+ *
+ * Generates random numbers with a uniform distribution, within a specified
+ * range with `W`, that range is then [-W/2, W/2], in addition to each
+ * random number it adds a base value given by `B`.
+ *
+ * \param B [double] base value that is added to each generated random number.
+ * \param W [double] indicates the range in which random numbers will be generated: [-W/2, W/2].
+ * \param q [int] number of random numbers to generate.
+*/
+vec randomUniformDistribution(double B, double W, int q){
+
+  vec values(q);
+  values = B;
+
+  default_random_engine prng(random_device{}());
+	uniform_real_distribution<double> ddist(-W/2.0, W/2.0);
+
+  for(int i = 0; i < q; i++){
+    values(i) = values(i) + ddist(prng);
+  }
+
+  return values;
+}
+
+/**
+ * \brief Shows a progress bar with the specified percentage.
+ *
+ * Shows a progress bar with the specified percentage between 0 and 1. It makes
+ * a carriage return but not an enter so that the next bar is placed in the
+ * same position as the previous one.
+ *
+ * \code{.cpp}
+ *  [====================================================================================                ] 84 %
+ * \endcode
+ *
+ * \param progress [double] percentage of completion.
+*/
+void progressBar(double progress){
+
+  if(progress > 1) progress = 1;
+  if(progress < 0) progress = 0;
+
+  static size_t barWidth = 100u;            // depending on screen size
+  static string fullBar = string(barWidth, '=') + string(barWidth, ' ');
+
+  auto offset = barWidth - (size_t)(progress * barWidth);
+
+  cout << "[";
+  cout.write(fullBar.data() + offset, barWidth);
+  cout << "] " << (int)(progress * 100) << " %" << '\r';
+  cout.flush();
 }
