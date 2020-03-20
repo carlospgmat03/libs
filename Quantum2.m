@@ -239,7 +239,9 @@ ModifiedCoherentState2[\[Theta]_, \[Phi]_, qubits_] :=
      PauliMatrix[1].CoherentState[\[Theta], \[Phi], 1]], 
    CoherentState[\[Theta], \[Phi], qubits - 4]], 1];
 
-StateToDirac[state_]:=Sum[state[[i]]*"|"<>(TableForm[{IntegerDigits[i-1,2,Log2[Length[state]]//Round]}, TableSpacing->{1.2,1.2}]//ToString)<>"\[RightAngleBracket]",{i,1,Length[state]}];
+StateToDirac[state_?VectorQ]:=Sum[state[[i]]*"|"<>(TableForm[{IntegerDigits[i-1,2,Log2[Length[state]]//Round]}, TableSpacing->{1.2,1.2}]//ToString)<>"\[RightAngleBracket]",{i,1,Length[state]}];
+
+StateToDirac[state_?MatrixQ]:=Sum[state[[i,j]]*"|"<>(TableForm[{IntegerDigits[i-1,2,Log2[Length[state]]//Round]}, TableSpacing->{1.2,1.2}]//ToString)<>"\[RightAngleBracket]\[LeftAngleBracket]"<>(TableForm[{IntegerDigits[j-1,2,Log2[Length[state]]//Round]}, TableSpacing->{1.2,1.2}]//ToString)<>"|",{i,1,Length[state]},{j,1,Length[state]}];
 
 CharlieMeasure[list_] := 
   Module[{l, listD, Criticallistmin, Criticallistmax, position, maxi, 
