@@ -689,8 +689,6 @@ If[is,{wreal,mat//Chop},is]
 
 (*Symbolic tools for factorized mixed states*)
 
-FactorizedSymbolicStateConstructor[dim_]:=TensorProduct@@Table[Subscript[\[Rho], i],{i,1,dim,1}];
-
 PreAbstractSwap[init_,i_,j_]:=Module[{aux,aux2},
 If[ToString[Head[init//Expand]]=="Times",
 len=Length[init];
@@ -722,6 +720,8 @@ init[[parttoleave]]
 AbstractPartialTrace[init_,toleave_]:=If[ToString[Head[init//Expand]]=="Plus",Map[PreAbstractPartialTrace[#,toleave]&,init//Expand],PreAbstractPartialTrace[init//Expand,toleave]];
 	
 End[]
+
+FactorizedSymbolicStateConstructor[dim_]:=TensorProduct@@Table[Subscript[\[Rho], i],{i,1,dim,1}];
 
 SinCosList[j_,vec_]:=Table[If[i==j,Cos,Sin][\[Theta][vec][i+1]],{i,0,j}];	
 	
