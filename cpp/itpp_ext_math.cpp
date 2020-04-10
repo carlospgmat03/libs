@@ -143,8 +143,8 @@ template <class Num_T> Num_T Last(const itpp::Array<Num_T >& v){// {{{
 } //}}}
 template <class Num_T> int Position_FirstIntersection(const itpp::Vec<Num_T >& v, const Num_T& e){// {{{
   for (int i=0; i<v.size();i++){ if (e==v(i)) return i; }
-  std::cerr << "Not found in Position_FirstIntersection\n";
-  abort();
+//   std::cerr << "Not found in Position_FirstIntersection\n";
+//   abort();
   return -1;
 } //}}}
 template <class Num_T> int Position_FirstIntersection(const itpp::Array<Num_T >& v, const Num_T& e){// {{{
@@ -2247,7 +2247,7 @@ double InverseParticipationRatio(const itpp::cvec& psi){ // {{{
  *
  * \return resulting value [double], concurrence of the density matrix.
 */
-double Concurrence(const itpp::Mat<std::complex<double>> rho){ // {{{
+double Concurrence(const itpp::Mat<std::complex<double> > rho){ // {{{
 	itpp::Mat<std::complex<double> > rho_tilde(4,4);
 	for (unsigned int i1=0;i1<4;i1++){
 		for (unsigned int i2=0;i2<4;i2++){
