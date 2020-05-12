@@ -6,6 +6,8 @@ MyAverage::usage =
 RandomUnitVector::usage = "This gives a random vector with the Haar measure. The dimension is 
                            the argument. If no argument is suplied, it is asumed to be 3";
 
+DistanceBetweenSetsOfPoints::usage = "It calculates the distance between two sets of points. They might have a different order. Basically it has been used to compare two spectra"
+
 Seed::usage = 
     "This function, without any argument, gives a random integer between 0
     and 1000000000-1 which can be used as a seed for an external program";
@@ -91,6 +93,19 @@ EllipseCharacteristics[poly_, vars_] :=  (* {{{ *)
    1/Sqrt[-Eigenvalues[Am]/cl2[[1, 1]]]}
   ]/; PolynomialQ[poly, vars] (* }}} *)
 (*  *)
+DistanceBetweenSetsOfPoints[p1_List, p2_List] /; 
+  If[Length[p1] == Length[p2], True, 
+   Message[DistanceBetweenSetsOfPoints::nnarg, Length[p1], 
+    Length[p2]]; False] := 
+ Module[{p2tmp = p2, n = Length[p2], OrderedList = {}, k},
+  Do[
+   k = Nearest[p2tmp[[;; n + 1 - i]] -> Automatic, p1[[i]]];
+   OrderedList = Append[OrderedList, p2tmp[[k]][[1]]];
+   p2tmp = Drop[p2tmp, k];, {i, n}];
+  Total[EuclideanDistance @@@ Transpose[{p1, OrderedList}]]]
+DistanceBetweenSetsOfPoints::nnarg = 
+  "The lengths of the lists must be equal, but they are  `1` and \
+`2`.";
 
 HistogramListPoints[data_, Options___] :=Transpose[{Drop[(#[[1]] + RotateLeft[#[[1]]])/
       2, -1], #[[2]]} &[HistogramList[data, Options]]]
@@ -114,28 +129,6 @@ NumberList[lista_]:=Flatten[Evaluate[#], 1] & /@ Transpose[{Range[Length[lista]]
 OffSpellErrors[]:={Off[General::spell],Off[General::spell1]}
 OnSpellErrors[]:={On[General::spell],On[General::spell1]}
 
-MyLegend[TheStyle_List, Heigth_, Xpos_, Xlength_, TheText_, XSepText_,  OptionsPattern[]] := 
-  {Text[TheText, Scaled[{Xpos + Xlength + XSepText, Heigth}],OptionValue[Alignment]], 
-  Join[TheStyle, {Line[{Scaled[{Xpos, Heigth}], 
-      Scaled[{Xpos + Xlength, Heigth}]}]}]}
-
-LegendBox[TheLegends_, TheStyles_, UpperHeight_, Xpos_, Xlength_, 
-  XSepText_, \[CapitalDelta]Height_,  OptionsPattern[]] := 
- Module[{i}, 
-  Table[MyLegend[TheStyles[[i]], 
-    UpperHeight - (i - 1) \[CapitalDelta]Height, Xpos, Xlength, 
-    TheLegends[[i]], XSepText, Alignment -> OptionValue[Alignment]], {i, Length[TheLegends]}]]
-Options[LegendBox] = {Alignment->{0,0}};
-Options[MyLegend] = {Alignment->{0,0}};
-
-
-MySymbol[Coordinate_,  OptionsPattern[]] :=
- {MyTriangle,MySquare,MyRhombous,MyInvertedTriangle,MyCircle,My5PointStar,
- 	My4PointStar1,My4PointStar2,MyInverted5PointStar, My4PointStar3, MyEllipse1,MyEllipse2}[[OptionValue[SymbolNumber]]][Coordinate, 
-  OptionValue[Color], OptionValue[Proportion], OptionValue[delta], OptionValue[ThicknessBorder]]
-Options[MySymbol] = {SymbolNumber -> 1, Color -> Hue[0],
-	Proportion -> GoldenRatio, delta -> 0.02,  ThicknessBorder -> 0.001};
-
 ReadListUncomment[file_, Options___] := 
  ReadList[ StringToStream[
    StringJoin[ StringInsert[#, "\n", -1] & /@  Select[ReadList[file, String], StringFreeQ[#, "#"] &]]], Options]
@@ -144,6 +137,7 @@ ReadListUncomment[file_, Options___] :=
 ColumnAddKeepFirst[MultiList_] :=  MapThread[Prepend, {(Plus @@ MultiList)[[All, 2 ;;]], MultiList[[1, All, 1]]}]
 ColumnAddKeepFirst[FirstList_, SecondList_] := ColumnAddKeepFirst[{FirstList, SecondList}]
 
+(*  Legends and symbols {{{ *)
 InsetWithSymbols[LowerLeft_List,BoxSize_List,RealtiveCoordinateLowerSymbol_, SepSymbols_,SymbolList_,TextList_, TextSpacing_]:=
 	Module[{i},
 	{Table[ SymbolList[[i]][ LowerLeft+RealtiveCoordinateLowerSymbol+{0,(i-1) SepSymbols}],{i, Length[SymbolList]}],
@@ -260,7 +254,28 @@ My4PointStar3[{x_, y_}, Color1_, Proportion_, delta_, th_] :=
       PointSet], Thickness[th], GrayLevel[0], 
     Line[Scaled[delta {#[[1]], Proportion #[[2]]}, {x, y}] & /@ 
       PointSetLine]}]]
+MyLegend[TheStyle_List, Heigth_, Xpos_, Xlength_, TheText_, XSepText_,  OptionsPattern[]] := 
+  {Text[TheText, Scaled[{Xpos + Xlength + XSepText, Heigth}],OptionValue[Alignment]], 
+  Join[TheStyle, {Line[{Scaled[{Xpos, Heigth}], 
+      Scaled[{Xpos + Xlength, Heigth}]}]}]}
 
+LegendBox[TheLegends_, TheStyles_, UpperHeight_, Xpos_, Xlength_, 
+  XSepText_, \[CapitalDelta]Height_,  OptionsPattern[]] := 
+ Module[{i}, 
+  Table[MyLegend[TheStyles[[i]], 
+    UpperHeight - (i - 1) \[CapitalDelta]Height, Xpos, Xlength, 
+    TheLegends[[i]], XSepText, Alignment -> OptionValue[Alignment]], {i, Length[TheLegends]}]]
+Options[LegendBox] = {Alignment->{0,0}};
+Options[MyLegend] = {Alignment->{0,0}};
+
+
+MySymbol[Coordinate_,  OptionsPattern[]] :=
+ {MyTriangle,MySquare,MyRhombous,MyInvertedTriangle,MyCircle,My5PointStar,
+ 	My4PointStar1,My4PointStar2,MyInverted5PointStar, My4PointStar3, MyEllipse1,MyEllipse2}[[OptionValue[SymbolNumber]]][Coordinate, 
+  OptionValue[Color], OptionValue[Proportion], OptionValue[delta], OptionValue[ThicknessBorder]]
+Options[MySymbol] = {SymbolNumber -> 1, Color -> Hue[0],
+	Proportion -> GoldenRatio, delta -> 0.02,  ThicknessBorder -> 0.001};
+(*  }}}  *)
 
 MyAverage[x_] := Plus @@ x/Length[x]
 
