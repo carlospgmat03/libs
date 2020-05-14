@@ -24,7 +24,7 @@ IPRbyCohstateSym::usage= "IPRbyCohstateSym[\[Theta]_, \[Phi]_, bx_, {values_, ve
 ModifiedCoherentState::usage = "ModifiedCoherentState[\[Theta]_, \[Phi]_, qubits_]"
 ModifiedCoherentState2::usage = "ModifiedCoherentState2[\[Theta]_, \[Phi]_, qubits_]"
 IPRbyStatebetter::usage = "IPRbyStatebetter[stateinput_,list_,vecsk_]"
-StateToDirac::usage = "VectorViewer[vec_] It shows the vector in Dirac notation in qubit representation."
+StateToDirac::usage = "StateToDirac[state_,base_:=2] It shows the vector or density matrix in Dirac notation in qubit representation."
 CharlieMeasure::usage = "CharlieMeasure[list_] or CharlieMeasure[list_]"
 CharlieMeasureAve::usage = "CharlieMeasureAve[list_]"
 CharlieMeasureForShowThings::usage = "CharlieMeasureForShowThings[list_]"
@@ -246,6 +246,10 @@ ModifiedCoherentState2[\[Theta]_, \[Phi]_, qubits_] :=
 StateToDirac[state_?VectorQ]:=Sum[state[[i]]*"|"<>(TableForm[{IntegerDigits[i-1,2,Log2[Length[state]]//Round]}, TableSpacing->{1.2,1.2}]//ToString)<>"\[RightAngleBracket]",{i,1,Length[state]}];
 
 StateToDirac[state_?MatrixQ]:=Sum[state[[i,j]]*"|"<>(TableForm[{IntegerDigits[i-1,2,Log2[Length[state]]//Round]}, TableSpacing->{1.2,1.2}]//ToString)<>"\[RightAngleBracket]\[LeftAngleBracket]"<>(TableForm[{IntegerDigits[j-1,2,Log2[Length[state]]//Round]}, TableSpacing->{1.2,1.2}]//ToString)<>"|",{i,1,Length[state]},{j,1,Length[state]}];
+
+StateToDirac[state_?MatrixQ,base_]:=Sum[state[[i,j]]*"|"<>(TableForm[{IntegerDigits[i-1,base,Log[Length[state],base]//Round]}, TableSpacing->{1.2,1.2}]//ToString)<>"\[RightAngleBracket]\[LeftAngleBracket]"<>(TableForm[{IntegerDigits[j-1,base,Log[Length[state],base]//Round]}, TableSpacing->{1.2,1.2}]//ToString)<>"|",{i,1,Length[state]},{j,1,Length[state]}];
+
+StateToDirac[state_?VectorQ,base_]:=Sum[state[[i]]*"|"<>(TableForm[{IntegerDigits[i-1,base,Log[Length[state],base]//Round]}, TableSpacing->{1.2,1.2}]//ToString)<>"\[RightAngleBracket]",{i,1,Length[state]}];
 
 CharlieMeasure[list_] := 
   Module[{l, listD, Criticallistmin, Criticallistmax, position, maxi, 
