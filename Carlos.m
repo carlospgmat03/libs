@@ -1,12 +1,14 @@
 BeginPackage["Carlos`"] ;
 
+
+
 MyAverage::usage = 
     "This function gives the average of more complex quantities than lists, 
     for example it is able to process lists of lists";
 RandomUnitVector::usage = "This gives a random vector with the Haar measure. The dimension is 
                            the argument. If no argument is suplied, it is asumed to be 3";
 
-DistanceBetweenSetsOfPoints::usage = "It calculates the distance between two sets of points. They might have a different order. Basically it has been used to compare two spectra"
+DistanceBetweenSetsOfPoints::usage = "It calculates the distance between two sets of points. They might have a different order. Basically it has been used to compare two spectra";
 
 Seed::usage = 
     "This function, without any argument, gives a random integer between 0
