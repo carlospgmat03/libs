@@ -547,8 +547,7 @@ JamiolkowskiStateToOperatorChoi[Rho_?MatrixQ] := Sqrt[Length[Rho]] Reshuffle[Rho
 JamiolkowskiOperatorChoiToState[O_?MatrixQ] := Reshuffle[O]/Sqrt[Length[O]]
 TransformationMatrixPauliBasisToComputationalBasis[] := {{1/Sqrt[2], 0, 0, 1/Sqrt[2]}, {0, 1/Sqrt[2], (-I)/Sqrt[2], 0}, {0, 1/Sqrt[2], I/Sqrt[2], 0}, 
  {1/Sqrt[2], 0, 0, -(1/Sqrt[2])}};
-
-Reshuffle[Phi_?MatrixQ] := Module[{Dim, mn, MuNu, m, Mu, n, Nu},
+(* {{{ *) Reshuffle[Phi_?MatrixQ] := Module[{Dim, mn, MuNu, m, Mu, n, Nu},
    Dim = Sqrt[Length[Phi]];
    Table[ {m, n} = IntegerDigits[mn, Dim, 2];
     {Mu, Nu} = IntegerDigits[MuNu, Dim, 2];
@@ -556,8 +555,8 @@ Reshuffle[Phi_?MatrixQ] := Module[{Dim, mn, MuNu, m, Mu, n, Nu},
      FromDigits[{n, Nu}, Dim] + 1]], {mn, 0, 
      Dim^2 - 1}, {MuNu , 0, Dim^2 - 1}]];
 
-
-RandomTracePreservingMapChoiBasis[] := Module[{psi},
+ (* }}} *)
+(* {{{ *) RandomTracePreservingMapChoiBasis[] := Module[{psi},
   psi = Total[
      MapThread[
       tensorProduct, {TwoRandomOrhtogonalStates[8], 
@@ -566,17 +565,26 @@ RandomTracePreservingMapChoiBasis[] := Module[{psi},
   ]
 AveragePurityChannelPauliBasis[Lambda_] := Total[Power[Lambda[[All, 1]], 2]]/2 + Power[Norm[Lambda[[2 ;;, 2 ;;]], "Frobenius"], 2]/6
 
-
-
-BlochEllipsoid[Cha_]:=Module[{center,T,coord,vecs,x,y,z,vecs0},
-T=Cha[[{2,3,4},{2,3,4}]];
-center={Cha[[2,1]],Cha[[3,1]],Cha[[4,1]]};
-vecs0=Graphics3D[{{Dashing[0.01],Opacity[0.5],Red,Arrow[{{0,0,0},1.3*Normalize[{1,0,0}]}],{Dashing[0.01],Opacity[0.5],Blue,Arrow[{{0,0,0},1.3*Normalize[{0,1,0}]}]},{Dashing[0.01],Opacity[0.5],Green,Arrow[{{0,0,0},1.3*Normalize[{0,0,1}]}]} } }];
-vecs=Graphics3D[{{Red,Arrow[{center,1.3*Normalize[T.{1,0,0}]}],{Blue,Arrow[{center,1.3*Normalize[T.{0,1,0}]}]},{Green,Arrow[{center,1.3*Normalize[T.{0,0,1}]}]} }}];
-coord={x,y,z}-center;
-coord=Inverse[T].coord;
-Show[ContourPlot3D[{coord[[1]]^2+coord[[2]]^2+coord[[3]]^2==1,x^2+y^2+z^2==1},{x,-1,1},{y,-1,1},{z,-1,1},AxesLabel->{"X","Y","Z"},ContourStyle->{Automatic,Opacity[0.3]},Mesh->None],vecs,vecs0,PlotRange->1.6]
+ (* }}} *)
+(* {{{ *) BlochEllipsoid[Cha_]:=Module[{center,T,coord,vecs,x,y,z,vecs0},
+  T=Cha[[{2,3,4},{2,3,4}]];
+  center={Cha[[2,1]],Cha[[3,1]],Cha[[4,1]]};
+  vecs0=Graphics3D[{{
+        Dashing[0.01],Opacity[0.5],Red, Arrow[{{0,0,0},1.3*Normalize[{1,0,0}]}],
+        {Dashing[0.01],Opacity[0.5],Blue,Arrow[{{0,0,0},1.3*Normalize[{0,1,0}]}]},
+        {Dashing[0.01],Opacity[0.5],Green,Arrow[{{0,0,0},1.3*Normalize[{0,0,1}]}]}
+        } }];
+  vecs=Graphics3D[{{Red,Arrow[{center,1.3*Normalize[T.{1,0,0}]}],
+           {Blue,Arrow[{center,1.3*Normalize[T.{0,1,0}]}]},
+           {Green,Arrow[{center,1.3*Normalize[T.{0,0,1}]}]} }}];
+  coord={x,y,z}-center;
+  coord=Inverse[T].coord;
+  Show[ContourPlot3D[
+    {coord[[1]]^2+coord[[2]]^2+coord[[3]]^2==1,x^2+y^2+z^2==1},
+    {x,-1,1},{y,-1,1},{z,-1,1},AxesLabel->{"X","Y","Z"},
+    ContourStyle->{Automatic,Opacity[0.3]},Mesh->None],vecs,vecs0,PlotRange->1.6]
 ]
+ (* }}} *)
 (* {{{ *) EvolvGate[Gate_, steps_, env_, state_]:=
  Module[{statefinal, list, gate, j},
   statefinal = tensorProduct[env,state];
