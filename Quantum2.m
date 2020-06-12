@@ -96,6 +96,7 @@ QuantumMapInProductPauliBasis::usage = "QuantumMapInProductPauliBasis[channel_,p
 ReshufflingPauliProductBasis::usage = "ReshufflingPauliProductBasis[mat_] Constructs the generalized matrix R of the channel (coefficients of matrix in Pauli product basis)."
 ChoiMatrixFromR::usage = "ChoiMatrixFromR[R_] constructs Choi Matrix from Matrix R."
 ChoiJamiStateFromPauliProductBasis::usage = "ChoiJamiStateFromPauliProductBasis[channelmatrix_] Constructs  Choi matrix from a channel written in the Pauli Product basis."
+Purify::usage = "Purify[\[Rho]_] Purification of rho with a system of the same dimension. The option random->True can be used for random purifications."
 
 
 Begin["Private`"] 
@@ -748,6 +749,15 @@ Sum[1/2^(2 particles) R[[i,j]]*Pauli[Flatten[{IntegerDigits[i-1,4,particles],Int
 ];
 
 ChoiJamiStateFromPauliProductBasis[channelmatrix_]:=ChoiMatrixFromR[ReshufflingPauliProductBasis[channelmatrix]];
+
+(*Purification routines*)
+
+Purify[\[Rho]_,OptionsPattern[{random->False}]]:=Module[{vals,vecs,U},
+{vals,vecs}=Eigensystem[\[Rho]];
+vecs=Map[Normalize,Orthogonalize[vecs]];
+If[OptionValue[random],U=CUEMember[Length[\[Rho]]];,U=IdentityMatrix[Length[\[Rho]]]];
+Sum[Sqrt[vals[[i]]]Flatten[KroneckerProduct[vecs[[i]],U.vecs[[i]]]],{i,1,Dimensions[\[Rho]][[1]]}]
+]
 
 End[]
 
