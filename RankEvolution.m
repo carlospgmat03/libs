@@ -14,8 +14,35 @@ GenerateMixedModel::usage = "Generates the model that interpolates between the c
 ChangePosition::usage = "Changes the position according to the null model that is written. Usage, ChangePosition[Psi0_, {a_Integer, b_Integer}], ChangePosition[Psi0_] or ChangePosition[Psi0_, skip_Integer]"
 FastProbabilityOfDisplacement::usage = "Calculates the probability of displacement, in a fast way. Usage FastProbabilityOfDisplacement[k_, n_, s_, i_]"
 GenerateModel2::usage = "Generates the null model"
+ModelStepIonizing::usage = "One step of the ionizing model"
+GenerateModelStepIonizing::usage = "Complete set of steps for the ionizing model"
 (*}}}*)
 Begin["`Private`"]
+(* Ionizing Model EL BUENO {{{*)
+ModelStepIonizing[ ModelState_, {ProbabilityLevy_, ProbabilityReplace_}] :=
+ Module[{Psi, LatestAddedState},
+  {Psi, LatestAddedState} = ModelState;
+  Psi = If[Random[] < ProbabilityLevy, ChangePosition[Psi], Psi]; 
+  If[Random[] < ProbabilityReplace,
+   LatestAddedState = LatestAddedState + 1;
+   Psi = ReplacePart[Psi, 
+     RandomInteger[{1, Length[Psi]}] -> LatestAddedState];];
+  {Psi, LatestAddedState}]
+
+ModelStepIonizing[LengthModel_, ProbabilitySet_, EvolutionTime_] := 
+ Nest[ModelStepIonizing[#, ProbabilitySet] &, {Range[LengthModel], 
+    LengthModel}, EvolutionTime][[1]]
+
+GeneratePreModelIonizing[LengthModel_, EvolutionTime_, ProbabilitySet_] :=
+ NestList[ModelStepIonizing[#, ProbabilitySet] &, {Range[LengthModel],
+    LengthModel}, EvolutionTime - 1]
+
+GenerateModelStepIonizing[LengthModel_, EvolutionTime_, ProbabilitySet_] := 
+  Module[{completo},
+   completo = GeneratePreModelIonizing[LengthModel, EvolutionTime, ProbabilitySet];
+   Transpose[completo][[1]][[All, ;; Length[completo[[1, 1]]]]]];
+
+(* Ionizing Model }}}*)
 (* Null Model {{{*)
 ChangePosition[Psi0_, {a_Integer, b_Integer}] := Flatten[Which[
    a < b, {Psi0[[1 ;; a - 1]], Psi0[[a + 1 ;; b]], Psi0[[a]], Psi0[[b + 1 ;;]]}, 
