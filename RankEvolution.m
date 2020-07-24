@@ -19,7 +19,7 @@ GenerateModelStepIonizing::usage = "Complete set of steps for the ionizing model
 (*}}}*)
 Begin["`Private`"]
 (* Ionizing Model EL BUENO {{{*)
-ModelStepIonizing[ ModelState_, {ProbabilityLevy_, ProbabilityReplace_}] :=
+ModelStepIonizing[ ModelState_List, {ProbabilityLevy_, ProbabilityReplace_}] :=
  Module[{Psi, LatestAddedState},
   {Psi, LatestAddedState} = ModelState;
   Psi = If[Random[] < ProbabilityLevy, ChangePosition[Psi], Psi]; 
@@ -29,9 +29,12 @@ ModelStepIonizing[ ModelState_, {ProbabilityLevy_, ProbabilityReplace_}] :=
      RandomInteger[{1, Length[Psi]}] -> LatestAddedState];];
   {Psi, LatestAddedState}]
 
-ModelStepIonizing[LengthModel_, ProbabilitySet_, EvolutionTime_] := 
+ModelStepIonizing[LengthModel_Integer, ProbabilitySet_List, EvolutionTime_] := 
  Nest[ModelStepIonizing[#, ProbabilitySet] &, {Range[LengthModel], 
     LengthModel}, EvolutionTime][[1]]
+
+ModelStepIonizing[LengthModel_Integer, ProbabilitySet_List] :=
+  ModelStepIonizing[LengthModel, ProbabilitySet,1]
 
 GeneratePreModelIonizing[LengthModel_, EvolutionTime_, ProbabilitySet_] :=
  NestList[ModelStepIonizing[#, ProbabilitySet] &, {Range[LengthModel],
