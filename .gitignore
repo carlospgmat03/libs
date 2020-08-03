@@ -38,3 +38,4 @@ cpp/tmp
 cpp/cmake-build-debug
 cpp/.idea
 cpp/Icon
+julia/.ipynb_checkpoints/Examples-checkpoint.ipynb
