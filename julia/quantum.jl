@@ -4,7 +4,7 @@ module quantum
 
 using LinearAlgebra
 
-export projector, basisstate, random_state, random_state_stat
+export projector, basisstate, random_state, random_state_stat, base_state, fromdigits, apply_unitary!, applyswap, applyswappure, apply_ising!, apply_kick!, testbit, sigma_x, sigma_y, sigma_z, sigmas
 
 #Generic Quantum Mechanics
 
@@ -23,12 +23,21 @@ function projector(state1,state2)
 end
 
 """
-Basis state
+Old one still in use for basis states
 """
 function basisstate(i,n)
     aux=zeros(ComplexF64,n)
     aux[i]=1
     return aux
+end
+
+"""
+Construye los elementos de la base
+"""
+function base_state(i,dim)
+    psi=zeros(Complex{Float64},dim)
+    psi[i+1]=1;
+    return psi
 end
 
 """
@@ -127,7 +136,18 @@ end
 
 # Spin chains
 
+sigma_x=[0. 1.; 1. 0.]
+sigma_y=[0. -im; im 0]
+sigma_z=[1. 0.;0. -1.]
+sigmas=Array[sigma_x, sigma_y, sigma_z]
 
+"""
+function testbit(n, bit)
+This function test if a a given bit in position "bit" of number "n" is on. 
+"""
+function testbit(n, bit)
+    ~(n&(1<<bit)==0)
+end 
 
 """
 apply_ising!(psi, J, target_qubit_1, target_qubit_2)
@@ -136,7 +156,7 @@ function apply_ising!(psi, J, target_qubit_1, target_qubit_2)
     expJ=exp(-im*J)
     expJc=conj(expJ)
     for i = 0: length(psi)-1
-        if testbit(i,target_qubit_1) $ testbit(i,target_qubit_2)
+        if testbit(i,target_qubit_1) && testbit(i,target_qubit_2)
             psi[i+1]*=expJc
         else
             psi[i+1]*=expJ
@@ -153,7 +173,7 @@ function apply_kick!(psi, b, target_qubit)
     if phi!=0
         b_normalized=b/phi
         sigma_n=sigmas[1]*b_normalized[1]+sigmas[2]*b_normalized[2]+sigmas[3]*b_normalized[3]
-        u=eye(2)*cos(phi)-1.0im*sigma_n*sin(phi)
+        u=[[1,0] [0,1]]*cos(phi)-1.0im*sigma_n*sin(phi)
         apply_unitary!(psi, u, target_qubit)
     end
 end 
