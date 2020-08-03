@@ -4,6 +4,8 @@ module rmt
 
 using LsqFit: curve_fit
 
+export P_Orthogonal, P_Unitary, unfolding, staircase
+
 function P_Orthogonal(x)
     return x.*exp(-x.^2*pi/4)*pi/2
 end
