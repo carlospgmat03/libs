@@ -692,6 +692,15 @@ digits2p[[{Target1,Target2}]]=digits2[[{Target2,Target1}]];
 Aux[[i,j]]=State[[FromDigits[digits1p,2]+1,FromDigits[digits2p,2]+1]];,{i,1,dim[[1]]},{j,1,dim[[1]]}];
 Aux
 ];
+
+ApplyPermutation[state_,permmatrix_]:=Module[{State,Aux,digitsinit,digitsfinal,len},
+len=Length[state];
+Aux=ConstantArray[0,len];
+Table[digitsinit=IntegerDigits[i-1,2,IntegerPart[Log2[len]]];
+digitsfinal=permmatrix.digitsinit;
+Aux[[i]]=state[[FromDigits[digitsfinal,2]+1]];,{i,1,Length[state]}];
+Aux
+]
 (*Coarse Graining stuff*)
 (*{{{*)
 ApplyLocalNoiseChain[State_?MatrixQ,p_]:=Module[{qubits},
