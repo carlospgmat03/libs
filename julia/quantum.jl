@@ -156,7 +156,7 @@ function apply_ising!(psi, J, target_qubit_1, target_qubit_2)
     expJ=exp(-im*J)
     expJc=conj(expJ)
     for i = 0: length(psi)-1
-        if testbit(i,target_qubit_1) && testbit(i,target_qubit_2)
+        if testbit(i,target_qubit_1) ⊻ testbit(i,target_qubit_2)
             psi[i+1]*=expJc
         else
             psi[i+1]*=expJ
