@@ -97,6 +97,9 @@ ReshufflingPauliProductBasis::usage = "ReshufflingPauliProductBasis[mat_] Constr
 ChoiMatrixFromR::usage = "ChoiMatrixFromR[R_] constructs Choi Matrix from Matrix R."
 ChoiJamiStateFromPauliProductBasis::usage = "ChoiJamiStateFromPauliProductBasis[channelmatrix_] Constructs  Choi matrix from a channel written in the Pauli Product basis."
 Purify::usage = "Purify[\[Rho]_] Purification of rho with a system of the same dimension. The option random->True can be used for random purifications."
+ChoiMatrixQubitParticles::usage = "ChoiMatrixQubitParticles[channel_,particles_]."
+QuantumMapInProyectorBasis::usage = "QuantumMapInProyectorBasis[channel_,particles_]."
+KrausQubitParticles::usage = "KrausQubitParticles[channel_,particles_]."
 
 
 Begin["Private`"] 
@@ -758,6 +761,14 @@ vecs=Map[Normalize,Orthogonalize[vecs]];
 If[OptionValue[random],U=CUEMember[Length[\[Rho]]];,U=IdentityMatrix[Length[\[Rho]]]];
 Sum[Sqrt[vals[[i]]]Flatten[KroneckerProduct[vecs[[i]],U.vecs[[i]]]],{i,1,Dimensions[\[Rho]][[1]]}]
 ]
+
+ChoiMatrixQubitParticles[channel_,particles_]:=ArrayFlatten[Table[channel[Proyector[BasisState[i,2^particles],BasisState[j,2^particles]]],{i,0,2^particles-1},{j,0,2^particles-1}]];
+
+QuantumMapInProyectorBasis[channel_,particles_]:=Flatten[Table[Flatten[Table[Tr[Dagger[Proyector[BasisState[k,2^particles],BasisState[l,2^particles]]].channel[Proyector[BasisState[i,2^particles],BasisState[j,2^particles]]]],{i,0,2^particles-1},{j,0,2^particles-1}]],{k,0,2^particles-1},{l,0,2^particles-1}],1];
+
+KrausQubitParticles[channel_,particles_]:=Map[Sqrt[#[[1]]]Transpose[Partition[#[[2]],2^particles]]&,ChoiMatrixQubitParticles[channel,particles]//Eigensystem//Transpose]//Chop;
+
+(*XX-chain section*)
 
 End[]
 
