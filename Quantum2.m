@@ -100,6 +100,7 @@ Purify::usage = "Purify[\[Rho]_] Purification of rho with a system of the same d
 ChoiMatrixQubitParticles::usage = "ChoiMatrixQubitParticles[channel_,particles_]."
 QuantumMapInProyectorBasis::usage = "QuantumMapInProyectorBasis[channel_,particles_]."
 KrausQubitParticles::usage = "KrausQubitParticles[channel_,particles_]."
+KrausQubitParticlesFromPauliProductBasis::usage = "KrausQubitParticlesFromPauliProductBasis[channel_?MatrixQ]."
 
 
 Begin["Private`"] 
@@ -767,6 +768,8 @@ ChoiMatrixQubitParticles[channel_,particles_]:=ArrayFlatten[Table[channel[Proyec
 QuantumMapInProyectorBasis[channel_,particles_]:=Flatten[Table[Flatten[Table[Tr[Dagger[Proyector[BasisState[k,2^particles],BasisState[l,2^particles]]].channel[Proyector[BasisState[i,2^particles],BasisState[j,2^particles]]]],{i,0,2^particles-1},{j,0,2^particles-1}]],{k,0,2^particles-1},{l,0,2^particles-1}],1];
 
 KrausQubitParticles[channel_,particles_]:=Map[Sqrt[#[[1]]]Transpose[Partition[#[[2]],2^particles]]&,ChoiMatrixQubitParticles[channel,particles]//Eigensystem//Transpose]//Chop;
+
+KrausQubitParticlesFromPauliProductBasis[channel_?MatrixQ]:=Map[Sqrt[#[[1]]]Transpose[Partition[#[[2]],Sqrt[Length[channel]]]]&,ChoiJamiStateFromPauliProductBasis[channel]//Eigensystem//Transpose]//Chop;
 
 (*XX-chain section*)
 
