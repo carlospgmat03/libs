@@ -101,6 +101,7 @@ ChoiMatrixQubitParticles::usage = "ChoiMatrixQubitParticles[channel_,particles_]
 QuantumMapInProyectorBasis::usage = "QuantumMapInProyectorBasis[channel_,particles_]."
 KrausQubitParticles::usage = "KrausQubitParticles[channel_,particles_]."
 KrausQubitParticlesFromPauliProductBasis::usage = "KrausQubitParticlesFromPauliProductBasis[channel_?MatrixQ]."
+CPQPauli::usage = "Complete positvity test for Pauli channels, with lambdas as the input, CPQPauli[\[Lambda]_]."
 
 
 Begin["Private`"] 
@@ -408,7 +409,6 @@ If[(MatrixRank[c]<rank),True,False
 ,False]
 ];
 
-
 DivisibilityKindOfGeneral[channel_,branches_:1]:=Module[{eigen,list,tmp,det,form},
 If[
 (*Checking Complete Positivity*)
@@ -419,6 +419,8 @@ If[TestViaRankOfCPDIV[channel],3,
 If[Chop[Det[channel]]>=0,2,1]]
 ],0]*0.25
 ];
+
+CPQPauli[\[Lambda]_]:=1/2 (1+\[Lambda][[1]]-\[Lambda][[2]]-\[Lambda][[3]])>=0&&1/2 (1-\[Lambda][[1]]+\[Lambda][[2]]-\[Lambda][[3]])>=0&&1/2 (1-\[Lambda][[1]]-\[Lambda][[2]]+\[Lambda][[3]])>=0&&1/2 (1+\[Lambda][[1]]+\[Lambda][[2]]+\[Lambda][[3]])>=0;
 
 EntanglementBreakingQ[x_,y_,z_]:=If[DivisibilityKindOf[x,y,z]>0,If[Max[0,1/4 (-Abs[-1+x+y-z]-Abs[-1+x-y+z]-Abs[-1-x+y+z]-Abs[1+x+y+z]+8 Max[1/4 Abs[-1+x+y-z],1/4 Abs[-1+x-y+z],1/4 Abs[-1-x+y+z],1/4 Abs[1+x+y+z]])]<=0,2,1],0];
 
