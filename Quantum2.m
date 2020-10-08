@@ -383,9 +383,9 @@ If[ (*Evaluating for CP-div*)
 list[[1]]^2>=\[Lambda]1*\[Lambda]2*\[Lambda]3,
 (*Evaluating for markov type evolution*)
 If[(*checking hermiticity preserving and CCP*)
-HermiticityPreservingAndCCPOfTheGeneratorQForDiagonal[\[Lambda]1,\[Lambda]2,\[Lambda]3,2]
+(\[Lambda]1*\[Lambda]2*\[Lambda]3>0&&\[Lambda]1/(\[Lambda]2 \[Lambda]3)>=0&&\[Lambda]2/(\[Lambda]1 \[Lambda]3)>=0&&\[Lambda]3/(\[Lambda]2 \[Lambda]1)>=0)||(\[Lambda]1==0&&\[Lambda]2==0&&\[Lambda]3==0)||(\[Lambda]1>0&&\[Lambda]2==0&&\[Lambda]3==0)||(\[Lambda]1==0&&\[Lambda]2>0&&\[Lambda]3==0)||(\[Lambda]1==0&&\[Lambda]2==0&&\[Lambda]3>0)
 ,4,3
-],2],1],0]];
+],2],1],0]*0.25];
 
 DivisibilityKindOf[\[Lambda]_]:=DivisibilityKindOf[\[Lambda][[1]],\[Lambda][[2]],\[Lambda][[3]]];
 
