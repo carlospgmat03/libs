@@ -769,7 +769,7 @@ ChoiMatrixQubitParticles[channel_,particles_]:=ArrayFlatten[Table[channel[Proyec
 
 QuantumMapInProyectorBasis[channel_,particles_]:=Flatten[Table[Flatten[Table[Tr[Dagger[Proyector[BasisState[k,2^particles],BasisState[l,2^particles]]].channel[Proyector[BasisState[i,2^particles],BasisState[j,2^particles]]]],{i,0,2^particles-1},{j,0,2^particles-1}]],{k,0,2^particles-1},{l,0,2^particles-1}],1];
 
-KrausQubitParticles[channel_,particles_]:=Map[Sqrt[#[[1]]]Transpose[Partition[#[[2]],2^particles]]&,ChoiMatrixQubitParticles[channel,particles]//Eigensystem//Transpose]//Chop;
+KrausQubitParticles[channel_,particles_]:=Select[Map[Sqrt[#[[1]]]Transpose[Partition[#[[2]],2^particles]]&,ChoiMatrixQubitParticles[channel,particles]//Eigensystem//Transpose]//Chop,MatrixRank[#]>0 &];
 
 KrausQubitParticlesFromPauliProductBasis[channel_?MatrixQ]:=Map[Sqrt[#[[1]]]Transpose[Partition[#[[2]],Sqrt[Length[channel]]]]&,ChoiJamiStateFromPauliProductBasis[channel]//Eigensystem//Transpose]//Chop;
 
