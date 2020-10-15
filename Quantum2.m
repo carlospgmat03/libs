@@ -257,9 +257,9 @@ StateToDirac[state_?VectorQ]:=Sum[state[[i]]*"|"<>(TableForm[{IntegerDigits[i-1,
 
 StateToDirac[state_?MatrixQ]:=Sum[state[[i,j]]*"|"<>(TableForm[{IntegerDigits[i-1,2,Log2[Length[state]]//Round]}, TableSpacing->{1.2,1.2}]//ToString)<>"\[RightAngleBracket]\[LeftAngleBracket]"<>(TableForm[{IntegerDigits[j-1,2,Log2[Length[state]]//Round]}, TableSpacing->{1.2,1.2}]//ToString)<>"|",{i,1,Length[state]},{j,1,Length[state]}];
 
-StateToDirac[state_?MatrixQ,base_]:=Sum[state[[i,j]]*"|"<>(TableForm[{IntegerDigits[i-1,base,Log[Length[state],base]//Round]}, TableSpacing->{1.2,1.2}]//ToString)<>"\[RightAngleBracket]\[LeftAngleBracket]"<>(TableForm[{IntegerDigits[j-1,base,Log[Length[state],base]//Round]}, TableSpacing->{1.2,1.2}]//ToString)<>"|",{i,1,Length[state]},{j,1,Length[state]}];
+StateToDirac[state_?MatrixQ,base_]:=Sum[state[[i,j]]*"|"<>(TableForm[{IntegerDigits[i-1,base,Log[base,Length[state]]//Round]}, TableSpacing->{1.2,1.2}]//ToString)<>"\[RightAngleBracket]\[LeftAngleBracket]"<>(TableForm[{IntegerDigits[j-1,base,Log[base,Length[state]]//Round]}, TableSpacing->{1.2,1.2}]//ToString)<>"|",{i,1,Length[state]},{j,1,Length[state]}];
 
-StateToDirac[state_?VectorQ,base_]:=Sum[state[[i]]*"|"<>(TableForm[{IntegerDigits[i-1,base,Log[Length[state],base]//Round]}, TableSpacing->{1.2,1.2}]//ToString)<>"\[RightAngleBracket]",{i,1,Length[state]}];
+StateToDirac[state_?VectorQ,base_]:=Sum[state[[i]]*"|"<>(TableForm[{IntegerDigits[i-1,base,Log[base, Length[state]]//Round]}, TableSpacing->{1.2,1.2}]//ToString)<>"\[RightAngleBracket]",{i,1,Length[state]}];
 
 CharlieMeasure[list_] := 
   Module[{l, listD, Criticallistmin, Criticallistmax, position, maxi, 
