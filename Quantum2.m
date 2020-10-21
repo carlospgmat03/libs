@@ -771,7 +771,7 @@ QuantumMapInProyectorBasis[channel_,particles_]:=Flatten[Table[Flatten[Table[Tr[
 
 KrausQubitParticles[channel_,particles_]:=Select[Map[Sqrt[#[[1]]]Transpose[Partition[#[[2]],2^particles]]&,ChoiMatrixQubitParticles[channel,particles]//Eigensystem//Transpose]//Chop,MatrixRank[#]>0 &];
 
-KrausQubitParticlesFromPauliProductBasis[channel_?MatrixQ]:=Map[Sqrt[#[[1]]]Transpose[Partition[#[[2]],Sqrt[Length[channel]]]]&,ChoiJamiStateFromPauliProductBasis[channel]//Eigensystem//Transpose]//Chop;
+KrausQubitParticlesFromPauliProductBasis[channel_?MatrixQ]:=Select[Map[Sqrt[#[[1]]]Transpose[Partition[#[[2]],Sqrt[Length[channel]]]]&,ChoiJamiStateFromPauliProductBasis[channel]//Eigensystem//Transpose]//Chop,MatrixRank[#]>0 &];
 
 (*XX-chain section*)
 
