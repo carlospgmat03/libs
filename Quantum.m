@@ -760,6 +760,7 @@ n=Log[4,Length[diagonal]];
 pauliToComputational=tensorPower[TransformationMatrixPauliBasisToComputationalBasis[],n];
 pauliToComputational.DiagonalMatrix[diagonal].Inverse[pauliToComputational]
 ];
+(*JA: PCEFigures est\[AAcute] programada del asco. Un d\[IAcute]a con ganas de distraerme la arreglo. Para mientras hace la tarea.*)
 PCEFigures[correlations_]:=Module[{cubeIndices,diagonalPCE},
 cubeIndices=Position[correlations,1]-1;
 If[Length[Dimensions[correlations]]==3,
