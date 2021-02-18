@@ -138,10 +138,10 @@ of \[Rho] in Pauli tensor products basis.
 PauliSuperoperator[pauliDiagonal_List]"
 PCEFigures::usage="
 Returns the figure representing the Pauli channel erasing operation. Works up 
-to 3 qubits (up to cubes).
-PCEFigures[taus_List]"
-BlochSphTransformation::usage="
-Returns Bloch Ball transformation of a 1-qubit quantum chanenl given a
+to 3 qubits (up to cubes). Parameters: list of 1D, 2D or 3D correlations left
+invariant by a PCE operation.
+PCEFigures[correlations_List]"
+BlochSphTransformation::usage="Returns Bloch Ball transformation of a 1-qubit quantum chanenl given a
 list with center point and the factor of x,y and z. 
 Example: BlochSphTransformation[{{0,0,0.3},{1,1/2,1/2}}] returns 
 a taco-like figure with center at (0,0,0.3).
