@@ -62,7 +62,7 @@ PartialTransposeSecond::usage = "Transpose the Second part of a bipartite system
 DirectSum::usage = "DirectSum[A1, A2] A1 \[CirclePlus] A2 or DirectSum[{A1, A2, ..., An}] = A1 \[CirclePlus] A2\[CirclePlus] ... \[CirclePlus] An"
 tensorProduct::usage = "Creates the tensor product for qubits, like TensorProduct_real_routine in linear.f90
       I think that the inidices in the number refer to where to place the second matrix."
-tensorPower::usage = "Creates the tensor product of n matrices"
+tensorPower::usage = "Creates the tensor product of n matrices" (*JA: est\[AAcute] extra\[NTilde]a esta definici\[OAcute]n*)
 OrthonormalBasisContaningVector::usage=" OrthonormalBasisContaningVector[psi_?VectorQ] will create an orthonorlam basis that contains the given vector"
 GetMatrixForm[Gate_, Qubits_] := Gate /@ IdentityMatrix[Power[2, Qubits]]
 ArbitraryPartialTrace::usage="Yields the partial trace of a Matrix. The first entry is the dimension of the Hilbert Space that you want
@@ -117,7 +117,7 @@ TransformationMatrixPauliBasisToComputationalBasis::usage = "The matrix that all
 Reshuffle::usage = "Apply the reshufle operation as undestood in Geometry of Quantum States, pags 260-262, and 264"
 RandomTracePreservingMapChoiBasis::usage = "Creates a singlequbit random trace preserving map"
 AveragePurityChannelPauliBasis::usage = "Calculates the average final purity given that the initial states are pure, and chosen with the Haar measure. "
-BlochEllipsoid::usage = "BlochEllipsoid[Cha_] Show the deformation of BlochSphere for a qubit channel in the pauli basis"
+BlochEllipsoid::usage = "BlochEllipsoid[Cha_] Shows the deformation of Bloch sphere for a qubit channel in the pauli basis."
 EvolvGate::usage="EvolvGate[Gate_, steps_, env_, state_]... Evoluciona cualquier estado aplicando un numero steps_ de veces la compuerta Gate de  la forma Gate[#, otherparameters_] donde debe ponerse # en el lugar donde Gate toma el estado"
 MakeQuantumChannel::usage="MakeQuantumChannel[Gate_, steps_, env_] Donde Gate va de la forma Gate[#, otherparameters_]  donde debe ponerse # en el lugar donde Gate toma el estado"
 SumPositiveDerivatives::usage="SumPositiveDerivatives[list_] Suma todas las contribuciones list(max)-list(min) sucesivos cuando la derivada es positiva"
@@ -132,6 +132,21 @@ ApplyLocalNoiseChain::usage = "ApplyLocalNoiseChain[State,p] Applies the map tha
 ApplyNoiseChain::usage = "ApplyNoiseChain[State,p] Applies the map that transforoms the density matrix State into the assessible density matrix when non-local noise is present using fuzzy measurements."
 PermutationMatrices::usgae = "Argument is the number of particles to permute, output is a list of matrices."
 PermutationMatrix::usage = "PermutationMatrix[p_List]."
+PauliSuperoperator::usage="Calculates superoperator of a Pauli quantum channel. Pauli quantum channels transform 
+qubits density matrices as \!\(\*SubscriptBox[\(r\), \(\*SubscriptBox[\(j\), \(1\)],  ... , \*SubscriptBox[\(j\), \(n\)]\)]\)\[Rule]\!\(\*SubscriptBox[\(\[Tau]\), \(\*SubscriptBox[\(j\), \(1\)],  ... , \*SubscriptBox[\(j\), \(n\)]\)]\)\!\(\*SubscriptBox[\(r\), \(\*SubscriptBox[\(j\), \(1\)],  ... , \*SubscriptBox[\(j\), \(n\)]\)]\), where \!\(\*SubscriptBox[\(r\), \(\*SubscriptBox[\(j\), \(1\)],  ... , \*SubscriptBox[\(j\), \(n\)]\)]\) are the components 
+of \[Rho] in Pauli tensor products basis.
+PauliSuperoperator[pauliDiagonal_List]"
+PCEFigures::usage="
+Returns the figure representing the Pauli channel erasing operation. Works up 
+to 3 qubits (up to cubes).
+PCEFigures[taus_List]"
+BlochSphTransformation::usage="
+Returns Bloch Ball transformation of a 1-qubit quantum chanenl given a
+list with center point and the factor of x,y and z. 
+Example: BlochSphTransformation[{{0,0,0.3},{1,1/2,1/2}}] returns 
+a taco-like figure with center at (0,0,0.3).
+BlochSphTransformation[coord_List]
+"
 (* }}} *)
 (* }}} *)
 Begin["Private`"] 
@@ -702,6 +717,22 @@ digitsfinal=permmatrix.digitsinit;
 Aux[[i]]=state[[FromDigits[digitsfinal,2]+1]];,{i,1,Length[state]}];
 Aux
 ]
+
+BlochSphTransformation[coord_]:=Module[{x0,y0,z0,a,b,c},
+{x0,y0,z0}=coord[[1]];
+{a,b,c}=If[#==0,0.02,#]&/@coord[[2]];
+Style[Show[ContourPlot3D[x^2+y^2+z^2==1,{x,-1,1},{y,-1,1},{z,-1,1},
+ContourStyle->{Yellow,Opacity[0.25]},Mesh->None],
+ContourPlot3D[(x-x0)^2/a^2+(y-y0)^2/b^2+(z-z0)^2/c^2==1,{x,-1,1},{y,-1,1},{z,-1,1},
+ContourStyle->{Dashed,Pink,Opacity[0.65]},Mesh->None],
+Graphics3D[{
+        Black, Arrow[Tube[{{0,0,0},1.3*Normalize[{1,0,0}]}],0.05],
+        Black,Arrow[Tube[{{0,0,0},1.3*Normalize[{0,1,0}]}],0.05],
+        Black,Arrow[Tube[{{0,0,0},1.3*Normalize[{0,0,1}]}],0.05],
+Text["x",{1.3,0,0}],Text["y",{0,1.3,0}],Text["z",{0,0,1.3}] },
+Boxed->False],Boxed->False,Axes->False,PlotRange->1.3],
+RenderingOptions->{"3DRenderingMethod"->"HardwareDepthPeeling"}]
+]
 (*Coarse Graining stuff*)
 (*{{{*)
 ApplyLocalNoiseChain[State_?MatrixQ,p_]:=Module[{qubits},
@@ -722,8 +753,42 @@ p Proyector[State]+2(1-p)/(qubits(qubits-1))(Sum[ApplySwap[State,i,j],{i,1,qubit
 ];
 PermutationMatrix[p_List]:=IdentityMatrix[Length[p]][[p]];
 PermutationMatrices[n_]:=PermutationMatrix/@Permutations[Range[n]];
+(*PCE operations related stuff.*)
+PauliSuperoperator[pauliDiagonal_List]:=Module[{n,pauliToComputational,diagonal},
+diagonal=pauliDiagonal//Flatten;
+n=Log[4,Length[diagonal]];
+pauliToComputational=tensorPower[TransformationMatrixPauliBasisToComputationalBasis[],n];
+pauliToComputational.DiagonalMatrix[diagonal].Inverse[pauliToComputational]
+];
+PCEFigures[correlations_]:=Module[{cubeIndices,diagonalPCE},
+cubeIndices=Position[correlations,1]-1;
+If[Length[Dimensions[correlations]]==3,
+Graphics3D[{If[Count[#,0]==3,{Black,Cube[#]},
+If[Count[#,0]==2,{RGBColor["#CC0000"],Cube[#]},
+If[Count[#,0]==1,{RGBColor["#004C99"],Cube[#]},
+If[Count[#,0]==0,{RGBColor["#99FF33"],Cube[#]}]]]]&/@cubeIndices,
+{Thickness[0.012],Line[{{{-0.5,-0.5,-0.5},{-0.5,-0.5,3.5}},{{-0.5,-0.5,-0.5},{-0.5,3.5,-0.5}},{{-0.5,-0.5,-0.5},{3.5,-0.5,-0.5}},
+{{3.5,-0.5,-0.5},{3.5,-0.5,3.5}},
+{{-0.5,-0.5,3.5},{3.5,-0.5,3.5}},
+{{-0.5,3.5,-0.5},{3.5,3.5,-0.5}},
+{{3.5,3.5,-0.5},{3.5,3.5,3.5}},
+{{3.5,3.5,3.5},{-0.5,3.5,3.5}},
+{{-0.5,3.5,3.5},{-0.5,3.5,-0.5}},
+{{-0.5,3.5,3.5},{-0.5,-0.5,3.5}},
+{{3.5,3.5,3.5},{3.5,-0.5,3.5}},
+{{3.5,3.5,-0.5},{3.5,-0.5,-0.5}}}]}},
+Axes->False,AxesLabel->{"x","y","z"},LabelStyle->Directive[Bold,Medium,Black],PlotRange->{{-0.5,3.5},{-0.5,3.5},{-0.5,3.5}},AxesOrigin->{0.5,0.5,0.5},AxesStyle->Thickness[0.005],ImageSize->Medium,ImagePadding->45],
+If[Length[Dimensions[correlations]]==2,
+diagonalPCE=correlations//Flatten;
+ArrayPlot[SparseArray[Position[ArrayReshape[diagonalPCE,{4,4}],1]->(If[#[[1]]==1\[And]#[[2]]==1,Black,If[#[[1]]==1\[Or]#[[2]]==1,RGBColor["#CC0000"],If[#[[1]]!=1\[And]#[[2]]!=1,RGBColor["#004C99"],Nothing]]]&/@Position[ArrayReshape[diagonalPCE,{4,4}],1]),{4,4}]]
+]
+]
+]
 (*}}}*)
 (*}}}*)
 End[] 
 EndPackage[]
 (* }}} *)
+
+
+
