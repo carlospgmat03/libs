@@ -141,12 +141,6 @@ Returns the figure representing the Pauli channel erasing operation. Works up
 to 3 qubits (up to cubes). Parameters: list of 1D, 2D or 3D correlations left
 invariant by a PCE operation.
 PCEFigures[correlations_List]"
-BlochSphTransformation::usage="Returns Bloch Ball transformation of a 1-qubit quantum chanenl given a
-list with center point and the factor of x,y and z. 
-Example: BlochSphTransformation[{{0,0,0.3},{1,1/2,1/2}}] returns 
-a taco-like figure with center at (0,0,0.3).
-BlochSphTransformation[coord_List]
-"
 (* }}} *)
 (* }}} *)
 Begin["Private`"] 
@@ -583,7 +577,7 @@ AveragePurityChannelPauliBasis[Lambda_] := Total[Power[Lambda[[All, 1]], 2]]/2 +
 
  (* }}} *)
 (* {{{ *) BlochEllipsoid[Cha_]:=Module[{center,T,coord,vecs,x,y,z,vecs0},
-  T=Cha[[{2,3,4},{2,3,4}]];
+  T=(#+DiagonalMatrix[If[#==0,0.01,0]&/@Diagonal[#]])&[Cha[[{2,3,4},{2,3,4}]]];
   center={Cha[[2,1]],Cha[[3,1]],Cha[[4,1]]};
   vecs0=Graphics3D[{{
         Dashing[0.01],Opacity[0.5],Red, Arrow[{{0,0,0},1.3*Normalize[{1,0,0}]}],
@@ -595,10 +589,10 @@ AveragePurityChannelPauliBasis[Lambda_] := Total[Power[Lambda[[All, 1]], 2]]/2 +
            {Green,Arrow[{center,1.3*Normalize[T.{0,0,1}]}]} }}];
   coord={x,y,z}-center;
   coord=Inverse[T].coord;
-  Show[ContourPlot3D[
+  Style[Show[ContourPlot3D[
     {coord[[1]]^2+coord[[2]]^2+coord[[3]]^2==1,x^2+y^2+z^2==1},
     {x,-1,1},{y,-1,1},{z,-1,1},AxesLabel->{"X","Y","Z"},
-    ContourStyle->{Automatic,Opacity[0.3]},Mesh->None],vecs,vecs0,PlotRange->1.6]
+    ContourStyle->{Automatic,Opacity[0.3]},Mesh->None],vecs,vecs0,PlotRange->1.3],RenderingOptions->{"3DRenderingMethod"->"HardwareDepthPeeling"}]
 ]
  (* }}} *)
 (* {{{ *) EvolvGate[Gate_, steps_, env_, state_]:=
@@ -718,21 +712,6 @@ Aux[[i]]=state[[FromDigits[digitsfinal,2]+1]];,{i,1,Length[state]}];
 Aux
 ]
 
-BlochSphTransformation[coord_]:=Module[{x0,y0,z0,a,b,c},
-{x0,y0,z0}=coord[[1]];
-{a,b,c}=If[#==0,0.02,#]&/@coord[[2]];
-Style[Show[ContourPlot3D[x^2+y^2+z^2==1,{x,-1,1},{y,-1,1},{z,-1,1},
-ContourStyle->{Yellow,Opacity[0.25]},Mesh->None],
-ContourPlot3D[(x-x0)^2/a^2+(y-y0)^2/b^2+(z-z0)^2/c^2==1,{x,-1,1},{y,-1,1},{z,-1,1},
-ContourStyle->{Dashed,Pink,Opacity[0.65]},Mesh->None],
-Graphics3D[{
-        Black, Arrow[Tube[{{0,0,0},1.3*Normalize[{1,0,0}]}],0.05],
-        Black,Arrow[Tube[{{0,0,0},1.3*Normalize[{0,1,0}]}],0.05],
-        Black,Arrow[Tube[{{0,0,0},1.3*Normalize[{0,0,1}]}],0.05],
-Text["x",{1.3,0,0}],Text["y",{0,1.3,0}],Text["z",{0,0,1.3}] },
-Boxed->False],Boxed->False,Axes->False,PlotRange->1.3],
-RenderingOptions->{"3DRenderingMethod"->"HardwareDepthPeeling"}]
-]
 (*Coarse Graining stuff*)
 (*{{{*)
 ApplyLocalNoiseChain[State_?MatrixQ,p_]:=Module[{qubits},
