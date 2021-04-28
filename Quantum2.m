@@ -102,6 +102,7 @@ QuantumMapInProyectorBasis::usage = "QuantumMapInProyectorBasis[channel_,particl
 KrausQubitParticles::usage = "KrausQubitParticles[channel_,particles_]."
 KrausQubitParticlesFromPauliProductBasis::usage = "KrausQubitParticlesFromPauliProductBasis[channel_?MatrixQ]."
 CPQPauli::usage = "Complete positvity test for Pauli channels, with lambdas as the input, CPQPauli[\[Lambda]_]."
+PositiveAndNegativeParts::usage = "PositiveAndNegativeParts[M_] returns the positve and negative parts of M such that M=M^+-M^- where M^{+-} are posive-semidefinite and positive, respectively."
 
 
 Begin["Private`"] 
@@ -110,7 +111,7 @@ Begin["Private`"]
   {{1, 0, 0}, {0, Exp[(2 \[Pi] I)/3], 0}, {0, 0,
     Exp[(2 \[Pi] I)/3]^2}}};
 silvester =
-  MatrixPower[shift, #1].MatrixPower[clock, #2] & @@@
+  MatrixPower[shift, #1] . MatrixPower[clock, #2] & @@@
    Tuples[{0, 1, 2}, {2}];
 silvester = 
   Permute[silvester, FindPermutation[{2, 3, 4, 7, 5, 9, 6, 8}]];
@@ -152,7 +153,7 @@ MatrixExp[-1.0*I HKi].MatrixExp[-1.0*I HI]
 matrixU[bx_,bz_,qubits_,topology_]:=Module[{HKi,HI},
 If[topology==4,HKi=HK[qubits,bx,bz]+sigma[1,0,qubits]\[Delta]bx,HKi=HK[qubits,bx,bz]];
 Switch[topology,1,HI=IsingChain[1.0,qubits],2,HI=Hallvsall[1.0,qubits],3,HI=IsingChainInhom[1.0,1.0+\[Delta]J,qubits],4,HI=IsingChain[1.0,qubits]];
-MatrixExp[-1.0*I HKi].MatrixExp[-1.0*I HI]
+MatrixExp[-1.0*I HKi] . MatrixExp[-1.0*I HI]
 ];
 
 (*matrixU[bx_,qubits_,topology_,\[Delta]_]:=Module[{HKi,HI},
@@ -164,7 +165,7 @@ MatrixExp[-1.0*I HKi].MatrixExp[-1.0*I HI]
 IPRSym[bx_,wk_,topology_,\[Delta]_]:=Module[{U,list,qubits,U0},
 qubits=Log[2,Length[Transpose[wk][[1]]]];
 U=matrixU[bx,qubits,topology,\[Delta]];
-U0=Dagger[wk].U.wk;
+U0=Dagger[wk] . U . wk;
 list=Orthogonalize[Eigenvectors[U0]];
 1/Length[list]Total[Abs[list]^4,2]
 ];
@@ -172,7 +173,7 @@ list=Orthogonalize[Eigenvectors[U0]];
 PRSym[bx_,wk_,topology_,\[Delta]_]:=Module[{U,list,qubits,U0},
 qubits=Log[2,Length[Transpose[wk][[1]]]];
 U=matrixU[bx,qubits,topology,\[Delta]];
-U0=Dagger[wk].U.wk;
+U0=Dagger[wk] . U . wk;
 list=Orthogonalize[Eigenvectors[U0]];
 Total[Table[Total[Abs[list[[index]]]^4]^(-1),{index,1,Length[Transpose[wk]]}]]
 ];
@@ -199,7 +200,7 @@ U=matrixU[bx,qubits,1];
 A=N[K[qubits]];
 {values,vecs}=Eigensystem[A];
 vecs=Orthogonalize[vecs];
-list=Flatten[Table[sta=MatrixPower[U,steps].vecs[[i]];Chop[A.sta-values[[i]]sta],{i,1,2^qubits}]];
+list=Flatten[Table[sta=MatrixPower[U,steps] . vecs[[i]];Chop[A . sta-values[[i]]sta],{i,1,2^qubits}]];
 list=DeleteCases[list,0];
 If[Length[list]==0,Print["No hay pex"],Print["Preocupate mi cabron"]]
 ];
@@ -221,7 +222,7 @@ IPRbyCohstateSym[\[Theta]_, \[Phi]_, bx_, {values_, vecs_},
   sta = Table[
     Chop[QuantumDotProduct[vecs0[[i]], 
       CoherentState[\[Theta], \[Phi], qubits]]], {i, dim}];
-  U0 = Dagger[w0].U.w0;
+  U0 = Dagger[w0] . U . w0;
   list = Orthogonalize[Eigenvectors[U0]];
   1/dim Total[
     Table[Abs[QuantumDotProduct[list[[i]], sta]]^4, {i, 1, dim}]]
@@ -244,13 +245,13 @@ Extractbyk[k, {values, Orthogonalize[vecs]}]
 
 ModifiedCoherentState[\[Theta]_, \[Phi]_, qubits_] := 
  Flatten[KroneckerProduct[CoherentState[\[Theta], \[Phi], 3], 
-   PauliMatrix[1].CoherentState[\[Theta], \[Phi], 1], 
+   PauliMatrix[1] . CoherentState[\[Theta], \[Phi], 1], 
    CoherentState[\[Theta], \[Phi], qubits - 4]], 1];
 
 ModifiedCoherentState2[\[Theta]_, \[Phi]_, qubits_] := 
  Flatten[KroneckerProduct[CoherentState[\[Theta], \[Phi], 2], 
-   KroneckerProduct[PauliMatrix[1].CoherentState[\[Theta], \[Phi], 1],
-     PauliMatrix[1].CoherentState[\[Theta], \[Phi], 1]], 
+   KroneckerProduct[PauliMatrix[1] . CoherentState[\[Theta], \[Phi], 1],
+     PauliMatrix[1] . CoherentState[\[Theta], \[Phi], 1]], 
    CoherentState[\[Theta], \[Phi], qubits - 4]], 1];
 
 StateToDirac[state_?VectorQ]:=Sum[state[[i]]*"|"<>(TableForm[{IntegerDigits[i-1,2,Log2[Length[state]]//Round]}, TableSpacing->{1.2,1.2}]//ToString)<>"\[RightAngleBracket]",{i,1,Length[state]}];
@@ -369,7 +370,7 @@ ClassicalCapacityDamping[t_,\[Lambda]_,\[Gamma]_,\[Omega]0_]:=FindMaximum[H[p]+H
 (*Routines for check divisibility properties*)
 BasisElement[i_,j_]:=Table[If[k==i&&l==j,1,0],{k,2},{l,2}];
 BasisElementOneIndex[i_]:=Switch[i,1,BasisElement[1,1],2,BasisElement[1,2],3,BasisElement[2,1],4,BasisElement[2,2]];
-w=Table[Tr[Dagger[BasisElementOneIndex[i+1]].PauliMatrix[j]/Sqrt[2]],{i,0,3},{j,0,3}];\[Omega]=Proyector[Bell[2]];\[Omega]ort=IdentityMatrix[4]-\[Omega];
+w=Table[Tr[Dagger[BasisElementOneIndex[i+1]] . PauliMatrix[j]/Sqrt[2]],{i,0,3},{j,0,3}];\[Omega]=Proyector[Bell[2]];\[Omega]ort=IdentityMatrix[4]-\[Omega];
 
 DivisibilityKindOf[\[Lambda]1_,\[Lambda]2_,\[Lambda]3_]:=Module[{eigen,list},
 list=Sort[Sqrt[{1,\[Lambda]1^2,\[Lambda]2^2,\[Lambda]3^2}]];
@@ -391,14 +392,14 @@ DivisibilityKindOf[\[Lambda]_]:=DivisibilityKindOf[\[Lambda][[1]],\[Lambda][[2]]
 
 PositiveSemidefiniteMatrixCustomQ[matrix_]:=And@@Table[PositiveSemidefiniteMatrixQ[matrix],{1000}];
 
-PositiveSemidefiniteMatrixCustom2Q[matrix_]:=And@@Table[v=RandomState[Length[matrix]];Chop[QuantumDotProduct[v,HermitianPart[matrix].v]]>=0,{1000}];
+PositiveSemidefiniteMatrixCustom2Q[matrix_]:=And@@Table[v=RandomState[Length[matrix]];Chop[QuantumDotProduct[v,HermitianPart[matrix] . v]]>=0,{1000}];
 
 PositiveSemidefiniteMatrixCustom3Q[matrix_]:=And@@NonNegative[Chop[Eigenvalues[HermitianPart[matrix]]]];
 
 g=DiagonalMatrix[{1,-1,-1,-1}];
 
 TestViaRankOfCPDIV[matrix_]:=Module[{c,rank,var,det,list},
-c=matrix.g.Transpose[matrix].g//Chop;
+c=matrix . g . Transpose[matrix] . g//Chop;
 rank=MatrixRank[matrix];
 det=Det[matrix];
 list=Sqrt[Abs[Eigenvalues[c]]];
@@ -447,12 +448,12 @@ maximizer[list_,factor_,0]:=maximizer[list,factor];
 
 maximizer[list_]:=maximizer[list,1,0];
 
-QuantumMapInPauliBasis[channel_]:=1/2Table[Tr[PauliMatrix[i].channel[PauliMatrix[j]]],{i,0,3},{j,0,3}];
+QuantumMapInPauliBasis[channel_]:=1/2Table[Tr[PauliMatrix[i] . channel[PauliMatrix[j]]],{i,0,3},{j,0,3}];
 
-QuantumMapInUnitBasis[channel_]:=Table[Tr[Dagger[BasisElementOneIndex[i]].channel[BasisElementOneIndex[j]]],{i,1,4},{j,1,4}];
+QuantumMapInUnitBasis[channel_]:=Table[Tr[Dagger[BasisElementOneIndex[i]] . channel[BasisElementOneIndex[j]]],{i,1,4},{j,1,4}];
 
-FromPauliToUnit[channel_]:=w.channel.Dagger[w];
-FromUnitToPauli[channel_]:=Dagger[w].channel.w;
+FromPauliToUnit[channel_]:=w . channel . Dagger[w];
+FromUnitToPauli[channel_]:=Dagger[w] . channel . w;
 
 EigensystemOrdered[A_]:=Module[{eigs,vecs,list1,list2},
 {eigs,vecs}=Eigensystem[A];
@@ -467,12 +468,12 @@ If[Element[eig,Reals]==False,Print["Se uso la rutina para logaritmo complejo"];R
 V=Transpose[vectors]//Chop;
 eigneg=Select[eig,#<0&]//Chop;
 L=DiagonalMatrix[Log[Abs[eig]]]//Chop;
-If[Length[eigneg]==0,V.L.Inverse[V],
+If[Length[eigneg]==0,V . L . Inverse[V],
 If[Length[eigneg]==2&&Chop[eigneg[[1]]-eigneg[[2]],10^(-10)]==0,
 pos=Position[eig,eigneg[[1]]][[{1,2},1]];
 L[[pos[[1]],pos[[2]]]]=(2 k+1) Pi;
 L[[pos[[2]],pos[[1]]]]=-(2 k+1) Pi;
-V.L.Inverse[V]//Chop
+V . L . Inverse[V]//Chop
 ,False]]
 ]
 ];
@@ -499,8 +500,8 @@ If[Total[Flatten[Chop[d2-diag]]]==0,
 
 w2=Transpose[w2]//Chop;
 d2=DiagonalMatrix[d2]//Chop;
-wreal=w.Inverse[w2]//Chop;
-If[is,wreal.chreorlog.Inverse[wreal]//Chop,is]
+wreal=w . Inverse[w2]//Chop;
+If[is,wreal . chreorlog . Inverse[wreal]//Chop,is]
 
 ,Return["bad calculation"]
 ]
@@ -513,7 +514,7 @@ b=0;
 branches=Table[b=b+(-1)^(j+1)*j,{j,0,2*upto}];
 is=False;
 If[DiagonalizableMatrixQ[matrix],
-Table[If[PositiveSemidefiniteMatrixCustom3Q[Chop[\[Omega]ort.Chop[Reshuffle[FromPauliToUnit[L=RealMatrixLogarithmComplexCase[Chop[matrix],k]//Chop]]].\[Omega]ort]],is=True;i=k;Return[Null,Table],is=False;],{k,branches}];,
+Table[If[PositiveSemidefiniteMatrixCustom3Q[Chop[\[Omega]ort . Chop[Reshuffle[FromPauliToUnit[L=RealMatrixLogarithmComplexCase[Chop[matrix],k]//Chop]]] . \[Omega]ort]],is=True;i=k;Return[Null,Table],is=False;],{k,branches}];,
 Return["non diagonalizable"];
 ];
 If[i!=0,Print["El logaritmo es real hasta k= "<>ToString[i]]];
@@ -522,14 +523,14 @@ If[is==True,L,False]
 
 DecompositionOfChannelsInSO[map_]:=Module[{a,e,i,newmap,eig,vecs},
 {a,e,i}=SingularValueDecomposition[map];
-{eig,vecs}=Chop[Eigensystem[Det[a]*Det[i]*(i.e.Transpose[i])]];
-{Det[a]*Det[i]*a.Transpose[i].Transpose[vecs],DiagonalMatrix[eig],vecs}
+{eig,vecs}=Chop[Eigensystem[Det[a]*Det[i]*(i . e . Transpose[i])]];
+{Det[a]*Det[i]*a . Transpose[i] . Transpose[vecs],DiagonalMatrix[eig],vecs}
 ];
 
 ForceSameSignatureForLorentz[matrix_]:=Module[{tmpmat,eigs,o,tildeM},
-tmpmat=matrix.g.Transpose[matrix]//Chop;
+tmpmat=matrix . g . Transpose[matrix]//Chop;
 {eigs,o}=EigensystemOrdered[tmpmat];tildeM=DiagonalMatrix[eigs];
-{o.matrix,o}
+{o . matrix,o}
 ];
 
 HermitianPart[m_]:=0.5*(m+Dagger[m]);
@@ -537,47 +538,47 @@ HermitianPart[m_]:=0.5*(m+Dagger[m]);
 QuantumMaptoR[channel_]:=Module[{g,\[Rho]},
 g=DiagonalMatrix[{1,-1,-1,-1}];
 \[Rho]=Reshuffle[FromPauliToUnit[channel]]/2//Chop;
-(Table[Tr[\[Rho].KroneckerProduct[PauliMatrix[i],PauliMatrix[j]]],{i,0,3},{j,0,3}])//FullSimplify//Chop
+(Table[Tr[\[Rho] . KroneckerProduct[PauliMatrix[i],PauliMatrix[j]]],{i,0,3},{j,0,3}])//FullSimplify//Chop
 ];
 
 LorentzMatrixQ[matrix_]:=
-Chop[matrix[[1,1]]]>0&&Chop[Det[matrix]]==1&&Chop[matrix.g.Transpose[matrix]]==g;
+Chop[matrix[[1,1]]]>0&&Chop[Det[matrix]]==1&&Chop[matrix . g . Transpose[matrix]]==g;
 
 DecompositionOfChannelsInSO31[matrix_]:=Module[{c,x,j,n,eig1,eig2,o,d,leftL,rightL},
-c=g.matrix.g.Transpose[matrix]//Chop;
+c=g . matrix . g . Transpose[matrix]//Chop;
 {x,j}=SchurDecomposition[c]//Chop;x=Inverse[x]//Chop;
-n=x.g.Transpose[x]//Chop;
+n=x . g . Transpose[x]//Chop;
 {eig1,o}=EigensystemOrdered[n]//Chop;
-leftL=Transpose[x].Transpose[o]//Chop;
-c=g.Transpose[matrix].g.matrix;
+leftL=Transpose[x] . Transpose[o]//Chop;
+c=g . Transpose[matrix] . g . matrix;
 {x,j}=SchurDecomposition[c]//Chop;x=Inverse[x]//Chop;
-n=x.g.Transpose[x]//Chop;
+n=x . g . Transpose[x]//Chop;
 {eig2,o}=EigensystemOrdered[n]//Chop;
 If[Chop[eig1]==Diagonal[g]&&eig2==Diagonal[g],None,Print["Wrong calculation"];Abort[];];
-rightL=Transpose[x].Transpose[o]//Chop;
-If[Det[rightL]==-1,rightL=Sign[rightL[[1,1]]]g.rightL;,If[rightL[[1,1]]<0,rightL=-g.g.rightL;]];
-If[Det[leftL]==-1,leftL=Sign[leftL[[1,1]]]g.leftL;,If[leftL[[1,1]]<0,leftL=-g.g.leftL;]];
-If[(LorentzMatrixQ[leftL]&&LorentzMatrixQ[rightL])==False,Print["Decomposition not done"];,{leftL,Transpose[leftL].matrix.rightL,rightL}//Chop]
+rightL=Transpose[x] . Transpose[o]//Chop;
+If[Det[rightL]==-1,rightL=Sign[rightL[[1,1]]]g . rightL;,If[rightL[[1,1]]<0,rightL=-g . g . rightL;]];
+If[Det[leftL]==-1,leftL=Sign[leftL[[1,1]]]g . leftL;,If[leftL[[1,1]]<0,leftL=-g . g . leftL;]];
+If[(LorentzMatrixQ[leftL]&&LorentzMatrixQ[rightL])==False,Print["Decomposition not done"];,{leftL,Transpose[leftL] . matrix . rightL,rightL}//Chop]
 ];
 
 AddOne[matrix_]:=Flatten[{{{1.0,0.0,0.0,0.0}},Table[Flatten[{0.0,matrix[[i,All]]}],{i,1,3}]},1];
 
 DecompositionOfChannelsInSO31Diagonal[matrix_]:=Module[{c,x,j,n,eig1,eig2,o,d,leftL,rightL,form,aux,form2,a,e,i},
 (*Transformada Izquierda:*)
-c=g.matrix.g.Transpose[matrix]//Chop;
+c=g . matrix . g . Transpose[matrix]//Chop;
 {x,j}=SchurDecomposition[c]//Chop;x=Inverse[x]//Chop;
-n=x.g.Transpose[x]//Chop;
+n=x . g . Transpose[x]//Chop;
 {eig1,o}=EigensystemOrdered[n]//Chop;
-leftL=Transpose[x].Transpose[o]//Chop;
+leftL=Transpose[x] . Transpose[o]//Chop;
 (*Transformada Derecha:*)
-c=g.Transpose[matrix].g.matrix;
+c=g . Transpose[matrix] . g . matrix;
 {x,j}=SchurDecomposition[c]//Chop;x=Inverse[x]//Chop;
-n=x.g.Transpose[x]//Chop;
+n=x . g . Transpose[x]//Chop;
 {eig2,o}=EigensystemOrdered[n]//Chop;
 If[Chop[eig1]==Diagonal[g]&&eig2==Diagonal[g],None,Print["Wrong calculation"];Abort[];];
-rightL=Transpose[x].Transpose[o]//Chop;
+rightL=Transpose[x] . Transpose[o]//Chop;
 (*Se define la forma normal preliminar, pues puede que no salga diagonal*)
-form=Transpose[leftL].matrix.rightL;
+form=Transpose[leftL] . matrix . rightL;
 e=form;
 (*En este paso construyo un canal solo con el bloque espacial de la matriz: *)
 form2=AddOne[Take[form,{2,4},{2,4}]];
@@ -586,15 +587,15 @@ If[DiagonalMatrixQ[form2]==False,
 {a,e,i}=DecompositionOfChannelsInSO[form2]//Chop;
 aux=form-form2;
 d=aux[[All,1]];
-d=Transpose[a].d//Chop;
+d=Transpose[a] . d//Chop;
 e[[All,1]]=d;e[[1,1]]=1;
 (*Se redefinen las transformaciones de Lorentz con las nuevas rotaciones:*)
-leftL=leftL.a//Chop;
-rightL=rightL.Transpose[i]//Chop;
+leftL=leftL . a//Chop;
+rightL=rightL . Transpose[i]//Chop;
 ];
 (*Se hacen propias y ortocronas usando el grupo cociente O(3,1)/SO^+(3,1):*)
-If[Det[rightL]==-1,rightL=Sign[rightL[[1,1]]]g.rightL;,If[rightL[[1,1]]<0,rightL=-g.g.rightL;]];
-If[Det[leftL]==-1,leftL=Sign[leftL[[1,1]]]g.leftL;,If[leftL[[1,1]]<0,leftL=-g.g.leftL;]];
+If[Det[rightL]==-1,rightL=Sign[rightL[[1,1]]]g . rightL;,If[rightL[[1,1]]<0,rightL=-g . g . rightL;]];
+If[Det[leftL]==-1,leftL=Sign[leftL[[1,1]]]g . leftL;,If[leftL[[1,1]]<0,leftL=-g . g . leftL;]];
 (*Un test util para mantener esta funcion y el output:*)
 If[(LorentzMatrixQ[leftL]&&LorentzMatrixQ[rightL])==False,Print["Decomposition not done"];,{leftL,e,rightL}//Chop]
 ];
@@ -604,7 +605,7 @@ form2=AddOne[Take[matrix,{2,4},{2,4}]];
 {a,e,i}=DecompositionOfChannelsInSO[form2]//Chop;
 aux=matrix-form2;
 d=aux[[All,1]];
-d=Transpose[a].d//Chop;
+d=Transpose[a] . d//Chop;
 e[[All,1]]=d;e[[1,1]]=1;
 leftL=a//Chop;
 rightL=Transpose[i]//Chop;
@@ -617,7 +618,7 @@ branches=Table[b=b+(-1)^(j+1)*j,{j,0,2*upto}];
 is=False;
 If[DiagonalizableMatrixQ[matrix],
 
-Table[If[PositiveSemidefiniteMatrixCustom3Q[\[Omega]ort.FullSimplify[Reshuffle[FromPauliToUnit[L=RealMatrixLogarithmComplexCase[Chop[matrix],k]//Chop]//Chop]].\[Omega]ort//Chop],is=True;i=k;Return[Null,Table],is=False;],{k,branches}];,
+Table[If[PositiveSemidefiniteMatrixCustom3Q[\[Omega]ort . FullSimplify[Reshuffle[FromPauliToUnit[L=RealMatrixLogarithmComplexCase[Chop[matrix],k]//Chop]//Chop]] . \[Omega]ort//Chop],is=True;i=k;Return[Null,Table],is=False;],{k,branches}];,
 Return["non diagonalizable"];
 ];
 If[i!=0,Print["Hermiticity preserving and ccp condition is fulfilled until k= "<>ToString[i]]];
@@ -628,7 +629,7 @@ WolfEisertCubittCiracMeasureQubitCase[channel_,OptionsPattern[{branches->5,noise
 noise[\[Mu]_]:=-\[Mu] DiagonalMatrix[{0,1,1,1}];
 dev=RealMatrixLogarithmComplexCase[channel,10];
 If[Length[dev]==0,0,
-lol=Min[DeleteCases[Table[If[PositiveSemidefiniteMatrixCustom3Q[Chop[\[Omega]ort.Reshuffle[FromPauliToUnit[RealMatrixLogarithmComplexCase[channel,i]+noise[j]]].\[Omega]ort]],j,None],{i,0,OptionValue[branches]},{j,0.0,1.0,OptionValue[noisedelta]}]//Flatten,None]];
+lol=Min[DeleteCases[Table[If[PositiveSemidefiniteMatrixCustom3Q[Chop[\[Omega]ort . Reshuffle[FromPauliToUnit[RealMatrixLogarithmComplexCase[channel,i]+noise[j]]] . \[Omega]ort]],j,None],{i,0,OptionValue[branches]},{j,0.0,1.0,OptionValue[noisedelta]}]//Flatten,None]];
 Exp[-3lol]
 ]
 ];
@@ -664,7 +665,7 @@ CPNoLRegion[\[Lambda]_,\[Tau]_,region_]:=Module[{cha,regcheck,vals,cptp},
 cha:={{1,0,0,0},{\[Tau][[1]],\[Lambda][[1]],0,0},{\[Tau][[2]],0,\[Lambda][[2]],0},{\[Tau][[3]],0,0,\[Lambda][[3]]}};
 regcheck=Switch[region,1,\[Lambda][[1]]>=0&&\[Lambda][[2]]<=0&&\[Lambda][[3]]<=0,2,\[Lambda][[1]]<=0&&\[Lambda][[2]]>=0&&\[Lambda][[3]]<=0,3,\[Lambda][[1]]<=0&&\[Lambda][[2]]<=0&&\[Lambda][[3]]>=0,0,True];
 cptp=And@@Thread[(cha//FromPauliToUnit//Reshuffle//Eigenvalues//N//Chop)>0];
-vals=cha.g.Transpose[cha].g//Eigenvalues//Abs//Sqrt;
+vals=cha . g . Transpose[cha] . g//Eigenvalues//Abs//Sqrt;
 (Min[vals]^2*Max[vals]^2>=Times@@vals)&&(Det[cha]>0)&&Not[\[Lambda][[1]]>=0&&\[Lambda][[2]]>=0&&\[Lambda][[3]]>=0]&&regcheck&&cptp
 ];
 CPNoLRegion[\[Lambda]_,\[Tau]_]:=CPNoLRegion[\[Lambda],\[Tau],0];
@@ -696,7 +697,7 @@ If[Total[Flatten[Chop[d2-diag]]]==0,
 
 w2=Transpose[w2]//Chop;
 d2=DiagonalMatrix[d2]//Chop;
-wreal=w.Inverse[w2]//Chop;
+wreal=w . Inverse[w2]//Chop;
 If[is,{wreal,mat//Chop},is]
 ,Return["bad calculation"]
 ]
@@ -738,7 +739,7 @@ AbstractPartialTrace[init_,toleave_]:=If[ToString[Head[init//Expand]]=="Plus",Ma
 (*Channel operations in product Pauli basis*)
 
 QuantumMapInProductPauliBasis[channel_,particles_]:=Module[{},
-Table[1/2^particles Tr[Pauli[IntegerDigits[i-1,4,particles]].channel[Pauli[IntegerDigits[j-1,4,particles]]]],{i,1,2^(2particles)},{j,1,2^(2particles)}]//Chop
+Table[1/2^particles Tr[Pauli[IntegerDigits[i-1,4,particles]] . channel[Pauli[IntegerDigits[j-1,4,particles]]]],{i,1,2^(2particles)},{j,1,2^(2particles)}]//Chop
 ];
 
 ReshufflingPauliProductBasis[mat_]:=Module[{particles,columns,aux},
@@ -762,18 +763,26 @@ Purify[\[Rho]_,OptionsPattern[{random->False}]]:=Module[{vals,vecs,U},
 {vals,vecs}=Eigensystem[\[Rho]];
 vecs=Map[Normalize,Orthogonalize[vecs]];
 If[OptionValue[random],U=CUEMember[Length[\[Rho]]];,U=IdentityMatrix[Length[\[Rho]]]];
-Sum[Sqrt[vals[[i]]]Flatten[KroneckerProduct[vecs[[i]],U.vecs[[i]]]],{i,1,Dimensions[\[Rho]][[1]]}]
+Sum[Sqrt[vals[[i]]]Flatten[KroneckerProduct[vecs[[i]],U . vecs[[i]]]],{i,1,Dimensions[\[Rho]][[1]]}]
 ]
 
 ChoiMatrixQubitParticles[channel_,particles_]:=ArrayFlatten[Table[channel[Proyector[BasisState[i,2^particles],BasisState[j,2^particles]]],{i,0,2^particles-1},{j,0,2^particles-1}]];
 
-QuantumMapInProyectorBasis[channel_,particles_]:=Flatten[Table[Flatten[Table[Tr[Dagger[Proyector[BasisState[k,2^particles],BasisState[l,2^particles]]].channel[Proyector[BasisState[i,2^particles],BasisState[j,2^particles]]]],{i,0,2^particles-1},{j,0,2^particles-1}]],{k,0,2^particles-1},{l,0,2^particles-1}],1];
+QuantumMapInProyectorBasis[channel_,particles_]:=Flatten[Table[Flatten[Table[Tr[Dagger[Proyector[BasisState[k,2^particles],BasisState[l,2^particles]]] . channel[Proyector[BasisState[i,2^particles],BasisState[j,2^particles]]]],{i,0,2^particles-1},{j,0,2^particles-1}]],{k,0,2^particles-1},{l,0,2^particles-1}],1];
 
 KrausQubitParticles[channel_,particles_]:=Select[Map[Sqrt[#[[1]]]Transpose[Partition[#[[2]],2^particles]]&,ChoiMatrixQubitParticles[channel,particles]//Eigensystem//Transpose]//Chop,MatrixRank[#]>0 &];
 
 KrausQubitParticlesFromPauliProductBasis[channel_?MatrixQ]:=Select[Map[Sqrt[#[[1]]]Transpose[Partition[#[[2]],Sqrt[Length[channel]]]]&,ChoiJamiStateFromPauliProductBasis[channel]//Eigensystem//Transpose]//Chop,MatrixRank[#]>0 &];
 
 (*XX-chain section*)
+
+PositiveAndNegativeParts[M_]:=Module[{eig,PositiveM,NegativeM},
+eig=Eigensystem[M];
+Select[eig//Chop//Transpose,#[[1]]>= 0&];
+PositiveM=Select[eig//Chop//Transpose,#[[1]]>= 0&];
+NegativeM=Select[eig//Chop//Transpose,#[[1]]< 0&];
+{Sum[PositiveM[[i]][[1]]Proyector[PositiveM[[i]][[2]]],{i,Length[PositiveM]}],Sum[-NegativeM[[i]][[1]]Proyector[NegativeM[[i]][[2]]],{i,Length[NegativeM]}]}
+];
 
 End[]
 
