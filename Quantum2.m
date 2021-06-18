@@ -104,6 +104,7 @@ KrausQubitParticlesFromPauliProductBasis::usage = "KrausQubitParticlesFromPauliP
 CPQPauli::usage = "Complete positvity test for Pauli channels, with lambdas as the input, CPQPauli[\[Lambda]_]."
 PositiveAndNegativeParts::usage = "PositiveAndNegativeParts[M_] returns the positve and negative parts of M such that M=M^+-M^- where M^{+-} are posive-semidefinite and positive, respectively."
 ComplementaryChannelFromKrausList::usage = "ComplementaryChannelFromKrausList[list][\[Rho]], computes the complementary channel accordingly Stinespring dilation theorem. Be aware that the complementary channel in general is rectangular, the dimension of the image is the Kraus rank."
+PositiveAndNegativeParts::usage = "PositiveAndNegativeParts[M_]: Gives a list with the positive and negative parts of the hermitian matrix M."
 
 
 Begin["Private`"] 
@@ -788,6 +789,14 @@ NegativeM=Select[eig//Chop//Transpose,#[[1]]< 0&];
 ComplementaryChannelFromKrausList[list_][\[Rho]_]:=Module[{dim},
 dim=Length[list];
 Sum[Tr[list[[i]] . \[Rho] . Dagger[list[[j]]]]Proyector[BasisState[i-1,dim],BasisState[j-1,dim]],{i,dim},{j,dim}]
+];
+
+PositiveAndNegativeParts[M_]:=Module[{eig,PositiveM,NegativeM},
+eig=Eigensystem[M];
+Select[eig//Chop//Transpose,#[[1]]>= 0&];
+PositiveM=Select[eig//Chop//Transpose,#[[1]]>= 0&];
+NegativeM=Select[eig//Chop//Transpose,#[[1]]< 0&];
+{Sum[PositiveM[[i]][[1]]Proyector[PositiveM[[i]][[2]]],{i,Length[PositiveM]}],Sum[-NegativeM[[i]][[1]]Proyector[NegativeM[[i]][[2]]],{i,Length[NegativeM]}]}
 ];
 
 End[]
