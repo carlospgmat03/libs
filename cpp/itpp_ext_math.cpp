@@ -1845,7 +1845,7 @@ itpp::ivec diagonal_sigma_z(int encoded_positions, int qubits){ // {{{
   return tmp;
 } // }}}
 
-/**
+/** Werner state {{{
  * \brief Generates a Werner state.
  *
  * Generates the density matrix of a werner state with a given alpha value.
@@ -1854,7 +1854,7 @@ itpp::ivec diagonal_sigma_z(int encoded_positions, int qubits){ // {{{
  *
  * \return generated Werner state within a matrix [itpp::Mat].
 */
-itpp::Mat<std::complex<double> > Werner(const double alpha){// {{{
+itpp::Mat<std::complex<double> > Werner(const double alpha){// 
 	itpp::Mat<std::complex<double>  > tmp(4,4);
  	tmp=0.;
 	tmp(0,0)=tmp(3,3)=(2-alpha)/4;
@@ -1867,7 +1867,7 @@ itpp::cvec StatisticallyNormalRandomState(unsigned int dim){ // {{{
   itpp::cvec tmp=itpp::randn_c(dim);
   return tmp/sqrt(dim);
 } // }}}
-/**
+/** {{{ RandomState
  * \brief Generates a random state.
  *
  * Given a specified dimension, it generates a normalized random state.
@@ -1876,7 +1876,7 @@ itpp::cvec StatisticallyNormalRandomState(unsigned int dim){ // {{{
  *
  * \return randomly generated state within a vector [itpp::cvec].
 */
-itpp::cvec RandomState(unsigned int dim){ // {{{
+itpp::cvec RandomState(unsigned int dim){ // 
   itpp::cvec tmp=itpp::randn_c(dim);
   return tmp/norm(tmp);
 } // }}}
@@ -1915,7 +1915,7 @@ itpp::cvec RandomSeparableState(unsigned int q){ // {{{
 //   std::cout << "norma = " << norm(psi) << std::endl;
   return psi/norm(psi);
 } // }}}
-/**
+/** BasisState {{{
  * \brief Generates a basis state.
  *
  * Given a dimension and a position for the basis, it generates a basis state.
@@ -1926,14 +1926,13 @@ itpp::cvec RandomSeparableState(unsigned int q){ // {{{
  * \return generated basis state within a vector [itpp::cvec].
 */
 
-itpp::cvec BasisState(unsigned int dim, unsigned int basis_number){ // {{{
+itpp::cvec BasisState(unsigned int dim, unsigned int basis_number){ // 
   itpp::cvec tmp(dim);
   tmp.zeros();
   tmp(basis_number)=1;
   return tmp;
 } // }}}
-
-/**
+/** BellState {{{
  * \brief Generates a bell state.
  *
  * Generates a bell state with specified dimension, default is 4.
@@ -1942,7 +1941,7 @@ itpp::cvec BasisState(unsigned int dim, unsigned int basis_number){ // {{{
  *
  * \return generated bell state within a vector [itpp::vec].
 */
-itpp::vec BellState(int dim=4){// {{{
+itpp::vec BellState(int dim=4){// 
   itpp::vec tmp(dim);
   tmp.zeros();
   tmp(0)=1;
@@ -1965,8 +1964,7 @@ itpp::vec BellState(double theta){// {{{
   tmp(dim-1)=sin(theta);
   return tmp;
 }// }}}
-
-/**
+/** exp_minus_i_b_sigma {{{
  * \brief Applies the exponential function.
  *
  * From sakurai eq (3.2.44) we have that
@@ -1980,14 +1978,13 @@ itpp::vec BellState(double theta){// {{{
  *
  * \return [itpp::cmat].
 */
-itpp::cmat exp_minus_i_b_sigma(itpp::vec b){// {{{
+itpp::cmat exp_minus_i_b_sigma(itpp::vec b){// 
   double theta=itpp::norm(b);
 //   std::cout << theta << std::endl;
   std::complex<double> I(0,1);
   itpp::vec n=b/theta;
   return cos(theta)*sigma(0)-I*sin(theta)*sigma(n);
 }// }}}
-
 itpp::cmat magnetic(itpp::vec b, int total){// {{{
   itpp::cmat tmp(cfpmath::pow_2(total),cfpmath::pow_2(total));
   tmp=0.;
@@ -2232,7 +2229,7 @@ double InverseParticipationRatio(const itpp::cvec& psi){ // {{{
 
 } // }}}
 
-/**
+/** Concurrence {{{
  * \brief Calculates the concurrence.
  *
  * Calculates the concurrence of the specified density matrix.
@@ -2247,7 +2244,7 @@ double InverseParticipationRatio(const itpp::cvec& psi){ // {{{
  *
  * \return resulting value [double], concurrence of the density matrix.
 */
-double Concurrence(const itpp::Mat<std::complex<double> > rho){ // {{{
+double Concurrence(const itpp::Mat<std::complex<double> > rho){ // 
 	itpp::Mat<std::complex<double> > rho_tilde(4,4);
 	for (unsigned int i1=0;i1<4;i1++){
 		for (unsigned int i2=0;i2<4;i2++){
@@ -2280,7 +2277,7 @@ double vonNeumann(const itpp::cmat rho){// {{{
   return vonNeumann(eigenvalues);
 } // }}}
 
-/**
+/** Purity {{{
  * \brief Calculates the purity.
  *
  * Calculates the purity of the specified density matrix.
@@ -2291,7 +2288,7 @@ double vonNeumann(const itpp::cmat rho){// {{{
  *
  * \return resulting value [double], purity of the density matrix.
 */
-double Purity(const itpp::Mat<std::complex<double> >& rho){// {{{
+double Purity(const itpp::Mat<std::complex<double> >& rho){// 
 	double P=0;
 	for (int i =0; i< rho.rows(); i++){
 		P += abs(itpp::dot (rho.get_col(i),rho.get_row(i)));
