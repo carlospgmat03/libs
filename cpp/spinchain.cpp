@@ -343,8 +343,7 @@ namespace spinchain{ // {{{
     }
     return;
   } // }}}
-  void apply_kick_spectator_double_chain(itpp::cvec& state, itpp::vec magnetic_field_central,itpp::vec magnetic_field_env1,
-itpp::vec magnetic_field_env2, int qubits_env1){// {{{
+  void apply_kick_spectator_double_chain(itpp::cvec& state, itpp::vec magnetic_field_central,itpp::vec magnetic_field_env1, itpp::vec magnetic_field_env2, int qubits_env1){// {{{
     int qubits=cfpmath::log_base_2(state.size());
 
     // Kick in the central system: a Bell pair
@@ -1149,12 +1148,11 @@ void apply_ising_allvsall(itpp::cvec& state, double J){//{{{
     return tmp;
   } // }}}
   // }}}
-  // Unsorted
+  // Unsorted {{{
   // itpp::vec eigenvalues(itpp::vec MagenticField, double Ising, int Dimension, std::string type_h){ // {{{
   //   itpp::cmat h= hamiltonian(MagenticField,Ising, Dimension, type_h);
   //   return eig_sym(h);
   // } // }}}
-  // Unsorted
 
   /**
    * \brief Applies the interaction between each element with the rest of the elements.
@@ -1185,7 +1183,7 @@ void apply_ising_allvsall(itpp::cvec& state, double J){//{{{
     return;
 
   }
-
+// }}}
 
 } // }}}
 #endif // SPIN_CHAIN
