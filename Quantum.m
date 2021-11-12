@@ -100,7 +100,7 @@ ApplyKrausOperators::usage = "Apply a set of Kraus Operors, (for example fro the
 vonNeumannEntropy::usage = "von Neumann entropy of a density Matrix, or a list of vectors. Usage vonNeumannEntropy[r_]"
 Bell::usage = "Bell[n] state gives a maximally entangled state of the type 
 sum_i^n |ii\>. Bell[ ] gives |00> + |11>" 
-StateToBlochSphere::usage="Get the Bloch sphere point of a mixed state"
+StateToBlochSphere::usage="Get the Bloch sphere point of a mixed state StateToBlochSphere[R_?MatrixQ]. Gives the components in cartesian coordinates"
 BlochSphereToState::usage="BlochSphereToState[CartesianCoordinatesOfPoint_List] transforms the points in the Bloch Sphere to a mixed state. Alternatively, one can give the angles, so BlochSphereToState[{\[Theta]_, \[Phi]_}]"
 QuantumMutualInformationReducedEntropies::usage="QuantumMutualInformationReducedEntropies[r_?MatrixQ] calcula la informacion mutia con entropias"
 QuantumMutualInformationMeasurements::usage="QuantumMutualInformationMeasurements[r_?MatrixQ] calcula la informacion mutua cuando 
