@@ -1,6 +1,7 @@
 BeginPackage["Carlos`"] ;
 
 
+ItppVectorToExpression::usage="Helps read data directly from itpp output, like to interface with a cpp program"
 
 MyAverage::usage = 
     "This function gives the average of more complex quantities than lists, 
@@ -82,6 +83,11 @@ EllipseCharacteristics::usage="Get center, angle of rotation and semiaxis of an 
 (* }}} *)
 Begin["Private`"];
 
+
+(* Read data from itpp output *)
+ItppVectorToExpression[vector_String] := 
+ ToExpression /@ StringSplit[ StringReplace[
+    StringTake[vector, {2, -2}], {"i" -> "I", "e+" :> "*^", "e-" :> "*^-"}]]
 (*  Geometry *)
 EllipseCharacteristics[poly_, vars_] :=  (* {{{ *)
  Module[{cl, center, Aq, Bq, Cq, Dq, Eq, Fq, cl2, Am},
