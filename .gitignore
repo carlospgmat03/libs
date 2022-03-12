@@ -17,7 +17,7 @@ phasespace/test
 semiclassical/test
 test_spins2d
 external
-CustomTicks.m
+# CustomTicks.m
 *.mod
 *.o
 *.bkp
