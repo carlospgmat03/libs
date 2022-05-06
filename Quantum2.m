@@ -105,6 +105,7 @@ CPQPauli::usage = "Complete positvity test for Pauli channels, with lambdas as t
 PositiveAndNegativeParts::usage = "PositiveAndNegativeParts[M_] returns the positve and negative parts of M such that M=M^+-M^- where M^{+-} are posive-semidefinite and positive, respectively."
 ComplementaryChannelFromKrausList::usage = "ComplementaryChannelFromKrausList[list][\[Rho]], computes the complementary channel accordingly Stinespring dilation theorem. Be aware that the complementary channel in general is rectangular, the dimension of the image is the Kraus rank."
 PositiveAndNegativeParts::usage = "PositiveAndNegativeParts[M_]: Gives a list with the positive and negative parts of the hermitian matrix M."
+KrausFromChoi::usage = "Follow its name"
 
 
 Begin["Private`"] 
@@ -772,9 +773,12 @@ ChoiMatrixQubitParticles[channel_,particles_]:=ArrayFlatten[Table[channel[Proyec
 
 QuantumMapInProyectorBasis[channel_,particles_]:=Flatten[Table[Flatten[Table[Tr[Dagger[Proyector[BasisState[k,2^particles],BasisState[l,2^particles]]] . channel[Proyector[BasisState[i,2^particles],BasisState[j,2^particles]]]],{i,0,2^particles-1},{j,0,2^particles-1}]],{k,0,2^particles-1},{l,0,2^particles-1}],1];
 
-KrausQubitParticles[channel_,particles_]:=Select[Map[Sqrt[#[[1]]]Transpose[Partition[#[[2]],2^particles]]&,ChoiMatrixQubitParticles[channel,particles]//Eigensystem//Transpose]//Chop,MatrixRank[#]>0 &];
+KrausFromChoi[choi_]:=Select[
+Map[Sqrt[#[[1]]]Partition[Normalize[#[[2]]],Sqrt[Length[choi]]]&,choi//Eigensystem//Transpose]//Chop,MatrixRank[#]>0 &];
 
-KrausQubitParticlesFromPauliProductBasis[channel_?MatrixQ]:=Select[Map[Sqrt[#[[1]]]Transpose[Partition[#[[2]],Sqrt[Length[channel]]]]&,ChoiJamiStateFromPauliProductBasis[channel]//Eigensystem//Transpose]//Chop,MatrixRank[#]>0 &];
+KrausQubitParticles[channel_,particles_]:=KrausFromChoi[ChoiMatrixQubitParticles[channel,particles]];
+
+KrausQubitParticlesFromPauliProductBasis[channel_?MatrixQ]:=KrausFromChoi[Round[Sqrt[Length[channel]]]*ChoiJamiStateFromPauliProductBasis[channel]]
 
 (*XX-chain section*)
 
