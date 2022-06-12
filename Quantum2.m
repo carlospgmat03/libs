@@ -69,7 +69,12 @@ PositiveSemidefiniteMatrixCustomQ::usage = "Mathematica test gives strange resul
 PositiveSemidefiniteMatrixCustom2Q::usage = "Custom check."
 PositiveSemidefiniteMatrixCustom3Q::usage = "By eigenvalues of the hermitian part"
 DecompositionOfChannelsInSO::usage = "Singular value decomposition but in SO."
-HermitianPart::usage = "HermitianPart."
+HermitianPart::usage = "Hermitian part of a matrix."
+AntiHermitianPart::usage = "AntiHermitian part of a matrix."
+PositiveSemidefinitePart::ysage = "PositiveSemidefinitePart."
+PositiveDefinitePart::usage = "PositiveDefinitePart."
+NegativeSemidefinitePart::usage = "NegativeSemidefinitePart."
+NegativeDefinitePart::usage = "NegativeDefinitePart."
 DecompositionOfChannelsInSO31Diagonal::usage= "The same of DecompositionOfChannelsInSO31 but forcing a diagonal in the spatial block."
 AddOne::usage="Direct sum from behind with an identity of dimension one."
 InfinitySupressor::usage = "InfinitySupressor[lista_,infinity_] This functions makes infinities finide by a given bound."
@@ -536,7 +541,30 @@ tmpmat=matrix . g . Transpose[matrix]//Chop;
 {o . matrix,o}
 ];
 
-HermitianPart[m_]:=0.5*(m+Dagger[m]);
+HermitianPart[m_]:=1/2*(m+Dagger[m]);
+
+AntiHermitianPart[m_]:=1/2*(m-Dagger[m]);
+
+PositiveSemidefinitePart[m_]:=Module[{eig,dec},
+eig=Transpose[Eigensystem[m]];
+dec=Select[eig,#[[1]]>=0&];
+If[Length[dec]==0,0*m,Total[Map[#[[1]]*Proyector[Normalize[#[[2]]]]&,dec]]]
+];
+PositiveDefinitePart[m_]:=Module[{eig,dec},
+eig=Transpose[Eigensystem[m]];
+dec=Select[eig,#[[1]]>0&];
+If[Length[dec]==0,0*m,Total[Map[#[[1]]*Proyector[Normalize[#[[2]]]]&,dec]]]
+];
+NegativeSemidefinitePart[m_]:=Module[{eig,dec},
+eig=Transpose[Eigensystem[m]];
+dec=Select[eig,#[[1]]<=0&];
+If[Length[dec]==0,0*m,-Total[Map[#[[1]]*Proyector[Normalize[#[[2]]]]&,dec]]]
+];
+NegativeDefinitePart[m_]:=Module[{eig,dec},
+eig=Transpose[Eigensystem[m]];
+dec=Select[eig,#[[1]]<0&];
+If[Length[dec]==0,0*m,-Total[Map[#[[1]]*Proyector[Normalize[#[[2]]]]&,dec]]]
+];
 
 QuantumMaptoR[channel_]:=Module[{g,\[Rho]},
 g=DiagonalMatrix[{1,-1,-1,-1}];
