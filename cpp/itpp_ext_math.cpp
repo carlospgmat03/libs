@@ -2107,6 +2107,15 @@ void apply_gate(itpp::cvec& state, int nwhich, itpp::cmat gate){// {{{
 //   std::cout << "este deberia estar rotado" << state << std::endl;
   return;
 }// }}}
+void apply_single_qubit_gate_on_all(itpp::cvec& state,  itpp::cmat gate){// {{{
+  int qubits=cfpmath::log_base_2(state.size());
+  int nwhich;
+  for (int i=0; i<qubits; i++){
+    nwhich= cfpmath::pow_2(i);
+    apply_gate(state, nwhich, gate);
+  }
+  return;
+}// }}}
 void apply_hadamard(itpp::cvec& state, int position){// {{{
   itpp::ivec pos(2);
   itpp::cvec moco;
