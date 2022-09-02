@@ -4,6 +4,8 @@ fortran 90, mathematica, matlab (and possibly others) to play with random matric
 quantum computation and tensor networks. 
 
 
+To be able to use de c++ toolbox, one must install tclap and itpp. In ubuntu it corresponds to the packages libitpp-dev libtclap-dev
+
 
 Maxima -  Files provided by Thomas Gorin to calculate integral of polynomials of uniatry matrices with the Haar measure
 cpp - C++ toolbox
