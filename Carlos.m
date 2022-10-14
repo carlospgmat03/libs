@@ -39,6 +39,13 @@ HistogramListPoints::usage="Shows the points that would correspond to a Histogra
 the same options as Histogram and HistogramList. Usage HistogramListPoints[data] or
 HistogramListPoints[data, bspec] or HistogramList[data,bspec,hspec]"
 
+HistogramPointsForLine::usage="Calculates the points to make a line corresponding to a Histogram. 
+Accepts
+the same options as Histogram and HistogramList. Usage HistogramPointsForLine [data] or
+HistogramPointsForLine[data, bspec] or HistogramPointsForLine[data,bspec,hspec]"
+
+
+
 (* {{{ Symbols and legends *)
 MySymbol::usage="Para poner simbolos. Tiene defauls. Es el recomendado ahora"
 SymbolNumber::usage="Option for MySymbol"
@@ -118,6 +125,10 @@ DistanceBetweenSetsOfPoints::nnarg =
 HistogramListPoints[data_, Options___] :=Transpose[{Drop[(#[[1]] + RotateLeft[#[[1]]])/
       2, -1], #[[2]]} &[HistogramList[data, Options]]]
 
+HistogramPointsForLine[data_, Options___] := 
+ Module[{hrs = HistogramList[data, Options]},
+  Transpose[{Flatten[Transpose[{hrs[[1]], hrs[[1]]}]], 
+    Flatten[{0, Transpose[{hrs[[2]], hrs[[2]]}], 0}]}]
 RandomUnitVector[n_] := Module[{v},
   v = RandomReal[NormalDistribution[0, 1], n];
   v/Norm[v]]
