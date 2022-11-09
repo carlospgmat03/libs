@@ -322,4 +322,4 @@ ColorCoding[NumberOfNumbers_Integer,NumberOfColors_Integer]:=
 
     
 End[];
-EndPackage[]
+EndPackage[];
