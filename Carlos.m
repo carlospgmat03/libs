@@ -125,10 +125,13 @@ DistanceBetweenSetsOfPoints::nnarg =
 HistogramListPoints[data_, Options___] :=Transpose[{Drop[(#[[1]] + RotateLeft[#[[1]]])/
       2, -1], #[[2]]} &[HistogramList[data, Options]]]
 
+
 HistogramPointsForLine[data_, Options___] := 
  Module[{hrs = HistogramList[data, Options]},
   Transpose[{Flatten[Transpose[{hrs[[1]], hrs[[1]]}]], 
-    Flatten[{0, Transpose[{hrs[[2]], hrs[[2]]}], 0}]}]
+    Flatten[{0, Transpose[{hrs[[2]], hrs[[2]]}], 0}]}]]
+
+
 RandomUnitVector[n_] := Module[{v},
   v = RandomReal[NormalDistribution[0, 1], n];
   v/Norm[v]]
