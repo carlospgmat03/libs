@@ -131,7 +131,10 @@ ApplySwapPure::usage = "Leaves the state in ket form if pure"
 ApplyLocalNoiseChain::usage = "ApplyLocalNoiseChain[State,p] Applies the map that transforoms the density matrix State into the assessible density matrix when local noise is present using fuzzy measurements."
 ApplyNoiseChain::usage = "ApplyNoiseChain[State,p] Applies the map that transforoms the density matrix State into the assessible density matrix when non-local noise is present using fuzzy measurements."
 PermutationMatrices::usgae = "Argument is the number of particles to permute, output is a list of matrices."
+(*
+Commented as is provided by Mathematica in 13.1
 PermutationMatrix::usage = "PermutationMatrix[p_List]."
+*)
 PauliSuperoperator::usage="Calculates superoperator of a Pauli quantum channel. Pauli quantum channels transform 
 qubits density matrices as \!\(\*SubscriptBox[\(r\), \(\*SubscriptBox[\(j\), \(1\)],  ... , \*SubscriptBox[\(j\), \(n\)]\)]\)\[Rule]\!\(\*SubscriptBox[\(\[Tau]\), \(\*SubscriptBox[\(j\), \(1\)],  ... , \*SubscriptBox[\(j\), \(n\)]\)]\)\!\(\*SubscriptBox[\(r\), \(\*SubscriptBox[\(j\), \(1\)],  ... , \*SubscriptBox[\(j\), \(n\)]\)]\), where \!\(\*SubscriptBox[\(r\), \(\*SubscriptBox[\(j\), \(1\)],  ... , \*SubscriptBox[\(j\), \(n\)]\)]\) are the components 
 of \[Rho] in Pauli tensor products basis.
@@ -730,7 +733,10 @@ ApplyNoiseChain[State_?VectorQ,p_]:=Module[{qubits},
 qubits=IntegerPart[Log2[Dimensions[State][[1]]]];
 p Proyector[State]+2(1-p)/(qubits(qubits-1))(Sum[ApplySwap[State,i,j],{i,1,qubits},{j,i+1,qubits}])
 ];
+(*
+Commented as is provided by Mathematica in 13.1
 PermutationMatrix[p_List]:=IdentityMatrix[Length[p]][[p]];
+*)
 PermutationMatrices[n_]:=PermutationMatrix/@Permutations[Range[n]];
 (*PCE operations related stuff.*)
 PauliSuperoperator[pauliDiagonal_List]:=Module[{n,pauliToComputational,diagonal},
