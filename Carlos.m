@@ -24,7 +24,10 @@ Norma::usage = "This function gives the norm of a list of numbers";
 
 ColorCoding::usage="This recieves 2 integer inputs, and outputs a 
 	graphic to read the number that represents each Hue";
+(*
+Se comenta porque ya Mathematica 13.1 trae una funcion que hace eso
 BlockDiagonalMatrix::usage="Gives a block diagonal matrix from a list"
+*)
 
 OffSpellErrors::usage ="Turns of spelling errors"
 OnSpellErrors::usage ="Turns on spelling errors"
@@ -138,13 +141,16 @@ RandomUnitVector[n_] := Module[{v},
 RandomUnitVector[] := RandomUnitVector[3]
 
 
+(*
+Se comenta porque ya Mathematica trae una funcion que hace eso
+(* From http://mathworld.wolfram.com/BlockDiagonalMatrix.html*)
 BlockDiagonalMatrix[b : {__?MatrixQ}] := 
  Module[{r, c, n = Length[b], i, j}, {r, c} = 
    Transpose[Dimensions /@ b];
   ArrayFlatten[
    Table[If[i == j, b[[i]], ConstantArray[0, {r[[i]], c[[j]]}]], {i, 
      n}, {j, n}]]]
-(* From http://mathworld.wolfram.com/BlockDiagonalMatrix.html*)
+*)
 
 NumberList[lista_]:=Flatten[Evaluate[#], 1] & /@ Transpose[{Range[Length[lista]], lista}]
 
