@@ -39,3 +39,5 @@ cpp/cmake-build-debug
 cpp/.idea
 cpp/Icon
 julia/.ipynb_checkpoints/
+
+.vscode/*
