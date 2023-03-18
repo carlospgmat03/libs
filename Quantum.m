@@ -15,7 +15,7 @@ ExtractDigits::usage = "Extract the digits of a number in its binary form. Same 
    numin=    0 1 1 0 1 1 1 = 55
    n1out=      1   0     1 = 5
    n2out=    0   1   1 1   = 7, {n1out,n2out}"
-BitsOn::usare = "The number of 1s in a binary representation, say 
+BitsOn::usage = "The number of 1s in a binary representation, say 
    n = 5 = 1 0 1
    BitsOn[n] = 2"
 MergeTwoIntegers::usage = "MergeTwoIntegers[na_, nb_, ndigits_]
@@ -72,8 +72,10 @@ operation will be applied."
 (* {{{ Quantum information routines *)
 ApplyControlGate::usage = "ApplyControlGate[U_, State_, TargetQubit_, ControlQubit_]"
 ApplyGate::usage = "ApplyGate[U_, State_, TargetQubit_]"
+ApplyOperator::usage = "ApplyOperator[op,rho] applies the operator op to the density matrix rho."
 ApplyChannel::usage = "Apply Quantum Channel to an operator"
 ControlNotMatrix::usage = "Get the control not matrix ControlNotMatrix[QubitControl_Integer, QubitTarget_Integer, NumberOfQubits_Integer]"
+SWAPMatrix::usage = "SWAPMatrix[n,{j,k}] yields the matrix that swaps the jth and kth qubits in a system of n qubits"
 QuantumDotProduct::usage = "Dot Product in which the first thing is congutate. Yields the true Psi1 dot Psi2" 
 ToSuperOperatorSpaceComputationalBasis::usage = "ToSuperOperatorSpaceComputationalBasis[rho_] converts a density matrix rho to superoperator space, where it is a vector, and the basis in the superoperator space is the computational basis, which is the same (or at least similar) to the Choi basis"
 FromSuperOperatorSpaceComputationalBasis::usage = "FromSuperOperatorSpaceComputationalBasis[rho_?VectorQ] converts a density matrix rho from superoperator space, where it is a vector, and the basis in the superoperator space is the computational basis, which is the same (or at least similar) to the Choi basis to the normal space, where it is a matrix"
@@ -109,6 +111,7 @@ Discord::usage="Discord[r_?MatrixQ] calcula el quantum discord de una matriz de 
 BasisState::usage="BasisState[BasisNumber_,Dimension_] gives a state of the computational basis. It is 
 numbered from 0 to Dimension-1"
 Hadamard::usage="Hadamard[] gate, Hadamard[QubitToApply, Total"
+LocalOneQubitOperator::usage="LocalOneQubitOperator[n,k,A] creates an operator that applies the one-qubit operator A at position k in a n-qubit system."
 (* }}} *)
 (* {{{ Quantum channels and basis transformations *)
 JamiolkowskiStateToOperatorChoi::usage = "JamiolkowskiStateToOperatorChoi[Rho] applies the Jamiolkovski isomorphism as is understood in Geometry of Quantum States pgs. 241, 243, 266"
@@ -126,11 +129,11 @@ Wstate::usage="Wstate[n_] Creates a W state, (|10...0>+|010...0>+...+|0...01>)/s
 RandomMixedState::usage="RandomMixedState[n_,combinations_], Constructs a Random mixed state of diemnsion n with random uniform combinations of pure states wti Haar measure."
 GellMann::usage = "GellMann[n_] Generalized Gell-Mann matrices from https://blog.suchideas.com/2016/04/sun-gell-mann-matrices-in-mathematica/ For example
 for n=2 it gives Pauli matrices, don't forget to add identity by yourself in need a complete basis."
-ApplySwap::usage= "ApplySwap[State,Target1,Target2] Applies Swap map betwen the two target qubits, the input can be a state vector or a density matrix."
+ApplySwap::usage= "ApplySwap[State,{j,k}] applies swap map betwen the jth and kth qubits, the input can be either a state vector or a density matrix."
 ApplySwapPure::usage = "Leaves the state in ket form if pure"
 ApplyLocalNoiseChain::usage = "ApplyLocalNoiseChain[State,p] Applies the map that transforoms the density matrix State into the assessible density matrix when local noise is present using fuzzy measurements."
 ApplyNoiseChain::usage = "ApplyNoiseChain[State,p] Applies the map that transforoms the density matrix State into the assessible density matrix when non-local noise is present using fuzzy measurements."
-PermutationMatrices::usgae = "Argument is the number of particles to permute, output is a list of matrices."
+PermutationMatrices::usage = "Argument is the number of particles to permute, output is a list of matrices."
 (*
 Commented as is provided by Mathematica in 13.1
 PermutationMatrix::usage = "PermutationMatrix[p_List]."
@@ -186,7 +189,7 @@ Begin["Private`"]
   psi2 = #/Norm[#] &[prepsi2];
   {psi1, psi2}]
 (* }}} *)
-(* {{{ *) RandomState[dim_Integer] := #/(Sqrt[Conjugate[#].#])&[Table[ RandomGaussianComplex[], {i, dim}]]; 
+(* {{{ *) RandomState[dim_Integer] := #/(Sqrt[Conjugate[#] . #])&[Table[ RandomGaussianComplex[], {i, dim}]]; 
 (* }}} *)
 (* {{{ *) RandomGaussianComplex[] := #[[1]] + #[[2]] I &[RandomReal[NormalDistribution[], {2}]];
 (* }}} *)
@@ -203,7 +206,7 @@ Options[RandomHermitianMatrix] = {Normalization -> "Default"};
 (* }}} *)
 (* {{{ *) PUEMember[n_Integer] := Module[{U},
 	U = CUEMember[n];
-	Chop[U.DiagonalMatrix[Table[Random[], {n}]-0.5].Dagger[U]]]
+	Chop[U . DiagonalMatrix[Table[Random[], {n}]-0.5] . Dagger[U]]]
 (* }}} *)
 (* {{{ *) GUEMember[n_Integer,   OptionsPattern[]] :=
 	Times[Switch[OptionValue[Normalization],"Default",1,"SizeIndependent",0.5, "Kohler", (n/2)/Power[Pi,2]], 
@@ -224,7 +227,7 @@ Options[GOEMember] = {Normalization -> "Default"};
 
 
 (* }}} *)
-(* {{{ *) RandomDensityMatrix[n_] := #/Tr[#] &[(#.Transpose[Conjugate[#]]) &[GUEMember[n]]]
+(* {{{ *) RandomDensityMatrix[n_] := #/Tr[#] &[(# . Transpose[Conjugate[#]]) &[GUEMember[n]]]
 
 (* }}} *)
 (* }}} *)
@@ -241,7 +244,7 @@ Triangular[n_] := n (n + 1)/2
 (* }}} *)
 
 (* }}} *)
-(* {{{ *) Commutator[A_?MatrixQ, B_?MatrixQ] := A.B - B.A
+(* {{{ *) Commutator[A_?MatrixQ, B_?MatrixQ] := A . B - B . A
 (* }}} *)
 (* {{{ *) PartialTrace[Rho_?MatrixQ, DigitsToLeave_] := Module[{ab1, ab2, na, nb},
 	nb = Power[2, BitsOn[DigitsToLeave]];
@@ -330,10 +333,10 @@ Triangular[n_] := n (n + 1)/2
  Module[{n, ri, i, Ri, F, eks},
   n = Length[psi];
   F = Sum[
-     ri = #/(Sqrt[Conjugate[#].#]) &[
+     ri = #/(Sqrt[Conjugate[#] . #]) &[
        Table[RandomGaussianComplex[], {i, n}]];
-     Ri = ri - (Conjugate[psi].ri) psi;
-     {Conjugate[Ri].psi, Conjugate[Ri].Ri};
+     Ri = ri - (Conjugate[psi] . ri) psi;
+     {Conjugate[Ri] . psi, Conjugate[Ri] . Ri};
      Proyector[Ri], {n - 1}] + Proyector[psi];
   eks = Transpose[
      Sort[Transpose[Eigensystem[F]], 
@@ -345,8 +348,11 @@ Triangular[n_] := n (n + 1)/2
 (* }}} *)
 (* }}} *)
 (* {{{ Quantum information routines *)
-(* {{{ *) ApplyChannel[Es_, rho_] := 
- Sum[Es[[k]].rho.Dagger[Es[[k]]], {k, Length[Es]}]
+(* {{{ *)ApplyOperator[operator_,rho_] := operator . rho . Dagger[operator]
+(* }}} *)
+(* {{{ *) (*ACG: ApplyChannel could be written as a composition of Map and ApplyOperator*)
+ApplyChannel[Es_, rho_] := 
+ Sum[Es[[k]] . rho . Dagger[Es[[k]]], {k, Length[Es]}]
 (* }}} *)
 (* {{{ *) Hadamard[] := 
  {{1,1},{1,-1}}/Sqrt[2]
@@ -367,6 +373,15 @@ ControlNot[QubitControl_Integer, QubitTarget_Integer, NumeroACambiar_Integer] :=
    Mod[DigitoControl + DigitoTarget, 2];
   FromDigits[NumeroEnBinario, 2]]
 (* }}} *)
+(* {{{ *) (*SWAP matrix using sprase arrays and *)
+SWAPMatrix[n_Integer, {j_Integer, k_Integer}] /; 
+  1 <= j <= n && 1 <= k <= n && j != k := 
+ Total[LocalOneQubitOperator[n, j, #] . 
+      LocalOneQubitOperator[n, k, #] & /@ 
+    Table[Pauli[i], {i, 0, 3}]]/2
+SWAPMatrix[n_Integer, {j_Integer, k_Integer}] /; 
+  1 <= j <= n && 1 <= k <= n && j == k := IdentityMatrix[2^n, SparseArray]
+(* }}} *)
 (* {{{ *) QuantumDotProduct[Psi1_?VectorQ, Psi2_?VectorQ] :=  Dot[Conjugate[Psi1], Psi2]
 (* }}} *)
 (* {{{ *) ToSuperOperatorSpaceComputationalBasis[rho_?MatrixQ] := 
@@ -377,7 +392,7 @@ ControlNot[QubitControl_Integer, QubitTarget_Integer, NumeroACambiar_Integer] :=
 (* }}} *)
 (* {{{ *) ToSuperOperatorSpacePauliBasis[r_?MatrixQ] := Module[{Qubits},
   Qubits = Log[2, Length[r]];
-  Chop[Table[ Tr[r.Pauli[IntegerDigits[i, 4, Qubits]]/Power[2.,Qubits/2]], {i, 0, Power[Length[r], 2] - 1}]]]
+  Chop[Table[ Tr[r . Pauli[IntegerDigits[i, 4, Qubits]]/Power[2.,Qubits/2]], {i, 0, Power[Length[r], 2] - 1}]]]
 (* }}} *)
 (* {{{ *) FromSuperOperatorSpacePauliBasis[r_?VectorQ] := Module[{Qubits},
   Qubits = Log[2, Length[r]]/2; 
@@ -390,7 +405,7 @@ ControlNot[QubitControl_Integer, QubitTarget_Integer, NumeroACambiar_Integer] :=
   T = R[[2 ;;, 2 ;;]];
   {oa, cd, ob} = SingularValueDecomposition[T];
   A = Chop[
-    DirectSum[{{1}}, Transpose[oa/Det[oa]]].R.DirectSum[{{1}}, 
+    DirectSum[{{1}}, Transpose[oa/Det[oa]]] . R . DirectSum[{{1}}, 
       ob/Det[ob]]];
   {a = A[[2 ;;, 1]], b = A[[1, 2 ;;]], c = Diagonal[A][[2 ;;]]}
   ]
@@ -403,21 +418,23 @@ ControlNot[QubitControl_Integer, QubitTarget_Integer, NumeroACambiar_Integer] :=
 
 
 (* }}} *)
-(* {{{  *) StateToBlochBasisRepresentation[r_?MatrixQ] := Table[Tr[r.Pauli[{i, j}]], {i, 0, 3}, {j, 0, 3}]
+(* {{{  *) StateToBlochBasisRepresentation[r_?MatrixQ] := Table[Tr[r . Pauli[{i, j}]], {i, 0, 3}, {j, 0, 3}]
 (* }}} *)
 (* {{{ *) CoherentState[\[Theta]_, \[Phi]_, n_] := 
  N[Flatten[
    tensorPower[{Cos[\[Theta]/2], Exp[I \[Phi]] Sin[\[Theta]/2]}, n], 
    1]]
 (* }}} *)
+(* {{{ *)LocalOneQubitOperator[n_Integer, k_Integer, a_] /; 1<=k<=n && Dimensions[a]=={2,2} :=
+KroneckerProduct[IdentityMatrix[2^(k-1), SparseArray],
+a,
+IdentityMatrix[2^(n-k), SparseArray]]
+(* }}} *)
 (* {{{ Pauli matrices*)  
-Pauli[0]=Pauli[{0}]={{1,0}, {0,1}}; 
-Pauli[1]=Pauli[{1}]={{0,1}, {1,0}}; 
-Pauli[2]=Pauli[{2}]={{0,-I},{I,0}}; 
-Pauli[3]=Pauli[{3}]={{1,0}, {0,-1}};
+Pauli[i_Integer]:=SparseArray[PauliMatrix[i]]
 Pauli[Indices_List] := KroneckerProduct @@ (Pauli /@ Indices)
 (* }}} *)
-(* {{{ *) Paulib[{b1_,b2_,b3_}] := b1 Pauli[1]+ b2 Pauli[2]+ b3 Pauli[3]
+(* {{{ *) Paulib[{b1_,b2_,b3_}] := b . Table[Pauli[i],{i,1,3}]
 (* }}} *)
 (* {{{ *) SumSigmaX[Qubits_] := SumSigmaX[Qubits] = Table[If[DigitCount[BitXor[i - 1, j - 1], 2, 1] == 1, 1, 0], {i, Power[2, Qubits]}, {j, Power[2, Qubits]}]
 (* }}} *)
@@ -432,17 +449,17 @@ Pauli[Indices_List] := KroneckerProduct @@ (Pauli /@ Indices)
 
 (* }}} *)
 (* {{{ *) Concurrence[rho_?MatrixQ]:=Module[{lambda}, 
-	lambda=Sqrt[Abs[Eigenvalues[rho.sigmaysigmay.Conjugate[rho].sigmaysigmay]]]; 
+	lambda=Sqrt[Abs[Eigenvalues[rho . sigmaysigmay . Conjugate[rho] . sigmaysigmay]]]; 
 	Max[{2*Max[lambda]-Plus@@lambda,0}]]
 Concurrence[\[Psi]_?VectorQ]:=Module[{}, 
-Abs[QuantumDotProduct[sigmaysigmay.Conjugate[\[Psi]], \[Psi]]]]
+Abs[QuantumDotProduct[sigmaysigmay . Conjugate[\[Psi]], \[Psi]]]]
 
 (* {{{ *) sigmaysigmay={{0, 0, 0, -1}, {0, 0, 1, 0}, {0, 1, 0, 0}, {-1, 0, 0, 0}}; (* }}} *)
 
 (* {{{ *) MultipartiteConcurrence[\[Psi]_?VectorQ] := Module[{M},M=Length[\[Psi]]-2;
 Sqrt[M-Sum[Purity[PartialTrace[\[Psi],i]],{i,1,M}]]*(2/Sqrt[M+2])](* }}} *)
 (* }}} *)
-(* {{{ *) Purity[rho_]:= Tr[rho.rho]
+(* {{{ *) Purity[rho_]:= Tr[rho . rho]
 
 (* }}} *)
 (* {{{ Proyector *)
@@ -450,7 +467,7 @@ Proyector[psi_, phi_] := Outer[Times, psi, Conjugate[phi]]
 Proyector[psi_] := Proyector[psi, psi]
 (* }}} *)
 (* {{{ *) ApplyKrausOperators[Operators_, rho_] := 
- Total[#.rho.Dagger[#] & /@ Operators]
+ Total[# . rho . Dagger[#] & /@ Operators]
 (* }}} *)
 (* {{{ *) KrausOperatorsForSuperUnitaryEvolution[psienv_, U_] := 
   Module[{Nenv, Ntotal, Nsub},
@@ -487,7 +504,7 @@ Proyector[psi_] := Proyector[psi, psi]
 (* {{{ *) Bell[] = Bell[2]
 
 (* }}} *)
-(* {{{  *) StateToBlochSphere[R_?MatrixQ] := Module[{sigma}, sigma={Pauli[1], Pauli[2], Pauli[3]}; Chop[Tr /@ (sigma.R)]]
+(* {{{  *) StateToBlochSphere[R_?MatrixQ] := Module[{sigma}, sigma={Pauli[1], Pauli[2], Pauli[3]}; Chop[Tr /@ (sigma . R)]]
 (* }}} *)
 (* {{{  *) BlochSphereToState[CartesianCoordinatesOfPoint_List] :=  
  Module[{r, \[Theta], \[Phi]}, 
@@ -515,10 +532,10 @@ BlochSphereToState[{\[Theta]_, \[Phi]_}] :=  {Cos[\[Theta]/2], Exp[I \[Phi]] Sin
     2 Cos[\[Theta]]^2 - 1};
   {a, b, c} = BlochNormalFormVectors[\[Rho]];
   {mp = a + c X, mm = a - c X};
-  ps = {(1 + b.X)/2, (1 - b.X)/2};
-  \[Lambda]s = {{1/2 (1 + Norm[mp]/(1 + b.X)), 
-     1/2 (1 - Norm[mp]/(1 + b.X))}, {1/2 (1 + Norm[mm]/(1 - b.X)), 
-     1/2 (1 - Norm[mm]/(1 - b.X))}};
+  ps = {(1 + b . X)/2, (1 - b . X)/2};
+  \[Lambda]s = {{1/2 (1 + Norm[mp]/(1 + b . X)), 
+     1/2 (1 - Norm[mp]/(1 + b . X))}, {1/2 (1 + Norm[mm]/(1 - b . X)), 
+     1/2 (1 - Norm[mm]/(1 - b . X))}};
   ps[[1]] vonNeumannEntropy[\[Lambda]s[[1]]] + 
    ps[[2]] vonNeumannEntropy[\[Lambda]s[[2]]]
   ]
@@ -532,7 +549,7 @@ BlochSphereToState[{\[Theta]_, \[Phi]_}] :=  {Cos[\[Theta]/2], Exp[I \[Phi]] Sin
   For[i = 0, i < Length[State]/2, i++,
    ie = MergeTwoIntegers[#, i, 
        Power[2, TargetQubits]] & /@ (Range[Length[U]] - 1);
-   StateOut[[ie + 1]] = U.State[[ie + 1]];
+   StateOut[[ie + 1]] = U . State[[ie + 1]];
    ];
   StateOut]
 (* }}} *)
@@ -548,7 +565,7 @@ BlochSphereToState[{\[Theta]_, \[Phi]_}] :=  {Cos[\[Theta]/2], Exp[I \[Phi]] Sin
    
    ie = MergeTwoIntegers[#, iwithcontrol, 
        Power[2, TargetQubit]] & /@ {0, 1};
-   StateOut[[ie + 1]] = U.State[[ie + 1]];
+   StateOut[[ie + 1]] = U . State[[ie + 1]];
    ];
   StateOut]
 (* }}} *)
@@ -587,11 +604,11 @@ AveragePurityChannelPauliBasis[Lambda_] := Total[Power[Lambda[[All, 1]], 2]]/2 +
         {Dashing[0.01],Opacity[0.5],Blue,Arrow[{{0,0,0},1.3*Normalize[{0,1,0}]}]},
         {Dashing[0.01],Opacity[0.5],Green,Arrow[{{0,0,0},1.3*Normalize[{0,0,1}]}]}
         } }];
-  vecs=Graphics3D[{{Red,Arrow[{center,1.3*Normalize[T.{1,0,0}]}],
-           {Blue,Arrow[{center,1.3*Normalize[T.{0,1,0}]}]},
-           {Green,Arrow[{center,1.3*Normalize[T.{0,0,1}]}]} }}];
+  vecs=Graphics3D[{{Red,Arrow[{center,1.3*Normalize[T . {1,0,0}]}],
+           {Blue,Arrow[{center,1.3*Normalize[T . {0,1,0}]}]},
+           {Green,Arrow[{center,1.3*Normalize[T . {0,0,1}]}]} }}];
   coord={x,y,z}-center;
-  coord=Inverse[T].coord;
+  coord=Inverse[T] . coord;
   Style[Show[ContourPlot3D[
     {coord[[1]]^2+coord[[2]]^2+coord[[3]]^2==1,x^2+y^2+z^2==1},
     {x,-1,1},{y,-1,1},{z,-1,1},AxesLabel->{"X","Y","Z"},
@@ -619,7 +636,7 @@ AveragePurityChannelPauliBasis[Lambda_] := Total[Power[Lambda[[All, 1]], 2]]/2 +
   \[Sigma][0] = cero + uno;
   \[Sigma][3] = uno - cero;
   Table[channel[i, j] = 
-    1/2 Table[Tr[PauliMatrix[i].\[Sigma][j][[k]]], {k, steps}], {i, 0,
+    1/2 Table[Tr[PauliMatrix[i] . \[Sigma][j][[k]]], {k, steps}], {i, 0,
      3}, {j, 0, 3}];
   Chop[Table[
     Table[channel[i, j][[k]], {i, 0, 3}, {j, 0, 3}], {k, steps}]]]
@@ -658,7 +675,7 @@ Wstate[n_] := Sum[BasisState[Power[2, m], Power[2, n]], {m, 0, n - 1}]/Sqrt[n]
 statelist=Table[Proyector[RandomState[n]],{combinations}];
 p=RandomReal[{0,1.0},combinations];
 p=p/Total[p];
-p.statelist//Chop
+p . statelist//Chop
 ];
 GellMann[n_] :=
  GellMann[n] = Flatten[Table[
@@ -674,25 +691,15 @@ GellMann[n_] :=
    Sqrt[2/l/(l + 1)] SparseArray[
     Table[{j, j} -> 1, {j, 1, l}]~Join~{{l + 1, l + 1} -> -l}, {n, n}]
   , {l, 1, n - 1}];
-ApplySwap[State_?VectorQ,Target1_,Target2_]:=Module[{Aux,digits,len,digits1,digits2},
-len=Length[State];
-Aux=ConstantArray[0,len];
-Table[digits=IntegerDigits[i-1,2,IntegerPart[Log2[len]]];
-digits1=digits;
-digits1[[{Target1,Target2}]]=digits[[{Target2,Target1}]];
-Aux[[i]]=State[[FromDigits[digits1,2]+1]];,{i,1,Length[State]}];
-Proyector[Aux]
-];
-ApplySwapPure[State_?VectorQ,Target1_,Target2_]:=Module[{Aux,digits,len,digits1,digits2},
-len=Length[State];
-Aux=ConstantArray[0,len];
-Table[digits=IntegerDigits[i-1,2,IntegerPart[Log2[len]]];
-digits1=digits;
-digits1[[{Target1,Target2}]]=digits[[{Target2,Target1}]];
-Aux[[i]]=State[[FromDigits[digits1,2]+1]];,{i,1,Length[State]}];
-Aux
-];
-ApplySwap[State_?MatrixQ,Target1_,Target2_]:=Module[{Aux,digits,dim,digits1,digits2,digits1p,digits2p},
+
+
+
+
+ApplySwap[rho_?VectorQ,{j_Integer,k_Integer}]:=With[{n = Log2[Length[rho]]},ApplyOperator[SWAPMatrix[n,{j,k}],rho] ]
+
+ApplySwap[rho_?SquareMatrixQ,{j_Integer,k_Integer}]:=With[{n = Log2[Dimensions[rho][[1]]]},ApplyOperator[SWAPMatrix[n,{j,k}],rho] ]
+
+Module[{Aux,digits,dim,digits1,digits2,digits1p,digits2p},
 dim=Dimensions[State];
 Aux=ConstantArray[0,dim];
 Table[
@@ -705,12 +712,20 @@ digits2p[[{Target1,Target2}]]=digits2[[{Target2,Target1}]];
 Aux[[i,j]]=State[[FromDigits[digits1p,2]+1,FromDigits[digits2p,2]+1]];,{i,1,dim[[1]]},{j,1,dim[[1]]}];
 Aux
 ];
-
+ApplySwapPure[State_?VectorQ,Target1_,Target2_]:=Module[{Aux,digits,len,digits1,digits2},
+len=Length[State];
+Aux=ConstantArray[0,len];
+Table[digits=IntegerDigits[i-1,2,IntegerPart[Log2[len]]];
+digits1=digits;
+digits1[[{Target1,Target2}]]=digits[[{Target2,Target1}]];
+Aux[[i]]=State[[FromDigits[digits1,2]+1]];,{i,1,Length[State]}];
+Aux
+];
 ApplyPermutation[state_,permmatrix_]:=Module[{State,Aux,digitsinit,digitsfinal,len},
 len=Length[state];
 Aux=ConstantArray[0,len];
 Table[digitsinit=IntegerDigits[i-1,2,IntegerPart[Log2[len]]];
-digitsfinal=permmatrix.digitsinit;
+digitsfinal=permmatrix . digitsinit;
 Aux[[i]]=state[[FromDigits[digitsfinal,2]+1]];,{i,1,Length[state]}];
 Aux
 ]
@@ -743,7 +758,7 @@ PauliSuperoperator[pauliDiagonal_List]:=Module[{n,pauliToComputational,diagonal}
 diagonal=pauliDiagonal//Flatten;
 n=Log[4,Length[diagonal]];
 pauliToComputational=tensorPower[TransformationMatrixPauliBasisToComputationalBasis[],n];
-pauliToComputational.DiagonalMatrix[diagonal].Inverse[pauliToComputational]
+pauliToComputational . DiagonalMatrix[diagonal] . Inverse[pauliToComputational]
 ];
 (*JA: PCEFigures est\[AAcute] programada del asco. Un d\[IAcute]a con ganas de distraerme la arreglo. Para mientras hace la tarea.*)
 PCEFigures[correlations_]:=Module[{cubeIndices,diagonalPCE},
