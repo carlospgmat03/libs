@@ -671,12 +671,15 @@ Wstate[n_] := Sum[BasisState[Power[2, m], Power[2, n]], {m, 0, n - 1}]/Sqrt[n]
     ];
    AppendTo[\[CapitalXi], \[Xi]];
    ]; Return[\[CapitalXi]]](*}}}*)
-(*{{{*)RandomMixedState[n_,combinations_]:=Module[{p,statelist},
+
+(*{{{ quien sabe quien piso estas aca*)RandomMixedState[n_,combinations_]:=Module[{p,statelist},
 statelist=Table[Proyector[RandomState[n]],{combinations}];
 p=RandomReal[{0,1.0},combinations];
 p=p/Total[p];
 p . statelist//Chop
 ];
+
+
 GellMann[n_] :=
  GellMann[n] = Flatten[Table[
    (* Symmetric case *)
@@ -699,6 +702,7 @@ ApplySwap[rho_?VectorQ,{j_Integer,k_Integer}]:=With[{n = Log2[Length[rho]]},Appl
 
 ApplySwap[rho_?SquareMatrixQ,{j_Integer,k_Integer}]:=With[{n = Log2[Dimensions[rho][[1]]]},ApplyOperator[SWAPMatrix[n,{j,k}],rho] ]
 
+   (* Esto es parte de algo que no está en ninguna funcion ni nada 
 Module[{Aux,digits,dim,digits1,digits2,digits1p,digits2p},
 dim=Dimensions[State];
 Aux=ConstantArray[0,dim];
@@ -712,6 +716,10 @@ digits2p[[{Target1,Target2}]]=digits2[[{Target2,Target1}]];
 Aux[[i,j]]=State[[FromDigits[digits1p,2]+1,FromDigits[digits2p,2]+1]];,{i,1,dim[[1]]},{j,1,dim[[1]]}];
 Aux
 ];
+
+*)
+
+
 ApplySwapPure[State_?VectorQ,Target1_,Target2_]:=Module[{Aux,digits,len,digits1,digits2},
 len=Length[State];
 Aux=ConstantArray[0,len];
@@ -730,8 +738,9 @@ Aux[[i]]=state[[FromDigits[digitsfinal,2]+1]];,{i,1,Length[state]}];
 Aux
 ]
 
-(*Coarse Graining stuff*)
-(*{{{*)
+(*}}}*)
+
+(*Coarse Graining stuff*) (*{{{*)
 ApplyLocalNoiseChain[State_?MatrixQ,p_]:=Module[{qubits},
 qubits=IntegerPart[Log2[Dimensions[State][[1]]]];
 p State+(1-p)/(qubits)(Sum[ApplySwap[State,i,Mod[i+1,qubits,1]],{i,1,qubits}])
