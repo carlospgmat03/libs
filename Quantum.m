@@ -29,6 +29,14 @@ MergeTwoIntegers::usage = "MergeTwoIntegers[na_, nb_, ndigits_]
   b                  = 1 0   0   1 0   = 18
   merge_two_integers = 1 0 1 0 0 1 0 1 = 165"
 xlog2x::usage = "Calculates x Log[2, x], but if x is 0, takes the correct limit"
+
+GetDigitQuantumPosition::usage = " GetDigitQuantumPosition[index_, qubitPosition_] 
+Calculates the digit of an index, assuming that
+the array starts in 0 (as we count in quantum information) and that the position 
+of the qubit is 0 at the rightmost position. Example:
+Table[GetDigit[5, i], {i, 0, 5}] -> {1, 0, 1, 0, 0, 0}"
+
+
 (* }}} *)
 (* {{{ Random States and matrices*)
 TwoRandomOrhtogonalStates::usage = "TwoRandomOrhtogonalStates[dim_] creates two random states orthogonal to each other using gram schmidt process. It is useful for creating states that provide a maximally mixed state in a qubit"
@@ -151,6 +159,10 @@ PCEFigures[correlations_List]"
 (* }}} *)
 Begin["Private`"] 
 (* {{{ Bitwise manipulation and basic math*)
+(* {{{ *) GetDigitQuantumPosition[index_, qubitPosition_] := 
+ Module[{digits = Reverse[IntegerDigits[index, 2]]},
+  If[qubitPosition >= Length[digits], 0, digits[[qubitPosition + 1]]]]
+(* }}} *)
 (* {{{ *) ExtractDigits[NumberIn_, LocationDigits_] := Module[{AuxArray, NumberOfDigits}, 
 	NumberOfDigits = IntegerLength[NumberIn, 2]; 
 	AuxArray = Transpose[{IntegerDigits[LocationDigits, 2, NumberOfDigits], 
