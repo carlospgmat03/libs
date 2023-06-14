@@ -714,23 +714,6 @@ ApplySwap[rho_?VectorQ,{j_Integer,k_Integer}]:=With[{n = Log2[Length[rho]]},Appl
 
 ApplySwap[rho_?SquareMatrixQ,{j_Integer,k_Integer}]:=With[{n = Log2[Dimensions[rho][[1]]]},ApplyOperator[SWAPMatrix[n,{j,k}],rho] ]
 
-   (* Esto es parte de algo que no está en ninguna funcion ni nada 
-Module[{Aux,digits,dim,digits1,digits2,digits1p,digits2p},
-dim=Dimensions[State];
-Aux=ConstantArray[0,dim];
-Table[
-digits1=IntegerDigits[i-1,2,IntegerPart[Log2[dim[[1]]]]];
-digits2=IntegerDigits[j-1,2,IntegerPart[Log2[dim[[1]]]]];
-digits1p=digits1;
-digits2p=digits2;
-digits1p[[{Target1,Target2}]]=digits1[[{Target2,Target1}]];
-digits2p[[{Target1,Target2}]]=digits2[[{Target2,Target1}]];
-Aux[[i,j]]=State[[FromDigits[digits1p,2]+1,FromDigits[digits2p,2]+1]];,{i,1,dim[[1]]},{j,1,dim[[1]]}];
-Aux
-];
-
-*)
-
 
 ApplySwapPure[State_?VectorQ,Target1_,Target2_]:=Module[{Aux,digits,len,digits1,digits2},
 len=Length[State];
