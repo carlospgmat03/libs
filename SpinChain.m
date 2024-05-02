@@ -34,7 +34,7 @@ Begin["Private`"]
 (* {{{ Primitives*)
 (* {{{ *) ApplyMagnetickKick[state_?VectorQ, b_, Target_] := 
  Module[{RotationMatrix, statenew, i, pos},
-  RotationMatrix = MatrixExp[-I Paulib[b]];
+  RotationMatrix = MatrixExp[-I MatrixPauliMagneticField[b,1]];
   statenew = state;
   For[i = 0, i < Length[state]/2, i++,
    pos = {MergeTwoIntegers[0, i, Power[2, Target]], 
