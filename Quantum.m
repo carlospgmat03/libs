@@ -710,9 +710,9 @@ GellMann[n_] :=
 
 
 
-ApplySwap[rho_?VectorQ,{j_Integer,k_Integer}]:=With[{n = Log2[Length[rho]]},ApplyOperator[SWAPMatrix[n,{j,k}],rho] ]
+ApplySwap[rho_?VectorQ,j_Integer,k_Integer]:=With[{n = Log2[Length[rho]]},ApplyOperator[SWAPMatrix[n,{j,k}],rho] ]
 
-ApplySwap[rho_?SquareMatrixQ,{j_Integer,k_Integer}]:=With[{n = Log2[Dimensions[rho][[1]]]},ApplyOperator[SWAPMatrix[n,{j,k}],rho] ]
+ApplySwap[rho_?SquareMatrixQ,j_Integer,k_Integer]:=With[{n = Log2[Dimensions[rho][[1]]]},ApplyOperator[SWAPMatrix[n,{j,k}],rho] ]
 
 
 ApplySwapPure[State_?VectorQ,Target1_,Target2_]:=Module[{Aux,digits,len,digits1,digits2},
