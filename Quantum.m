@@ -155,6 +155,7 @@ Returns the figure representing the Pauli channel erasing operation. Works up
 to 3 qubits (up to cubes). Parameters: list of 1D, 2D or 3D correlations left
 invariant by a PCE operation.
 PCEFigures[correlations_List]"
+ApplyMultiQubitGate::usage="ApplyMultiQubitGate[state_,gate_,targets_] Applies multiqubit gate, targets in binary."
 (* }}} *)
 (* }}} *)
 Begin["Private`"] 
@@ -788,12 +789,25 @@ diagonalPCE=correlations//Flatten;
 ArrayPlot[SparseArray[Position[ArrayReshape[diagonalPCE,{4,4}],1]->(If[#[[1]]==1\[And]#[[2]]==1,Black,If[#[[1]]==1\[Or]#[[2]]==1,RGBColor["#CC0000"],If[#[[1]]!=1\[And]#[[2]]!=1,RGBColor["#004C99"],Nothing]]]&/@Position[ArrayReshape[diagonalPCE,{4,4}],1]),{4,4}]]
 ]
 ]
-]
+];
+
+ApplyMultiQubitGate::dimerr="Invalid target dimensions `1`. The condition 2^Total[IntegerDigits[targets, 2]] == dimtarget must hold.";ApplyMultiQubitGate[state_,gate_,targets_]:=Module[{statenew,pos,dimtarget,dimtotal,tmp},
+statenew=state;
+dimtarget=Length[gate];
+dimtotal=Length[state];
+If[2^Total[IntegerDigits[targets,2]]=!=dimtarget,Message[ApplyMultiQubitGate::dimerr,targets];
+Return[$Failed];];
+Table[
+Table[
+pos=Table[MergeTwoIntegers[targetindex,untouched,targets],{targetindex,0,dimtarget-1}]+1;
+statenew[[pos]]=gate . state[[pos]];
+,{j,0,7}]
+,{untouched,0,dimtotal/dimtarget-1}];
+statenew//Chop
+];
 (*}}}*)
 (*}}}*)
 End[] 
 EndPackage[]
 (* }}} *)
-
-
 
