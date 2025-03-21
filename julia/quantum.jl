@@ -1,39 +1,32 @@
 __precompile__() # Este comando es para que julia precompile el paquete
 
+
 module quantum
 
 using LinearAlgebra
 
-export projector, basisstate, random_state, random_state_stat, base_state, fromdigits, apply_unitary!, applyswap, applyswappure, apply_ising!, apply_kick!, testbit, sigma_x, sigma_y, sigma_z, sigmas
+export projector, basisstate, random_state, random_state_stat, base_state, fromdigits, apply_unitary!, applyswap, applyswappure, apply_ising!, apply_kick!, testbit, sigma_x, sigma_y, sigma_z, sigmas, merge_two_integers
 
 #Generic Quantum Mechanics
 
-"""
-Projector from either one or two states
-"""
+@doc "Projector from either one or two states"
 function projector(state)
     return state*state'
 end
 
-"""
-Projector from either one or two states
-"""
+@doc "Projector from either one or two states"
 function projector(state1,state2)
     return state1*state2'
 end
 
-"""
-Old one still in use for basis states
-"""
+@doc "Old one still in use for basis states"
 function basisstate(i,n)
     aux=zeros(ComplexF64,n)
     aux[i]=1
     return aux
 end
 
-"""
-Construye los elementos de la base
-"""
+@doc "Construye los elementos de la base"
 function base_state(i,dim)
     psi=zeros(Complex{Float64},dim)
     psi[i+1]=1;
@@ -49,27 +42,20 @@ function random_state(dim::Int=2)
     return vec(v)
 end
 
-"""
-Creates a random state statistically normalized
-"""
+@doc "Creates a random state statistically normalized"
 function random_state_stat(dim::Int=2)
     v=randn(dim,1)+randn(dim,1)im
     v=v/sqrt(2*dim)
     return vec(v)
 end
 
-"""
-From digits like in mathematica
-"""
+@doc "From digits like in mathematica"
 function fromdigits(digits,base)
     sum([digits[k]*base^(k-1) for k=1:length(digits)])
 end
 
 
-"""
-    apply_unitary!(psi, u, target_qubit)
-This function applies efficiently an arbitrary unitary "u" to the target qubit, and modifies the state psi. 
-"""
+@doc "apply_unitary!(psi, u, target_qubit) This function applies efficiently an arbitrary unitary 'u' to the target qubit, and modifies the state psi."
 function apply_unitary!(psi, u, target_qubit)
     number_of_qubits = trailing_zeros(length(psi))
     end_outer_counter = 2^(number_of_qubits-target_qubit-1)-1
@@ -141,17 +127,12 @@ sigma_y=[0. -im; im 0]
 sigma_z=[1. 0.;0. -1.]
 sigmas=Array[sigma_x, sigma_y, sigma_z]
 
-"""
-function testbit(n, bit)
-This function test if a a given bit in position "bit" of number "n" is on. 
-"""
+@doc "function testbit(n, bit) This function test if a a given bit in position  'bit' of number 'n' is on."
 function testbit(n, bit)
     ~(n&(1<<bit)==0)
 end 
 
-"""
-apply_ising!(psi, J, target_qubit_1, target_qubit_2)
-"""
+@doc "apply_ising!(psi, J, target_qubit_1, target_qubit_2)"
 function apply_ising!(psi, J, target_qubit_1, target_qubit_2)
     expJ=exp(-im*J)
     expJc=conj(expJ)
@@ -165,9 +146,8 @@ function apply_ising!(psi, J, target_qubit_1, target_qubit_2)
 end 
 
 
-"""
-apply_kick!(psi, b, target_qubit)
-"""
+
+@doc "apply_kick!(psi, b, target_qubit)"
 function apply_kick!(psi, b, target_qubit)
     phi=norm(b)
     if phi!=0
@@ -179,4 +159,24 @@ function apply_kick!(psi, b, target_qubit)
 end 
 
 
+end
+
+@doc "merge_two_integers, same functioning as usual"
+function merge_two_integers(a::Int, b::Int, mask::Int)::Int
+    result = 0
+    bit_position = 0
+
+    while mask != 0 || a != 0 || b != 0
+        if mask & 1 == 1
+            result |= (a & 1) << bit_position
+            a >>= 1
+        else
+            result |= (b & 1) << bit_position
+            b >>= 1
+        end
+        mask >>= 1
+        bit_position += 1
+    end
+
+    return result
 end
