@@ -5,7 +5,8 @@ module quantum
 
 using LinearAlgebra
 
-export projector, basisstate, random_state, random_state_stat, base_state, fromdigits, apply_unitary!, applyswap, applyswappure, apply_ising!, apply_kick!, testbit, sigma_x, sigma_y, sigma_z, sigmas, merge_two_integers
+export projector, basisstate, random_state, random_state_stat, base_state, fromdigits, apply_unitary!, applyswap, applyswappure, apply_ising!, apply_kick!, testbit
+export sigma_x, sigma_y, sigma_z, sigmas, merge_two_integers, pauli, parity_operator
 
 #Generic Quantum Mechanics
 
@@ -19,15 +20,15 @@ function projector(state1,state2)
     return state1*state2'
 end
 
-@doc "Old one still in use for basis states"
-function basisstate(i,n)
+@doc "Old one still in use for basis states desde el 1"
+function basisstate(i::Int,n::Int)
     aux=zeros(ComplexF64,n)
     aux[i]=1
     return aux
 end
 
-@doc "Construye los elementos de la base"
-function base_state(i,dim)
+@doc "Construye los elementos de la base comenzando desde el 0"
+function base_state(i::Int,dim::Int)
     psi=zeros(Complex{Float64},dim)
     psi[i+1]=1;
     return psi
@@ -36,7 +37,7 @@ end
 """
 Creates a random state
 """
-function random_state(dim::Int=2)
+function random_state(dim::Int=2)::Vector{Complex{<:AbstractFloat}}
     v=randn(dim,1)+randn(dim,1)im
     v=v/norm(v)
     return vec(v)
@@ -125,7 +126,8 @@ end
 sigma_x=[0. 1.; 1. 0.]
 sigma_y=[0. -im; im 0]
 sigma_z=[1. 0.;0. -1.]
-sigmas=Array[sigma_x, sigma_y, sigma_z]
+identity = [1. 0.; 0 1.]
+sigmas = Dict(0 => identity, 1 => sigma_x, 2 => sigma_y, 3 => sigma_z)
 
 @doc "function testbit(n, bit) This function test if a a given bit in position  'bit' of number 'n' is on."
 function testbit(n, bit)
@@ -159,8 +161,6 @@ function apply_kick!(psi, b, target_qubit)
 end 
 
 
-end
-
 @doc "merge_two_integers, same functioning as usual"
 function merge_two_integers(a::Int, b::Int, mask::Int)::Int
     result = 0
@@ -179,4 +179,37 @@ function merge_two_integers(a::Int, b::Int, mask::Int)::Int
     end
 
     return result
+end
+
+@doc "pauli(index, target, particles) quite self-explanatory, index goes form 0 to 3, where 0 is identity"
+function pauli(index, target, particles)
+    list = []
+    for i in 0:particles-1
+        if i == target
+            push!(list, sigmas[index])
+        else
+            push!(list, sigmas[0])
+        end
+    end
+    return kron(list...)
+end
+
+@doc "Parity operator"
+function parity_operator(particles)
+    list = [sigmas[1] for _ in 1:particles]
+    return kron(list...)
+end
+
+function original_integer(list)
+    return parse(Int, join(list); base=2)
+end
+
+function base_2(integer; pad= nothing)
+    if pad == nothing
+        return reverse(digits(integer, base = 2))
+    else
+        return reverse(digits(integer, base = 2, pad = pad))
+    end
+end
+
 end
