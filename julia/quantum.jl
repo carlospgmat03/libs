@@ -212,4 +212,99 @@ function base_2(integer; pad= nothing)
     end
 end
 
+@doc "apply_multiqubit_gate(state::Vector{T}, gate, target) This function applies a multiqubit gate to a given state."
+function apply_multiqubit_gate(state::Vector{T}, gate, target) where T
+    new_state = copy(state)
+    dim_target = size(gate)[1]
+    dim_untouched = length(state)/dim_target|>Int
+    for index_untouched in 0:dim_untouched-1
+        pos = [merge_two_integers(index_target, index_untouched, target)+1 for index_target in 0:dim_target-1]
+        new_state[pos] = gate*new_state[pos]
+    end
+    return new_state
+end
+
+@doc "apply_multiqubit_gate!(state::Vector{T}, gate, target) This function applies a multiqubit gate to a given state and modifies the state in place."
+function apply_multiqubit_gate!(state::Vector{T}, gate, target) where T
+    dim_target = size(gate)[1]
+    dim_untouched = length(state)/dim_target|>Int
+    for index_untouched in 0:dim_untouched-1
+        pos = [merge_two_integers(index_target, index_untouched, target)+1 for index_target in 0:dim_target-1]
+        state[pos] = gate*state[pos]
+    end
+end
+
+@doc "apply_multiqubit_gate(state::Matrix{T}, gate, target) This function applies a multiqubit gate to a given state."
+function apply_multiqubit_gate(state::Matrix{T}, gate, target) where T
+    dim_target = size(gate)[1]
+    dim_untouched = size(state)[1]/dim_target|>Int
+    new_state = copy(state)
+    for (index_untouched1,index_untouched2) in Base.product(0:dim_untouched-1, 0:dim_untouched-1)
+        pos1 = [merge_two_integers(index_target, index_untouched1, target)+1 for index_target in 0:dim_target-1]
+        pos2 = [merge_two_integers(index_target, index_untouched2, target)+1 for index_target in 0:dim_target-1]
+        new_state[pos1, pos2] = gate*new_state[pos1, pos2]*gate'
+    end
+    return new_state
+end
+
+@doc "apply_multiqubit_gate!(state::Matrix{T}, gate, target) This function applies a multiqubit gate to a given state and modifies the state in place."
+function apply_multiqubit_gate!(state::Matrix{T}, gate, target) where T
+    dim_target = size(gate)[1]
+    dim_untouched = size(state)[1]/dim_target|>Int
+    for (index_untouched1,index_untouched2) in Base.product(0:dim_untouched-1, 0:dim_untouched-1)
+        pos1 = [merge_two_integers(index_target, index_untouched1, target)+1 for index_target in 0:dim_target-1]
+        pos2 = [merge_two_integers(index_target, index_untouched2, target)+1 for index_target in 0:dim_target-1]
+        state[pos1, pos2] = gate*state[pos1, pos2]*gate'
+    end
+end
+
+@doc "state_to_dirac(vector::Vector{<:Number}) Converts a vector representing a quantum state into Dirac notation."
+function state_to_dirac(vector::Vector{<:Number})
+    # Get the indices and values of non-zero elements
+    indices = findall(x -> x != 0, vector)
+    if isempty(indices)
+        error("The vector does not represent a valid computational basis state.")
+    end
+
+    # Convert each index to binary representation
+    num_qubits = Int(log2(length(vector)))
+    binary_representations = [reverse(digits(index - 1, base=2, pad=num_qubits)) for index in indices]
+
+    # Construct the ket notation with coefficients
+    terms = [(string(vector[index]) * "|" * join(binary) * "⟩") for (index, binary) in zip(indices, binary_representations)]
+    ket = join(terms, " + ")
+    return ket
+end
+
+@doc "state_to_dirac(matrix::Matrix{<:Number}) Converts a matrix representing a quantum state into Dirac notation."
+function state_to_dirac(matrix::Matrix{<:Number})
+    # Get the size of the matrix
+    dim = size(matrix, 1)
+    if dim != size(matrix, 2)
+        error("The matrix must be square.")
+    end
+
+    # Determine the number of qubits
+    num_qubits = Int(log2(dim))
+    if 2^num_qubits != dim
+        error("The matrix size must be a power of 2.")
+    end
+
+    # Construct the ket-bra representation
+    terms = []
+    for i in 1:dim
+        for j in 1:dim
+            if matrix[i, j] != 0
+                ket = "|" * join(reverse(digits(i - 1, base=2, pad=num_qubits))) * "⟩"
+                bra = "⟨" * join(reverse(digits(j - 1, base=2, pad=num_qubits))) * "|"
+                push!(terms, string(matrix[i, j], ket, bra))
+            end
+        end
+    end
+
+    # Join terms with " + " for the final representation
+    ketbra = join(terms, " + ")
+    return ketbra
+end
+
 end
