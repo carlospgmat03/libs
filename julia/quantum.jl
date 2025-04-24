@@ -6,7 +6,7 @@ module quantum
 using LinearAlgebra
 
 export projector, basisstate, random_state, random_state_stat, base_state, fromdigits, apply_unitary!, applyswap, applyswappure, apply_ising!, apply_kick!, testbit
-export sigma_x, sigma_y, sigma_z, sigmas, merge_two_integers, pauli, parity_operator
+export sigma_x, sigma_y, sigma_z, sigmas, merge_two_integers, pauli, parity_operator, apply_multiqubit_gate, apply_multiqubit_gate!, state_to_dirac
 
 #Generic Quantum Mechanics
 
