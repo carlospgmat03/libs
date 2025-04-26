@@ -6,7 +6,7 @@ module quantum
 using LinearAlgebra
 
 export projector, basisstate, random_state, random_state_stat, base_state, fromdigits, apply_unitary!, applyswap, applyswappure, apply_ising!, apply_kick!, testbit
-export sigma_x, sigma_y, sigma_z, sigmas, merge_two_integers, pauli, parity_operator, apply_multiqubit_gate, apply_multiqubit_gate!, state_to_dirac
+export sigma_x, sigma_y, sigma_z, sigmas, merge_two_integers, pauli, parity_operator, apply_multiqubit_gate, apply_multiqubit_gate!, state_to_dirac, partial_trace
 
 #Generic Quantum Mechanics
 
@@ -306,5 +306,62 @@ function state_to_dirac(matrix::Matrix{<:Number})
     ketbra = join(terms, " + ")
     return ketbra
 end
+
+@doc "partial_trace(state::Matrix{T}, target) This function calculates the partial trace of a quantum state over a specified target qubit."
+function partial_trace(state::Matrix{T}, target) where T
+    # Get the size of the state
+    dim_total = size(state, 1)
+
+    dim_target = 2^sum(quantum.base_2(target))
+
+    # Calculate the dimensions of the reduced state
+    dim_trace = dim_total/dim_target|>Int
+    reduced_state = zeros(T, dim_target, dim_target)
+
+    # Perform the partial trace over the target qubit
+    for (i, j) in Base.product(0:dim_target-1, 0:dim_target-1)
+        for k in 0:dim_trace-1
+            # Calculate the indices for the original state
+            index1 = merge_two_integers(i, k, target) + 1
+            index2 = merge_two_integers(j, k, target) + 1
+            reduced_state[i+1, j+1] += state[index1, index2]
+        end
+    end
+    return reduced_state
+end
+
+@doc "partial_trace(state::Vector{T}, target) This function calculates the partial trace of a quantum state over a specified target qubit."
+function partial_trace(state::Vector{T}, target) where T
+    # Get the size of the state
+    dim_total = length(state)
+
+    # Calculate the dimensions of the reduced state
+    dim_target = 2^sum(quantum.base_2(target))
+    dim_trace = dim_total/dim_target|>Int
+    reduced_state = zeros(T, dim_target, dim_target)
+
+    # Perform the partial trace over the target qubit
+    for (i, j) in Base.product(0:dim_target-1, 0:dim_target-1)
+        for k in 0:dim_trace-1
+            # Calculate the indices for the original state
+            index1 = merge_two_integers(i, k, target) + 1
+            index2 = merge_two_integers(j, k, target) + 1
+            reduced_state[i+1, j+1] += state[index1] * conj(state[index2])
+        end
+    end
+    return reduced_state
+end
+
+@doc "extract_digits(in::Int, target::Int) This function extracts the digits of a number in a given base. Same as implemented by Carlos in Mathematica"
+function extract_digits(in::Int, target::Int)
+    inlist = quantum.base_2(in)
+    targetlist = quantum.base_2(target, pad=length(inlist))
+    println("inlist: ", inlist)
+    println("targetlist: ", targetlist)
+    indices0 = findall(x -> x == 0, targetlist)
+    indices1 = findall(x -> x == 1, targetlist)
+    return (quantum.original_integer(inlist[indices0]),quantum.original_integer(inlist[indices1]))
+end
+
 
 end
