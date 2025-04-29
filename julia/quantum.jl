@@ -252,7 +252,7 @@ function merge_two_integers(a::Int, b::Int, mask::Int)::Int
     return result
 end
 
-@doc "pauli(index, target, particles) quite self-explanatory, index goes form 0 to 3, where 0 is identity"
+@doc "pauli(index, target, particles) quite self-explanatory, index goes form 0 to 3, where 0 is identity. Particles are indexed from left to right starting in zero"
 function pauli(index, target, particles)
     list = []
     for i in 0:particles-1
@@ -263,6 +263,12 @@ function pauli(index, target, particles)
         end
     end
     return kron(list...)
+end
+
+
+@doc "Same as in mathematica, instead of using index, target and particles, this method constructs the matrix from matrix indices"
+function pauli(vector::Vector{Int})
+    return kron([sigmas[x] for x in vector]...)
 end
 
 @doc "Parity operator"
