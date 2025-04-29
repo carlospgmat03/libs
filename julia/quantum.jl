@@ -147,7 +147,7 @@ function apply_swap!(state::Vector{T}, target1::Int, target2::Int) where T
     end
 end
 
-@doc
+@doc "apply_swap(state::Matrix{T}, target1::Int, target2::Int) This function applies a swap operation to a given state."
 function apply_swap(state::Matrix{T}, target1::Int, target2::Int) where T
     new_state = copy(state)  # Shallow copy is sufficient
     particles = log2(size(state, 1)) |> Int
