@@ -4,10 +4,11 @@ __precompile__() # Este comando es para que julia precompile el paquete
 module quantum
 
 using LinearAlgebra
+using SparseArrays
 
 export projector, basisstate, random_state, random_state_stat, base_state, fromdigits, apply_unitary!, applyswap, applyswappure, apply_ising!, apply_kick!, testbit
 export sigma_x, sigma_y, sigma_z, sigmas, merge_two_integers, pauli, parity_operator, apply_multiqubit_gate, apply_multiqubit_gate!, state_to_dirac, partial_trace, base_2, original_integer, extract_digits
-export apply_swap, apply_swap!, Hadamard, local_qubit_unitary_matrix
+export apply_swap, apply_swap!, Hadamard, local_qubit_unitary_matrix, state_from_spins
 
 #Generic Quantum Mechanics
 
@@ -316,6 +317,29 @@ function apply_multiqubit_gate!(state::Vector{T}, gate, target) where T
     end
 end
 
+
+@doc "apply_multiqubit_gate(state::Vector{T}, gate, target) This function applies a multiqubit gate to a given state."
+function apply_multiqubit_gate(state::SparseVector{T}, gate, target) where T
+    new_state = copy(state)
+    dim_target = size(gate)[1]
+    dim_untouched = length(state)/dim_target|>Int
+    for index_untouched in 0:dim_untouched-1
+        pos = [merge_two_integers(index_target, index_untouched, target)+1 for index_target in 0:dim_target-1]
+        new_state[pos] = gate*new_state[pos]
+    end
+    return new_state
+end
+
+@doc "apply_multiqubit_gate!(state::Vector{T}, gate, target) This function applies a multiqubit gate to a given state and modifies the state in place."
+function apply_multiqubit_gate!(state::SparseVector{T}, gate, target) where T
+    dim_target = size(gate)[1]
+    dim_untouched = length(state)/dim_target|>Int
+    for index_untouched in 0:dim_untouched-1
+        pos = [merge_two_integers(index_target, index_untouched, target)+1 for index_target in 0:dim_target-1]
+        state[pos] = gate*state[pos]
+    end
+end
+
 @doc "apply_multiqubit_gate(state::Matrix{T}, gate, target) This function applies a multiqubit gate to a given state."
 function apply_multiqubit_gate(state::Matrix{T}, gate, target) where T
     dim_target = size(gate)[1]
@@ -447,5 +471,11 @@ end
 
 #define hadamard matrix
 Hadamard = 1/sqrt(2) * [1 1; 1 -1]
+
+@doc "base_state(list::Vector{Int}) This function creates a base state from a list of spins, eg [1,0,1,0]."
+function state_from_spins(list::Vector{Int})
+    qubits = length(list)|> Int
+    return base_state(original_integer(list),2^qubits)
+end
 
 end
