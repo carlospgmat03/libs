@@ -7,6 +7,7 @@ using LinearAlgebra
 
 export projector, basisstate, random_state, random_state_stat, base_state, fromdigits, apply_unitary!, applyswap, applyswappure, apply_ising!, apply_kick!, testbit
 export sigma_x, sigma_y, sigma_z, sigmas, merge_two_integers, pauli, parity_operator, apply_multiqubit_gate, apply_multiqubit_gate!, state_to_dirac, partial_trace, base_2, original_integer, extract_digits
+export apply_swap, apply_swap!, Hadamard
 
 #Generic Quantum Mechanics
 
@@ -433,5 +434,7 @@ function extract_digits(in::Int, target::Int)
     return (original_integer(inlist[indices0]),quantum.original_integer(inlist[indices1]))
 end
 
+#define hadamard matrix
+Hadamard = 1/sqrt(2) * [1 1; 1 -1]
 
 end
