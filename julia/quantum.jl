@@ -252,10 +252,10 @@ function merge_two_integers(a::Int, b::Int, mask::Int)::Int
     return result
 end
 
-@doc "pauli(index, target, particles) quite self-explanatory, index goes form 0 to 3, where 0 is identity. Particles are indexed from left to right starting in zero"
+@doc "pauli(index, target, particles) quite self-explanatory, index goes form 0 to 3, where 0 is identity. Particles are indexed from left to right starting in one."
 function pauli(index, target, particles)
     list = []
-    for i in 0:particles-1
+    for i in 1:particles
         if i == target
             push!(list, sigmas[index])
         else
@@ -266,10 +266,15 @@ function pauli(index, target, particles)
 end
 
 
-@doc "Same as in mathematica, instead of using index, target and particles, this method constructs the matrix from matrix indices"
+@doc "pauli([vector]) Same as in mathematica, instead of using index, target and particles, this method constructs the matrix from matrix indices."
 function pauli(vector::Vector{Int})
     return kron([sigmas[x] for x in vector]...)
 end
+
+@doc "local_qubit_unitary_matrix(matrix::Matrix{T}, place::Int, particles::Int) This function creates a local qubit unitary matrix. Particles are indexed from left to right starting in one."
+function local_qubit_unitary_matrix(matrix::Matrix{T}, place::Int, particles::Int) where T
+    return kron([i == place ? matrix : I(2) for i in 1:particles]...)
+ end
 
 @doc "Parity operator"
 function parity_operator(particles)
