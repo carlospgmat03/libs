@@ -73,6 +73,7 @@ end
 #Apply permutations
 
 #Swaps
+@doc "Old swap function, use apply_swap instead"
 function applyswap(state::Array{Complex{Float64},2},target1::Int64,target2::Int64)::Array{Complex{Float64},2}
     len=size(state)[1]
     aux=zeros(ComplexF64,len,len)
@@ -92,6 +93,7 @@ function applyswap(state::Array{Complex{Float64},2},target1::Int64,target2::Int6
     aux
 end
 
+@doc "Old swap function, use apply_swap instead"
 function applyswap(state::Array{Complex{Float64},1},target1::Int64,target2::Int64)::Array{Complex{Float64},2}
     len=length(state)
     aux=zeros(ComplexF64,len)
@@ -105,7 +107,7 @@ function applyswap(state::Array{Complex{Float64},1},target1::Int64,target2::Int6
     projector(aux)
 end
 
-
+@doc "Old swap function, use apply_swap instead"
 function applyswappure(state::Array{Complex{Float64},1},target1::Int64,target2::Int64)::Array{Complex{Float64},1}
     len=length(state)
     aux=zeros(ComplexF64,len)
@@ -117,6 +119,74 @@ function applyswappure(state::Array{Complex{Float64},1},target1::Int64,target2::
         aux[i]=state[fromdigits(digits1p,2)+1]
         end
     aux
+end
+
+@doc "apply_swap(state::Vector{T}, target1::Int, target2::Int) This function applies a swap operation to a given state."
+function apply_swap(state::Vector{T}, target1::Int, target2::Int) where T
+    new_state = copy(state)
+    particles = log2(length(state))|>Int
+    for i in 0:length(state)-1
+        digits1=base_2(i, pad=particles)
+        digits1p=copy(digits1)
+        digits1p[target1]=digits1[target2]
+        digits1p[target2]=digits1[target1]
+        new_state[i+1] = state[original_integer(digits1p)+1]
+    end
+    return new_state
+end
+
+@doc "apply_swap!(state::Vector{T}, target1::Int, target2::Int) This function applies a swap operation to a given state and modifies the state in place."
+function apply_swap!(state::Vector{T}, target1::Int, target2::Int) where T
+    particles = log2(length(state))|>Int
+    for i in 0:length(state)-1
+        digits1=base_2(i, pad=particles)
+        digits1p=copy(digits1)
+        digits1p[target1]=digits1[target2]
+        digits1p[target2]=digits1[target1]
+        state[i+1] = state[original_integer(digits1p)+1]
+    end
+end
+
+@doc
+function apply_swap(state::Matrix{T}, target1::Int, target2::Int) where T
+    new_state = copy(state)  # Shallow copy is sufficient
+    particles = log2(size(state, 1)) |> Int
+    for (i, j) in Base.Iterators.product(0:size(state, 1)-1, 0:size(state, 2)-1)
+        digits1 = base_2(i, pad=particles)
+        digits2 = base_2(j, pad=particles)
+        
+        # Swap target1 and target2 in the binary representation
+        digits1p = copy(digits1)
+        digits2p = copy(digits2)
+        digits1p[target1] = digits1[target2]
+        digits1p[target2] = digits1[target1]
+        digits2p[target1] = digits2[target2]
+        digits2p[target2] = digits2[target1]
+        
+        # Update the new_state matrix
+        new_state[i+1, j+1] = state[original_integer(digits1p)+1, original_integer(digits2p)+1]
+    end
+    return new_state
+end
+
+@doc "apply_swap!(state::Matrix{T}, target1::Int, target2::Int) This function applies a swap operation to a given state and modifies the state in place."
+function apply_swap!(state::Matrix{T}, target1::Int, target2::Int) where T
+    particles = log2(size(state, 1)) |> Int
+    for (i, j) in Base.Iterators.product(0:size(state, 1)-1, 0:size(state, 2)-1)
+        digits1 = base_2(i, pad=particles)
+        digits2 = base_2(j, pad=particles)
+        
+        # Swap target1 and target2 in the binary representation
+        digits1p = copy(digits1)
+        digits2p = copy(digits2)
+        digits1p[target1] = digits1[target2]
+        digits1p[target2] = digits1[target1]
+        digits2p[target1] = digits2[target2]
+        digits2p[target2] = digits2[target1]
+        
+        # Update the new_state matrix
+        state[i+1, j+1] = state[original_integer(digits1p)+1, original_integer(digits2p)+1]
+    end
 end
 
 #Everypermutation under construction
