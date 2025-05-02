@@ -4,9 +4,11 @@ __precompile__() # Este comando es para que julia precompile el paquete
 module quantum
 
 using LinearAlgebra
+using SparseArrays
 
 export projector, basisstate, random_state, random_state_stat, base_state, fromdigits, apply_unitary!, applyswap, applyswappure, apply_ising!, apply_kick!, testbit
-export sigma_x, sigma_y, sigma_z, sigmas, merge_two_integers, pauli, parity_operator, apply_multiqubit_gate, apply_multiqubit_gate!, state_to_dirac
+export sigma_x, sigma_y, sigma_z, sigmas, merge_two_integers, pauli, parity_operator, apply_multiqubit_gate, apply_multiqubit_gate!, state_to_dirac, partial_trace, base_2, original_integer, extract_digits
+export apply_swap, apply_swap!, Hadamard, local_qubit_unitary_matrix, state_from_spins
 
 #Generic Quantum Mechanics
 
@@ -73,6 +75,7 @@ end
 #Apply permutations
 
 #Swaps
+@doc "Old swap function, use apply_swap instead"
 function applyswap(state::Array{Complex{Float64},2},target1::Int64,target2::Int64)::Array{Complex{Float64},2}
     len=size(state)[1]
     aux=zeros(ComplexF64,len,len)
@@ -92,6 +95,7 @@ function applyswap(state::Array{Complex{Float64},2},target1::Int64,target2::Int6
     aux
 end
 
+@doc "Old swap function, use apply_swap instead"
 function applyswap(state::Array{Complex{Float64},1},target1::Int64,target2::Int64)::Array{Complex{Float64},2}
     len=length(state)
     aux=zeros(ComplexF64,len)
@@ -105,7 +109,7 @@ function applyswap(state::Array{Complex{Float64},1},target1::Int64,target2::Int6
     projector(aux)
 end
 
-
+@doc "Old swap function, use apply_swap instead"
 function applyswappure(state::Array{Complex{Float64},1},target1::Int64,target2::Int64)::Array{Complex{Float64},1}
     len=length(state)
     aux=zeros(ComplexF64,len)
@@ -117,6 +121,74 @@ function applyswappure(state::Array{Complex{Float64},1},target1::Int64,target2::
         aux[i]=state[fromdigits(digits1p,2)+1]
         end
     aux
+end
+
+@doc "apply_swap(state::Vector{T}, target1::Int, target2::Int) This function applies a swap operation to a given state."
+function apply_swap(state::Vector{T}, target1::Int, target2::Int) where T
+    new_state = copy(state)
+    particles = log2(length(state))|>Int
+    for i in 0:length(state)-1
+        digits1=base_2(i, pad=particles)
+        digits1p=copy(digits1)
+        digits1p[target1]=digits1[target2]
+        digits1p[target2]=digits1[target1]
+        new_state[i+1] = state[original_integer(digits1p)+1]
+    end
+    return new_state
+end
+
+@doc "apply_swap!(state::Vector{T}, target1::Int, target2::Int) This function applies a swap operation to a given state and modifies the state in place."
+function apply_swap!(state::Vector{T}, target1::Int, target2::Int) where T
+    particles = log2(length(state))|>Int
+    for i in 0:length(state)-1
+        digits1=base_2(i, pad=particles)
+        digits1p=copy(digits1)
+        digits1p[target1]=digits1[target2]
+        digits1p[target2]=digits1[target1]
+        state[i+1] = state[original_integer(digits1p)+1]
+    end
+end
+
+@doc "apply_swap(state::Matrix{T}, target1::Int, target2::Int) This function applies a swap operation to a given state."
+function apply_swap(state::Matrix{T}, target1::Int, target2::Int) where T
+    new_state = copy(state)  # Shallow copy is sufficient
+    particles = log2(size(state, 1)) |> Int
+    for (i, j) in Base.Iterators.product(0:size(state, 1)-1, 0:size(state, 2)-1)
+        digits1 = base_2(i, pad=particles)
+        digits2 = base_2(j, pad=particles)
+        
+        # Swap target1 and target2 in the binary representation
+        digits1p = copy(digits1)
+        digits2p = copy(digits2)
+        digits1p[target1] = digits1[target2]
+        digits1p[target2] = digits1[target1]
+        digits2p[target1] = digits2[target2]
+        digits2p[target2] = digits2[target1]
+        
+        # Update the new_state matrix
+        new_state[i+1, j+1] = state[original_integer(digits1p)+1, original_integer(digits2p)+1]
+    end
+    return new_state
+end
+
+@doc "apply_swap!(state::Matrix{T}, target1::Int, target2::Int) This function applies a swap operation to a given state and modifies the state in place."
+function apply_swap!(state::Matrix{T}, target1::Int, target2::Int) where T
+    particles = log2(size(state, 1)) |> Int
+    for (i, j) in Base.Iterators.product(0:size(state, 1)-1, 0:size(state, 2)-1)
+        digits1 = base_2(i, pad=particles)
+        digits2 = base_2(j, pad=particles)
+        
+        # Swap target1 and target2 in the binary representation
+        digits1p = copy(digits1)
+        digits2p = copy(digits2)
+        digits1p[target1] = digits1[target2]
+        digits1p[target2] = digits1[target1]
+        digits2p[target1] = digits2[target2]
+        digits2p[target2] = digits2[target1]
+        
+        # Update the new_state matrix
+        state[i+1, j+1] = state[original_integer(digits1p)+1, original_integer(digits2p)+1]
+    end
 end
 
 #Everypermutation under construction
@@ -181,10 +253,10 @@ function merge_two_integers(a::Int, b::Int, mask::Int)::Int
     return result
 end
 
-@doc "pauli(index, target, particles) quite self-explanatory, index goes form 0 to 3, where 0 is identity"
+@doc "pauli(index, target, particles) quite self-explanatory, index goes form 0 to 3, where 0 is identity. Particles are indexed from left to right starting in one."
 function pauli(index, target, particles)
     list = []
-    for i in 0:particles-1
+    for i in 1:particles
         if i == target
             push!(list, sigmas[index])
         else
@@ -193,6 +265,17 @@ function pauli(index, target, particles)
     end
     return kron(list...)
 end
+
+
+@doc "pauli([vector]) Same as in mathematica, instead of using index, target and particles, this method constructs the matrix from matrix indices."
+function pauli(vector::Vector{Int})
+    return kron([sigmas[x] for x in vector]...)
+end
+
+@doc "local_qubit_unitary_matrix(matrix::Matrix{T}, place::Int, particles::Int) This function creates a local qubit unitary matrix. Particles are indexed from left to right starting in one."
+function local_qubit_unitary_matrix(matrix::Matrix{T}, place::Int, particles::Int) where T
+    return kron([i == place ? matrix : I(2) for i in 1:particles]...)
+ end
 
 @doc "Parity operator"
 function parity_operator(particles)
@@ -226,6 +309,29 @@ end
 
 @doc "apply_multiqubit_gate!(state::Vector{T}, gate, target) This function applies a multiqubit gate to a given state and modifies the state in place."
 function apply_multiqubit_gate!(state::Vector{T}, gate, target) where T
+    dim_target = size(gate)[1]
+    dim_untouched = length(state)/dim_target|>Int
+    for index_untouched in 0:dim_untouched-1
+        pos = [merge_two_integers(index_target, index_untouched, target)+1 for index_target in 0:dim_target-1]
+        state[pos] = gate*state[pos]
+    end
+end
+
+
+@doc "apply_multiqubit_gate(state::Vector{T}, gate, target) This function applies a multiqubit gate to a given state."
+function apply_multiqubit_gate(state::SparseVector{T}, gate, target) where T
+    new_state = copy(state)
+    dim_target = size(gate)[1]
+    dim_untouched = length(state)/dim_target|>Int
+    for index_untouched in 0:dim_untouched-1
+        pos = [merge_two_integers(index_target, index_untouched, target)+1 for index_target in 0:dim_target-1]
+        new_state[pos] = gate*new_state[pos]
+    end
+    return new_state
+end
+
+@doc "apply_multiqubit_gate!(state::Vector{T}, gate, target) This function applies a multiqubit gate to a given state and modifies the state in place."
+function apply_multiqubit_gate!(state::SparseVector{T}, gate, target) where T
     dim_target = size(gate)[1]
     dim_untouched = length(state)/dim_target|>Int
     for index_untouched in 0:dim_untouched-1
@@ -305,6 +411,71 @@ function state_to_dirac(matrix::Matrix{<:Number})
     # Join terms with " + " for the final representation
     ketbra = join(terms, " + ")
     return ketbra
+end
+
+@doc "partial_trace(state::Matrix{T}, target) This function calculates the partial trace of a quantum state over a specified target qubit."
+function partial_trace(state::Matrix{T}, target) where T
+    # Get the size of the state
+    dim_total = size(state, 1)
+
+    dim_target = 2^sum(base_2(target))
+
+    # Calculate the dimensions of the reduced state
+    dim_trace = dim_total/dim_target|>Int
+    reduced_state = zeros(T, dim_target, dim_target)
+
+    # Perform the partial trace over the target qubit
+    for (i, j) in Base.product(0:dim_target-1, 0:dim_target-1)
+        for k in 0:dim_trace-1
+            # Calculate the indices for the original state
+            index1 = merge_two_integers(i, k, target) + 1
+            index2 = merge_two_integers(j, k, target) + 1
+            reduced_state[i+1, j+1] += state[index1, index2]
+        end
+    end
+    return reduced_state
+end
+
+@doc "partial_trace(state::Vector{T}, target) This function calculates the partial trace of a quantum state over a specified target qubit."
+function partial_trace(state::Vector{T}, target) where T
+    # Get the size of the state
+    dim_total = length(state)
+
+    # Calculate the dimensions of the reduced state
+    dim_target = 2^sum(base_2(target))
+    dim_trace = dim_total/dim_target|>Int
+    reduced_state = zeros(T, dim_target, dim_target)
+
+    # Perform the partial trace over the target qubit
+    for (i, j) in Base.product(0:dim_target-1, 0:dim_target-1)
+        for k in 0:dim_trace-1
+            # Calculate the indices for the original state
+            index1 = merge_two_integers(i, k, target) + 1
+            index2 = merge_two_integers(j, k, target) + 1
+            reduced_state[i+1, j+1] += state[index1] * conj(state[index2])
+        end
+    end
+    return reduced_state
+end
+
+@doc "extract_digits(in::Int, target::Int) This function extracts the digits of a number in a given base. Same as implemented by Carlos in Mathematica"
+function extract_digits(in::Int, target::Int)
+    inlist = base_2(in)
+    targetlist = base_2(target, pad=length(inlist))
+    println("inlist: ", inlist)
+    println("targetlist: ", targetlist)
+    indices0 = findall(x -> x == 0, targetlist)
+    indices1 = findall(x -> x == 1, targetlist)
+    return (original_integer(inlist[indices0]),quantum.original_integer(inlist[indices1]))
+end
+
+#define hadamard matrix
+Hadamard = 1/sqrt(2) * [1 1; 1 -1]
+
+@doc "base_state(list::Vector{Int}) This function creates a base state from a list of spins, eg [1,0,1,0]."
+function state_from_spins(list::Vector{Int})
+    qubits = length(list)|> Int
+    return base_state(original_integer(list),2^qubits)
 end
 
 end
