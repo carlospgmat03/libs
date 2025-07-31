@@ -19,3 +19,20 @@ SpinChain.m - Spin chain files
 TheoreticalRMT.m - Files to plot RMT results in mathematica
 test.nb - File that allows testing of the mathematica libraries. 
 
+
+## Installation on Linux-based Systems
+
+1. Clone or download the [`libs`](https://github.com/carlospgmat03/libs) repository into your home folder:
+
+    ```bash
+    git clone https://github.com/carlospgmat03/libs ~/libs
+    ```
+    or if you prefer, download the specific [v3.1.0](https://github.com/carlospgmat03/libs/releases/tag/v3.1.0) version.
+
+2. Add the following line to your `~/.Wolfram/Kernel/init.m` file:
+
+    ```mathematica
+    AppendTo[$Path, FileNameJoin[{"/home/" <> ToString[$Username], "libs"}]];
+    ```
+
+> **Note**: If `init.m` does not exist, create the file and the necessary directory path.
