@@ -2,22 +2,36 @@
 
 (* {{{ *) BeginPackage["SpinChain`",{"Carlos`", "Quantum`"}]
 (* {{{ Primitives *)
-ApplyMagnetickKick::usage = "ApplyMagnetickKick[state_, b_, Target_] or ApplyMagnetickKick[state_, b_]"
-ApplyIsing::usage = "ApplyIsing[state_, J_, Position1_, Position2_]"
+ApplyMagnetickKick::usage = 
+  "ApplyMagnetickKick[state_, b_, target_] applies a magnetic kick with field strength b to the specified target qubit in the quantum state. \
+ApplyMagnetickKick[state_, b_] applies the kick to all qubits in the state.";
+
+ApplyIsing::usage = 
+  "ApplyIsing[state_, J_, i_, j_] applies an Ising interaction of strength J between qubits i and j in the quantum state.";
 (* }}} *)
 (* {{{ Full topologies*)
-ApplyIsingTorus::usage="Se hace la topologia de un toro. Solo la parte de Ising"
-ApplyIsingChain::usage="Se hace la topologia de una cadena. Solo la parte de Ising"
-ApplyChain::usage="Se hace la topologia de una cadena."
-ApplyInverseChain::usage="Se hace la topologia de una cadena pero hacia atras en el tiempo."
-ApplyCommonEnvironment::usage="Se refiere a la topologia (a) del PRL de n-body Bell en PRA."
+
+ApplyIsingChain::usage = 
+  "ApplyIsingChain[state_, J_] applies Ising interactions of strength J along a periodic chain topology to the quantum state.";
+ApplyChain::usage = 
+  "ApplyChain[state_, J_, b_] applies a magnetic kick with field strength b to all qubits and then de Ising interaction in a chain topology.";
+ApplyInverseChain::usage=
+  "ApplyInverseChain[state_, J_, b_] applies the inverse operator as ApplyChain[state_, J_, b_]. ";
+ApplyIsingTorus::usage=
+  "ApplyIsingTorus[state_, J_] applies Ising interactions of strength J along a periodic torus topology to the quantum state.";
+ApplyChainStar::usage="ApplyChainStar[state_, Jenv_,Jint_, b_] Se hace la topologia de la estrella con el magnetic kick. There is a Jenv of the chain, that acts like and environment for a single qubit that is interacting maybe with all others via Jint and returns the new quantum state."
+ApplyIsingStar::usage = 
+  "ApplyIsingStar[state_?VectorQ, Jenv_, Jint_] applies Ising interactions of strength J in a star topology and returns the new quantum state.";
+ApplyCommonEnvironment::usage = 
+  "ApplyCommonEnvironment[state_, b_, Jenv_, Jcoupling_] applies a magnetic kick with field strength b to the quantum state, then applies Ising interactions with environment coupling Jenv and edge coupling Jcoupling, returning the new quantum state. Se refiere a la topologia (a) del PRL de n-body Bell en PRA.";
 ApplyDephasingChain::usage="ApplyDephasingChain[psi0_, Delta_, Jenv_, benv_, Jinteraction_] Se hace la topologia de una cadena que solo hace dephasing"
-ApplyChainStar::usage="ApplyChainStar[state_, Jenv_,Jint_, b_] Se hace la topologia de la estrella con el magnetic kick"
-ApplyIsingStar::usage="Se hace la topologia de una estrella, solo la parte de Ising"
-ApplyIsingStarEnvironment::usage="Se hace la topologia de una estrella, solo la parte de Ising, en el environment"
-ApplyMagnetickKickStarEnvironment::usage="Se hace el kick pero solo en los qubits que son del environment"
+ApplyIsingStarEnvironment::usage = 
+  "ApplyIsingStarEnvironment[state_, Jenv_] applies Ising interactions of strength Jenv in the environment, which is the chain part of the topology  and returns the new quantum state.";
+ApplyMagnetickKickStarEnvironment::usage="The kick part in all but the first qubit. Think of all but the first as an enviroment tipically."
 ApplyIsingStarInteractionQubitEnvironment::usage="Se hace el kick pero solo la interaccion con el  environment"
 ApplyInomogeneousChain::usage="ApplyInomogeneousChain[state_?VectorQ, J_, J10_, b_] Se hace la cadena inhomogenea donde J10 indica la interaccion ising entre el primero y segundo qubit"
+ApplyIsingAllVsAll::usage = 
+  "ApplyIsingAllVsAll[state_, J_] applies Ising interactions of strength J between all pairs of qubits and returns the new quantum state.";
 (* }}} *)
 (* {{{ Explicit Matrices *)
 IsingMatrix::usage="Get the matrix for the Ising Interaction Sigma_i Sigma_j, or for sum Sigma_i Sigma_j. In the first case, call as IsingMatrix[{IsingPosition1_Integer, IsingPosition2_Integer}, Qubits_Integer], and in the second,  IsingMatrix[IsingPositions_List, Qubits_Integer]"
@@ -27,7 +41,6 @@ MatrixPauliMagneticField::usage="Matrix corresponding to the hamiltonian b.sum s
 HamiltonianMagenitcChain::usage="Matrix Corresponding to the continuous Periodic ising spin chain with magnetic field"
 HamiltonianMagenitcGrid::usage="Matrix Corresponding to the continuous toric ising grid chain with magnetic field"
 ApplyMagnetickKickInhom::usage="ApplyMagnetickKickInhom[state_, b_, binhom_], Se aplica el magnetick kick donde binhom es el campo del spin 0"
-ApplyIsingAllVsAll::usage"ApplyIsingAllVsAll[state_,J_]"
 (* }}} *)
 (* }}} *)
 Begin["Private`"] 
