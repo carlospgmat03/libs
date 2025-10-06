@@ -73,9 +73,6 @@ tensorProduct::usage = "Creates the tensor product for qubits, like TensorProduc
 tensorPower::usage = "Creates the tensor product of n matrices" (*JA: est\[AAcute] extra\[NTilde]a esta definici\[OAcute]n*)
 OrthonormalBasisContaningVector::usage=" OrthonormalBasisContaningVector[psi_?VectorQ] will create an orthonorlam basis that contains the given vector"
 GetMatrixForm[Gate_, Qubits_] := Gate /@ IdentityMatrix[Power[2, Qubits]]
-ArbitraryPartialTrace::usage="Yields the partial trace of a Matrix. The first entry is the dimension of the Hilbert Space that you want
-to remove or trace out. The second is the dimension of the Hilbert space that you want to keep. The third is the Matrix on which this 
-operation will be applied."
 (* }}} *)
 (* {{{ Quantum information routines *)
 ApplyControlGate::usage = "ApplyControlGate[U_, State_, TargetQubit_, ControlQubit_]"
@@ -259,7 +256,7 @@ Triangular[n_] := n (n + 1)/2
 (* }}} *)
 (* {{{ *) Commutator[A_?MatrixQ, B_?MatrixQ] := A . B - B . A
 (* }}} *)
-(* {{{ *) PartialTrace[Rho_?MatrixQ, DigitsToLeave_] := Module[{ab1, ab2, na, nb},
+(* {{{ *) PartialTrace[Rho_?MatrixQ, DigitsToLeave_?List] := Module[{ab1, ab2, na, nb},
 	nb = Power[2, BitsOn[DigitsToLeave]];
 	na = Length[Rho]/nb;
 	Table[
