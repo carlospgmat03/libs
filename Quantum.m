@@ -256,7 +256,7 @@ Triangular[n_] := n (n + 1)/2
 (* }}} *)
 (* {{{ *) Commutator[A_?MatrixQ, B_?MatrixQ] := A . B - B . A
 (* }}} *)
-(* {{{ *) PartialTrace[Rho_?MatrixQ, DigitsToLeave_?List] := Module[{ab1, ab2, na, nb},
+(* {{{ *) PartialTrace[Rho_?MatrixQ, DigitsToLeave_] := Module[{ab1, ab2, na, nb},
 	nb = Power[2, BitsOn[DigitsToLeave]];
 	na = Length[Rho]/nb;
 	Table[
