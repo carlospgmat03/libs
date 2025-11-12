@@ -80,7 +80,7 @@ ApplyGate::usage = "ApplyGate[U_, State_, TargetQubit_]"
 ApplyOperator::usage = "ApplyOperator[op,rho] applies the operator op to the density matrix rho."
 ApplyChannel::usage = "Apply Quantum Channel to an operator"
 ControlNotMatrix::usage = "Get the control not matrix ControlNotMatrix[QubitControl_Integer, QubitTarget_Integer, NumberOfQubits_Integer]"
-SWAPMatrix::usage = "SWAPMatrix[n,{j,k}] yields the matrix that swaps the jth and kth qubits in a system of n qubits"
+SWAPMatrix::usage = "DEPRECATED (used in ineficient functions) SWAPMatrix[n,{j,k}] yields the matrix that swaps the jth and kth qubits in a system of n qubits"
 QuantumDotProduct::usage = "Dot Product in which the first thing is congutate. Yields the true Psi1 dot Psi2" 
 ToSuperOperatorSpaceComputationalBasis::usage = "ToSuperOperatorSpaceComputationalBasis[rho_] converts a density matrix rho to superoperator space, where it is a vector, and the basis in the superoperator space is the computational basis, which is the same (or at least similar) to the Choi basis"
 FromSuperOperatorSpaceComputationalBasis::usage = "FromSuperOperatorSpaceComputationalBasis[rho_?VectorQ] converts a density matrix rho from superoperator space, where it is a vector, and the basis in the superoperator space is the computational basis, which is the same (or at least similar) to the Choi basis to the normal space, where it is a matrix"
@@ -134,8 +134,7 @@ Wstate::usage="Wstate[n_] Creates a W state, (|10...0>+|010...0>+...+|0...01>)/s
 RandomMixedState::usage="RandomMixedState[n_,combinations_], Constructs a Random mixed state of diemnsion n with random uniform combinations of pure states wti Haar measure."
 GellMann::usage = "GellMann[n_] Generalized Gell-Mann matrices from https://blog.suchideas.com/2016/04/sun-gell-mann-matrices-in-mathematica/ For example
 for n=2 it gives Pauli matrices, don't forget to add identity by yourself in need a complete basis."
-ApplySwap::usage= "ApplySwap[State,{j,k}] applies swap map betwen the jth and kth qubits, the input can be either a state vector or a density matrix."
-ApplySwapPure::usage = "Leaves the state in ket form if pure"
+ApplySwap::usage= "ApplySwap[State,{j,k}] or simply ApplySwap[State,j,k]  applies swap map betwen the jth and kth qubits, the input can be either a state vector or a density matrix."
 ApplyLocalNoiseChain::usage = "ApplyLocalNoiseChain[State,p] Applies the map that transforoms the density matrix State into the assessible density matrix when local noise is present using fuzzy measurements."
 ApplyNoiseChain::usage = "ApplyNoiseChain[State,p] Applies the map that transforoms the density matrix State into the assessible density matrix when non-local noise is present using fuzzy measurements."
 PermutationMatrices::usage = "Argument is the number of particles to permute, output is a list of matrices."
@@ -708,12 +707,7 @@ GellMann[n_] :=
 
 
 
-ApplySwap[rho_?VectorQ,j_Integer,k_Integer]:=With[{n = Log2[Length[rho]]},ApplyOperator[SWAPMatrix[n,{j,k}],rho] ]
-
-ApplySwap[rho_?SquareMatrixQ,j_Integer,k_Integer]:=With[{n = Log2[Dimensions[rho][[1]]]},ApplyOperator[SWAPMatrix[n,{j,k}],rho] ]
-
-
-ApplySwapPure[State_?VectorQ,Target1_,Target2_]:=Module[{Aux,digits,len,digits1,digits2},
+ApplySwap[State_?VectorQ,Target1_,Target2_]:=Module[{Aux,digits,len,digits1,digits2},
 len=Length[State];
 Aux=ConstantArray[0,len];
 Table[digits=IntegerDigits[i-1,2,IntegerPart[Log2[len]]];
@@ -722,6 +716,23 @@ digits1[[{Target1,Target2}]]=digits[[{Target2,Target1}]];
 Aux[[i]]=State[[FromDigits[digits1,2]+1]];,{i,1,Length[State]}];
 Aux
 ];
+ApplySwap[State_?MatrixQ,Target1_,Target2_]:=Module[{Aux,digits,dim,digits1,digits2,digits1p,digits2p},
+dim=Dimensions[State];
+Aux=ConstantArray[0,dim];
+Table[
+digits1=IntegerDigits[i-1,2,IntegerPart[Log2[dim[[1]]]]];
+digits2=IntegerDigits[j-1,2,IntegerPart[Log2[dim[[1]]]]];
+digits1p=digits1;
+digits2p=digits2;
+digits1p[[{Target1,Target2}]]=digits1[[{Target2,Target1}]];
+digits2p[[{Target1,Target2}]]=digits2[[{Target2,Target1}]];
+Aux[[i,j]]=State[[FromDigits[digits1p,2]+1,FromDigits[digits2p,2]+1]];,{i,1,dim[[1]]},{j,1,dim[[1]]}];
+Aux
+];
+
+ApplySwap[State_,{Target1_,Target2_}]:=ApplySwap[State,Target1,Target2]
+
+
 ApplyPermutation[state_,permmatrix_]:=Module[{State,Aux,digitsinit,digitsfinal,len},
 len=Length[state];
 Aux=ConstantArray[0,len];
