@@ -57,30 +57,45 @@ BlochSphereToState::usage = "BlochSphereToState[{x, y, z}] converts a Bloch sphe
 in Cartesian coordinates to a qubit pure state. BlochSphereToState[{theta, phi}] uses \
 spherical angles directly."
 
+OrthonormalBasisContaningVector::usage = "OrthonormalBasisContaningVector[psi] returns an \
+orthonormal basis for the Hilbert space such that the first vector is psi (up to a global \
+phase chosen to make the first component real and positive)."
+
 Begin["`Private`"]
 
-RandomGaussianComplex[] :=
+(* {{{ Random complex and real scalars *)
+
+(* {{{ *) RandomGaussianComplex[] :=
   RandomReal[NormalDistribution[]] + I RandomReal[NormalDistribution[]]
 
 RandomGaussianComplex[mu_, sigma_] :=
   mu + sigma RandomGaussianComplex[]
+(* }}} *)
 
-RandomGaussian[] := RandomReal[NormalDistribution[]]
+(* {{{ *) RandomGaussian[] := RandomReal[NormalDistribution[]]
+(* }}} *)
 
-RandomState[dim_Integer] :=
+(* }}} *)
+
+(* {{{ Random states and matrices *)
+
+(* {{{ *) RandomState[dim_Integer] :=
   Normalize[Table[RandomGaussianComplex[], {dim}]]
+(* }}} *)
 
-TwoRandomOrhtogonalStates[dim_Integer] :=
+(* {{{ *) TwoRandomOrhtogonalStates[dim_Integer] :=
   Module[{psi1, psi2},
     psi1 = RandomState[dim];
     psi2 = RandomState[dim];
     psi2 = psi2 - (Conjugate[psi1] . psi2) psi1;
     {psi1, Normalize[psi2]}]
+(* }}} *)
 
-Proyector[psi_?VectorQ, phi_?VectorQ] := Outer[Times, psi, Conjugate[phi]]
+(* {{{ *) Proyector[psi_?VectorQ, phi_?VectorQ] := Outer[Times, psi, Conjugate[phi]]
 Proyector[psi_?VectorQ] := Outer[Times, psi, Conjugate[psi]]
+(* }}} *)
 
-Options[GUEMember] = {Normalization -> "Default"};
+(* {{{ *) Options[GUEMember] = {Normalization -> "Default"};
 GUEMember[n_Integer, opts : OptionsPattern[]] :=
   Module[{m, scale},
     m     = Table[RandomGaussianComplex[], {n}, {n}];
@@ -89,8 +104,9 @@ GUEMember[n_Integer, opts : OptionsPattern[]] :=
       "SizeIndependent", 1/2,
       "Kohler",          (n/2) / Pi^2];
     scale (m + ConjugateTranspose[m])]
+(* }}} *)
 
-Options[GOEMember] = {Normalization -> "Default"};
+(* {{{ *) Options[GOEMember] = {Normalization -> "Default"};
 GOEMember[n_Integer, opts : OptionsPattern[]] :=
   Module[{m, scale},
     m     = Table[RandomGaussian[], {n}, {n}];
@@ -100,15 +116,18 @@ GOEMember[n_Integer, opts : OptionsPattern[]] :=
       "SizeIndependent", 1/2,
       "Kohler",          (n/2) / Pi^2];
     scale (m + Transpose[m])]
+(* }}} *)
 
-CUEMember[n_Integer] := RandomVariate[CircularUnitaryMatrixDistribution[n]]
+(* {{{ *) CUEMember[n_Integer] := RandomVariate[CircularUnitaryMatrixDistribution[n]]
+(* }}} *)
 
-PUEMember[n_Integer] :=
+(* {{{ *) PUEMember[n_Integer] :=
   Module[{u},
     u = CUEMember[n];
     Chop[u . DiagonalMatrix[RandomReal[{-1/2, 1/2}, n]] . ConjugateTranspose[u]]]
+(* }}} *)
 
-Options[RandomHermitianMatrix] = {Normalization -> "Default"};
+(* {{{ *) Options[RandomHermitianMatrix] = {Normalization -> "Default"};
 RandomHermitianMatrix[qubits_Integer, opts : OptionsPattern[]] :=
   Module[{n, m, scale},
     n     = 2^qubits;
@@ -118,37 +137,71 @@ RandomHermitianMatrix[qubits_Integer, opts : OptionsPattern[]] :=
       "SizeIndependent", 1/2,
       "Kohler",          2^(qubits - 1) / Pi^2];
     scale (m + ConjugateTranspose[m])]
+(* }}} *)
 
-RandomDensityMatrix[n_Integer] :=
+(* {{{ *) RandomDensityMatrix[n_Integer] :=
   Module[{m},
     m = GUEMember[n];
     # / Tr[#] & [m . ConjugateTranspose[m]]]
+(* }}} *)
 
-RandomMixedState[n_Integer, combinations_Integer] :=
+(* {{{ *) RandomMixedState[n_Integer, combinations_Integer] :=
   Module[{states, weights},
     states  = Table[Proyector[RandomState[n]], {combinations}];
     weights = # / Total[#] & [RandomReal[{0, 1}, combinations]];
     Chop[weights . states]]
+(* }}} *)
 
-BasisState[k_Integer, dim_Integer] := UnitVector[dim, k + 1]
+(* }}} *)
 
-Bell[n_Integer] := Flatten[IdentityMatrix[n]] / Sqrt[n]
+(* {{{ Named states *)
+
+(* {{{ *) BasisState[k_Integer, dim_Integer] := UnitVector[dim, k + 1]
+(* }}} *)
+
+(* {{{ *) Bell[n_Integer] := Flatten[IdentityMatrix[n]] / Sqrt[n]
 Bell[] := Bell[2]
+(* }}} *)
 
-GHZ[n_Integer] :=
+(* {{{ *) GHZ[n_Integer] :=
   Module[{dim = 2^n},
     (UnitVector[dim, 1] + UnitVector[dim, dim]) / Sqrt[2]]
+(* }}} *)
 
-Wstate[n_Integer] := Sum[BasisState[2^m, 2^n], {m, 0, n-1}] / Sqrt[n]
+(* {{{ *) Wstate[n_Integer] := Sum[BasisState[2^m, 2^n], {m, 0, n-1}] / Sqrt[n]
+(* }}} *)
 
-CoherentState[theta_, phi_, n_Integer] :=
+(* {{{ *) CoherentState[theta_, phi_, n_Integer] :=
   Flatten[tensorPower[N[{Cos[theta/2], Exp[I phi] Sin[theta/2]}], n]]
+(* }}} *)
 
-BlochSphereToState[{x_, y_, z_}] :=
+(* }}} *)
+
+(* {{{ Bloch sphere *)
+
+(* {{{ *) BlochSphereToState[{x_, y_, z_}] :=
   Module[{sph = Quiet[CoordinateTransform["Cartesian" -> "Spherical", {x, y, z}], ArcTan::indet]},
     BlochSphereToState[{sph[[2]], sph[[3]] /. Indeterminate -> 0}]]
 
 BlochSphereToState[{theta_, phi_}] := {Cos[theta/2], Exp[I phi] Sin[theta/2]}
+(* }}} *)
+
+(* }}} *)
+
+(* {{{ Basis construction *)
+
+(* {{{ *) OrthonormalBasisContaningVector[psi_?VectorQ] :=
+  Module[{n = Length[psi], ri, Ri, F, eks},
+    F = Sum[
+      ri = Normalize[Table[RandomGaussianComplex[], {n}]];
+      Ri = ri - (Conjugate[psi] . ri) psi;
+      Proyector[Ri], {n - 1}] + Proyector[psi];
+    eks = Transpose[Sort[Transpose[Eigensystem[F]],
+      Abs[#1[[1]] - 1] < Abs[#2[[1]] - 1] &]][[2]];
+    Exp[I (Arg[psi[[1]]] - Arg[eks[[1, 1]]])] Normalize[#] & /@ eks]
+(* }}} *)
+
+(* }}} *)
 
 End[]
 
