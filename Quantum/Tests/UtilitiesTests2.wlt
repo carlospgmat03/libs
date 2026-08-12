@@ -110,3 +110,50 @@ VerificationTest[
 VerificationTest[
   Dimensions[PermutationMatrices[3][[1]]], {3, 3},
   TestID -> "PermutationMatrices-each-matrix-is-3x3"]
+
+(* ---------------- GellMann ---------------- *)
+
+VerificationTest[
+  Normal /@ GellMann[2],
+  PauliMatrix /@ {1, 2, 3},
+  TestID -> "GellMann-n2-is-Pauli-matrices"
+]
+
+VerificationTest[
+  Length[GellMann[3]],
+  8,
+  TestID -> "GellMann-n3-has-n2-minus-1-matrices"
+]
+
+(* Standard generalized Gell-Mann normalization: Tr[T_a.T_b] == 2 delta_ab *)
+VerificationTest[
+  Chop[Table[Tr[GellMann[3][[a]] . GellMann[3][[b]]], {a, 8}, {b, 8}]],
+  2 IdentityMatrix[8],
+  TestID -> "GellMann-n3-trace-orthonormality"
+]
+
+VerificationTest[
+  Chop[Tr /@ GellMann[3]],
+  ConstantArray[0, 8],
+  TestID -> "GellMann-n3-traceless"
+]
+
+VerificationTest[
+  Chop[Total[Flatten[Abs[Dagger[#] - #]]] & /@ GellMann[3]],
+  ConstantArray[0, 8],
+  TestID -> "GellMann-n3-hermitian"
+]
+
+VerificationTest[
+  GellMann[0],
+  $Failed,
+  {GellMann::posint},
+  TestID -> "GellMann-zero-raises-message"
+]
+
+VerificationTest[
+  GellMann[-3],
+  $Failed,
+  {GellMann::posint},
+  TestID -> "GellMann-negative-raises-message"
+]
