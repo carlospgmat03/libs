@@ -55,8 +55,14 @@ matrix (unit trace to 10^-13, non-negative eigenvalues after Chop)."
 GetDigitQuantumPosition::usage = "GetDigitQuantumPosition[index, k] returns the k-th bit of \
 index (0-indexed from the LSB). Equivalent to BitAnd[BitShiftRight[index, k], 1]."
 
-GellMann::usage = "GellMann[n] returns the list of n^2-1 generalized Gell-Mann matrices for \
-su(n): symmetric off-diagonal, antisymmetric off-diagonal, then diagonal generators."
+GellMann::usage = "GellMann[n] gives the n^2-1 generalized Gell-Mann \
+matrices for SU(n) (construction from \
+https://blog.suchideas.com/2016/04/sun-gell-mann-matrices-in-mathematica/), \
+normalized so that Tr[GellMann[n][[a]].GellMann[n][[b]]] == 2 \
+KroneckerDelta[a,b]. For n=2 this gives the three Pauli matrices. The \
+result does not include the identity; add \
+Sqrt[2/n] IdentityMatrix[n] yourself if you need a complete Hermitian \
+basis. Results are memoized per n."
 
 BaseForHermitianMatrices::usage = "BaseForHermitianMatrices[j, n] returns the j-th element \
 of an orthonormal basis for n x n Hermitian matrices: diagonal projectors for j <= n, then \
@@ -257,12 +263,24 @@ DirectSum[list_List] := Fold[DirectSum, list[[1]], Rest[list]]
 
 (* {{{ Basis *)
 
-(* {{{ *) GellMann[n_Integer] :=
-  GellMann[n] = Join[
-    Flatten[Table[SparseArray[{{j,k}->1, {k,j}->1}, {n,n}], {k,2,n}, {j,1,k-1}], 1],
-    Flatten[Table[SparseArray[{{j,k}->-I, {k,j}->I}, {n,n}], {k,2,n}, {j,1,k-1}], 1],
-    Table[Sqrt[2/l/(l+1)] SparseArray[
-      Join[Table[{j,j}->1, {j,1,l}], {{l+1,l+1}->-l}], {n,n}], {l,1,n-1}]]
+(* {{{ GellMann *) 
+GellMann::posint = "Argument `1` must be a positive integer.";
+GellMann[n_Integer?Positive] :=
+ GellMann[n] = Flatten[Table[
+    (* Symmetric case *)
+    SparseArray[{{j, k} -> 1, {k, j} -> 1}, {n, n}]
+    , {k, 2, n}, {j, 1, k - 1}], 1]~
+   Join~Flatten[Table[
+     (* Antisymmetric case *)
+     SparseArray[{{j, k} -> -I, {k, j} -> +I}, {n, n}]
+     , {k, 2, n}, {j, 1, k - 1}], 1]~
+   Join~Table[
+    (* Diagonal case *)
+    Sqrt[2/l/(l + 1)] SparseArray[
+      Table[{j, j} -> 1, {j, 1, l}]~Join~{{l + 1, l + 1} -> -l}, {n, n}]
+    , {l, 1, n - 1}];
+GellMann[n_] := (Message[GellMann::posint, n]; $Failed)
+
 (* }}} *)
 
 (* {{{ TriangularRoot and Triangular *)

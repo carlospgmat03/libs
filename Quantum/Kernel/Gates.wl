@@ -3,6 +3,7 @@ BeginPackage["Quantum`"]
 Pauli::usage = "Pauli[i] returns the i-th Pauli matrix (i = 0,1,2,3) as a sparse array. \
 Pauli[{i1, i2, ...}] returns the tensor product Pauli[i1] \[CircleTimes] Pauli[i2] \[CircleTimes] ..."
 
+
 Paulib::usage = "Paulib[{b1, b2, b3}] returns b1 Pauli[1] + b2 Pauli[2] + b3 Pauli[3]."
 
 Hadamard::usage = "Hadamard[] returns the 2x2 Hadamard gate {{1,1},{1,-1}}/Sqrt[2]."
@@ -128,6 +129,7 @@ SWAPMatrix[n_Integer, {j_Integer, k_Integer}] /; 1 <= j <= n && 1 <= k <= n && j
 (* }}} *)
 
 (* }}} *)
+
 
 End[]
 
