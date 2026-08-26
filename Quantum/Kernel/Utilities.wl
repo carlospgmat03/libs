@@ -71,6 +71,11 @@ symmetric and antisymmetric off-diagonal pairs."
 PermutationMatrices::usage = "PermutationMatrices[n] returns the list of all n! permutation \
 matrices for permutations of n elements (uses the built-in PermutationMatrix)."
 
+ApplyPermutation::usage = "ApplyPermutation[state, perm] applies a qubit permutation to state \
+(vector or density matrix). perm is a 0-indexed list {p_0, ..., p_{nq-1}} using push convention: \
+p_k is the output qubit that receives input qubit k (0-indexed from the LSB). \
+ApplyPermutation[state, {1,0}] is equivalent to ApplySwap[state, 0, 1]."
+
 Begin["`Private`"]
 
 (* {{{ Bitwise utilities *)
@@ -175,6 +180,23 @@ ApplyMultiQubitGate::dimerr =
 ApplySwap[state_, j_Integer, k_Integer] :=
   ApplyMultiQubitGate[state, {{1,0,0,0},{0,0,1,0},{0,1,0,0},{0,0,0,1}}, 2^j + 2^k]
 ApplySwap[state_, {j_Integer, k_Integer}] := ApplySwap[state, j, k]
+(* }}} *)
+
+(* {{{ *) ApplyPermutation[state_?VectorQ, perm_List] :=
+  Module[{nq = Length[perm], n = Length[state], idx},
+    idx = Table[
+      With[{b = Reverse[IntegerDigits[j-1, 2, nq]]},
+        FromDigits[Reverse[b[[perm + 1]]], 2] + 1],
+      {j, n}];
+    state[[idx]]]
+
+ApplyPermutation[state_?MatrixQ, perm_List] :=
+  Module[{nq = Length[perm], n = Length[state], idx},
+    idx = Table[
+      With[{b = Reverse[IntegerDigits[j-1, 2, nq]]},
+        FromDigits[Reverse[b[[perm + 1]]], 2] + 1],
+      {j, n}];
+    state[[idx, idx]]]
 (* }}} *)
 
 (* }}} *)

@@ -157,3 +157,58 @@ VerificationTest[
   {GellMann::posint},
   TestID -> "GellMann-negative-raises-message"
 ]
+
+(* ApplyPermutation: 0-indexed push convention, consistent with ApplySwap *)
+
+(* identity permutation leaves vector unchanged *)
+VerificationTest[
+  ApplyPermutation[{1, 2, 3, 4}, {0, 1}],
+  {1, 2, 3, 4},
+  TestID -> "ApplyPermutation-identity-vector"]
+
+(* perm={1,0}: swap qubits 0 and 1; |01> -> |10> *)
+VerificationTest[
+  ApplyPermutation[{0, 1, 0, 0}, {1, 0}],
+  {0, 0, 1, 0},
+  TestID -> "ApplyPermutation-swap-2qubit-vector"]
+
+(* consistency: ApplyPermutation swap matches ApplySwap *)
+VerificationTest[
+  ApplyPermutation[{0, 1, 0, 0}, {1, 0}],
+  ApplySwap[{0, 1, 0, 0}, 0, 1],
+  TestID -> "ApplyPermutation-matches-ApplySwap-0-1"]
+
+(* perm={2,1,0}: qubit 0->2, 1->1, 2->0; |001> -> |100> (same as ApplySwap[..,0,2]) *)
+VerificationTest[
+  ApplyPermutation[{0, 1, 0, 0, 0, 0, 0, 0}, {2, 1, 0}],
+  {0, 0, 0, 0, 1, 0, 0, 0},
+  TestID -> "ApplyPermutation-reverse-3qubit-|001>->|100>"]
+
+VerificationTest[
+  ApplyPermutation[{0, 1, 0, 0, 0, 0, 0, 0}, {2, 1, 0}],
+  ApplySwap[{0, 1, 0, 0, 0, 0, 0, 0}, 0, 2],
+  TestID -> "ApplyPermutation-matches-ApplySwap-0-2"]
+
+(* cyclic perm={1,2,0}: qubit 0->1, 1->2, 2->0; |010> -> |100> *)
+VerificationTest[
+  ApplyPermutation[{0, 0, 1, 0, 0, 0, 0, 0}, {1, 2, 0}],
+  {0, 0, 0, 0, 1, 0, 0, 0},
+  TestID -> "ApplyPermutation-cyclic-3qubit-|010>->|100>"]
+
+(* inverse cyclic perm={2,0,1}: qubit 0->2, 1->0, 2->1; |010> -> |001> *)
+VerificationTest[
+  ApplyPermutation[{0, 0, 1, 0, 0, 0, 0, 0}, {2, 0, 1}],
+  {0, 1, 0, 0, 0, 0, 0, 0},
+  TestID -> "ApplyPermutation-inv-cyclic-3qubit-|010>->|001>"]
+
+(* density matrix: |01><01| -> |10><10| under swap *)
+VerificationTest[
+  ApplyPermutation[{{0,0,0,0},{0,1,0,0},{0,0,0,0},{0,0,0,0}}, {1, 0}],
+  {{0,0,0,0},{0,0,0,0},{0,0,1,0},{0,0,0,0}},
+  TestID -> "ApplyPermutation-density-matrix-swap"]
+
+(* density matrix result matches ApplySwap result *)
+VerificationTest[
+  ApplyPermutation[{{0,0,0,0},{0,1,0,0},{0,0,0,0},{0,0,0,0}}, {1, 0}],
+  ApplySwap[{{0,0,0,0},{0,1,0,0},{0,0,0,0},{0,0,0,0}}, 0, 1],
+  TestID -> "ApplyPermutation-density-matrix-matches-ApplySwap"]
