@@ -212,3 +212,62 @@ VerificationTest[
   ApplyPermutation[{{0,0,0,0},{0,1,0,0},{0,0,0,0},{0,0,0,0}}, {1, 0}],
   ApplySwap[{{0,0,0,0},{0,1,0,0},{0,0,0,0},{0,0,0,0}}, 0, 1],
   TestID -> "ApplyPermutation-density-matrix-matches-ApplySwap"]
+
+(* PartialTrace invariance: a unitary acting only on the traced-out qubits cannot
+   change the reduced state of the kept qubits, since
+   Tr_B[(1_A x U_B) rho (1_A x U_B^dag)] = Tr_B[rho] by cyclicity on the B factor.
+   All cases use 4 qubits (dim 16): `mask` selects the kept qubits, the gate targets
+   are the complementary bits. Seeds are fixed so a failure is reproducible. *)
+
+(* pure state, contiguous split: keep qubits {0,1} (mask=3), U on qubits {2,3} (=12) *)
+VerificationTest[
+  Module[{psi, u},
+    SeedRandom[20260904];
+    psi = RandomState[16]; u = CUEMember[4];
+    Norm[PartialTrace[ApplyMultiQubitGate[psi, u, 12], 3]
+         - PartialTrace[psi, 3], "Frobenius"] < 10^-10],
+  True,
+  TestID -> "PartialTrace-invariant-under-unitary-on-traced-qubits-vector"]
+
+(* pure state, interleaved split: keep qubits {0,2} (mask=5), U on qubits {1,3} (=10).
+   This exercises the MergeTwoIntegers/ExtractDigits bit interleaving. *)
+VerificationTest[
+  Module[{psi, u},
+    SeedRandom[20260905];
+    psi = RandomState[16]; u = CUEMember[4];
+    Norm[PartialTrace[ApplyMultiQubitGate[psi, u, 10], 5]
+         - PartialTrace[psi, 5], "Frobenius"] < 10^-10],
+  True,
+  TestID -> "PartialTrace-invariant-under-unitary-on-traced-qubits-vector-interleaved"]
+
+(* mixed state: exercises the MatrixQ branch of PartialTrace, which is separate code *)
+VerificationTest[
+  Module[{rho, u},
+    SeedRandom[20260906];
+    rho = RandomDensityMatrix[16]; u = CUEMember[4];
+    Norm[PartialTrace[ApplyMultiQubitGate[rho, u, 10], 5]
+         - PartialTrace[rho, 5], "Frobenius"] < 10^-10],
+  True,
+  TestID -> "PartialTrace-invariant-under-unitary-on-traced-qubits-matrix"]
+
+(* asymmetric split: keep qubit {0} (mask=1), U on qubits {1,2,3} (=14), an 8x8 unitary *)
+VerificationTest[
+  Module[{psi, u},
+    SeedRandom[20260907];
+    psi = RandomState[16]; u = CUEMember[8];
+    Norm[PartialTrace[ApplyMultiQubitGate[psi, u, 14], 1]
+         - PartialTrace[psi, 1], "Frobenius"] < 10^-10],
+  True,
+  TestID -> "PartialTrace-invariant-under-unitary-on-traced-qubits-1-vs-3"]
+
+(* Negative control: a unitary on the KEPT qubits does change the reduced state.
+   Without this, the tests above would still pass if PartialTrace ignored `mask`
+   or ApplyMultiQubitGate were a no-op. *)
+VerificationTest[
+  Module[{psi, u},
+    SeedRandom[20260908];
+    psi = RandomState[16]; u = CUEMember[4];
+    Norm[PartialTrace[ApplyMultiQubitGate[psi, u, 5], 5]
+         - PartialTrace[psi, 5], "Frobenius"] > 10^-6],
+  True,
+  TestID -> "PartialTrace-changes-under-unitary-on-kept-qubits"]
