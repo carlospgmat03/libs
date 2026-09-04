@@ -271,3 +271,176 @@ VerificationTest[
          - PartialTrace[psi, 5], "Frobenius"] > 10^-6],
   True,
   TestID -> "PartialTrace-changes-under-unitary-on-kept-qubits"]
+
+(* PartialTrace covariance: a unitary acting only on the KEPT qubits passes through the
+   partial trace as a conjugation on the reduced state,
+   Tr_B[(U_A x 1_B) rho (U_A x 1_B)^dag] = U_A Tr_B[rho] U_A^dag.
+   This is the sharp version of the negative control above: the reduced state does not
+   just change, it changes in exactly the predicted way. Same 4-qubit setting (dim 16),
+   with the gate targets now equal to the kept `mask`. *)
+
+(* pure state, contiguous split: keep qubits {0,1} (mask=3), U on the same qubits *)
+VerificationTest[
+  Module[{psi, u},
+    SeedRandom[20260909];
+    psi = RandomState[16]; u = CUEMember[4];
+    Norm[PartialTrace[ApplyMultiQubitGate[psi, u, 3], 3]
+         - u . PartialTrace[psi, 3] . Dagger[u], "Frobenius"] < 10^-10],
+  True,
+  TestID -> "PartialTrace-covariant-under-unitary-on-kept-qubits-vector"]
+
+(* pure state, interleaved split: keep qubits {0,2} (mask=5), U on the same qubits.
+   Checks that ApplyMultiQubitGate and PartialTrace agree on how the kept qubits are
+   compacted into the reduced index. *)
+VerificationTest[
+  Module[{psi, u},
+    SeedRandom[20260910];
+    psi = RandomState[16]; u = CUEMember[4];
+    Norm[PartialTrace[ApplyMultiQubitGate[psi, u, 5], 5]
+         - u . PartialTrace[psi, 5] . Dagger[u], "Frobenius"] < 10^-10],
+  True,
+  TestID -> "PartialTrace-covariant-under-unitary-on-kept-qubits-vector-interleaved"]
+
+(* mixed state: exercises the MatrixQ branch of PartialTrace *)
+VerificationTest[
+  Module[{rho, u},
+    SeedRandom[20260911];
+    rho = RandomDensityMatrix[16]; u = CUEMember[4];
+    Norm[PartialTrace[ApplyMultiQubitGate[rho, u, 5], 5]
+         - u . PartialTrace[rho, 5] . Dagger[u], "Frobenius"] < 10^-10],
+  True,
+  TestID -> "PartialTrace-covariant-under-unitary-on-kept-qubits-matrix"]
+
+(* asymmetric split: keep qubits {1,2,3} (mask=14), U is 8x8 *)
+VerificationTest[
+  Module[{psi, u},
+    SeedRandom[20260912];
+    psi = RandomState[16]; u = CUEMember[8];
+    Norm[PartialTrace[ApplyMultiQubitGate[psi, u, 14], 14]
+         - u . PartialTrace[psi, 14] . Dagger[u], "Frobenius"] < 10^-10],
+  True,
+  TestID -> "PartialTrace-covariant-under-unitary-on-kept-qubits-3-vs-1"]
+
+(* single kept qubit: keep qubit {0} (mask=1), U is 2x2 *)
+VerificationTest[
+  Module[{psi, u},
+    SeedRandom[20260913];
+    psi = RandomState[16]; u = CUEMember[2];
+    Norm[PartialTrace[ApplyMultiQubitGate[psi, u, 1], 1]
+         - u . PartialTrace[psi, 1] . Dagger[u], "Frobenius"] < 10^-10],
+  True,
+  TestID -> "PartialTrace-covariant-under-unitary-on-kept-qubits-single-qubit"]
+
+(* Bit-order probe: keep qubits {0,1} (mask=3) but act with H on qubit 0 only.
+   Since qubit 0 is the LSB, on the reduced 4-dim space this must be Id x H, not H x Id.
+   A random unitary on the whole kept mask cannot catch a bit-order mismatch; this can. *)
+VerificationTest[
+  Module[{psi, reduced, uRight, uWrong},
+    SeedRandom[20260914];
+    psi = RandomState[16];
+    reduced = PartialTrace[ApplyMultiQubitGate[psi, Hadamard[], 1], 3];
+    uRight = tensorProduct[IdentityMatrix[2], Hadamard[]];
+    uWrong = tensorProduct[Hadamard[], IdentityMatrix[2]];
+    Norm[reduced - uRight . PartialTrace[psi, 3] . Dagger[uRight], "Frobenius"] < 10^-10 &&
+    Norm[reduced - uWrong . PartialTrace[psi, 3] . Dagger[uWrong], "Frobenius"] > 10^-6],
+  True,
+  TestID -> "PartialTrace-covariance-respects-qubit-bit-order"]
+
+(* Unitary on a strict subset of the kept qubits: keep {0,1,2} (mask=7), U on {0,1} (=3).
+   Kept qubits 0,1,2 map to reduced positions 0,1,2, so the reduced targets are also 3. *)
+VerificationTest[
+  Module[{psi, u},
+    SeedRandom[20260915];
+    psi = RandomState[16]; u = CUEMember[4];
+    Norm[PartialTrace[ApplyMultiQubitGate[psi, u, 3], 7]
+         - ApplyMultiQubitGate[PartialTrace[psi, 7], u, 3], "Frobenius"] < 10^-10],
+  True,
+  TestID -> "PartialTrace-commutes-with-gate-on-subset-of-kept-qubits"]
+
+(* Same, interleaved: keep {0,1,3} (mask=11), U on {0,3} (=9). Kept qubits 0,1,3 compact
+   to reduced positions 0,1,2, so full targets {0,3} become reduced targets {0,2} (=5). *)
+VerificationTest[
+  Module[{psi, u},
+    SeedRandom[20260916];
+    psi = RandomState[16]; u = CUEMember[4];
+    Norm[PartialTrace[ApplyMultiQubitGate[psi, u, 9], 11]
+         - ApplyMultiQubitGate[PartialTrace[psi, 11], u, 5], "Frobenius"] < 10^-10],
+  True,
+  TestID -> "PartialTrace-commutes-with-gate-on-subset-of-kept-qubits-interleaved"]
+
+(* Locality of gate application on product states: a unitary on subsystem A acts on the
+   A factor alone, (1_B x U_A)(psi_B x psi_A) = psi_B x (U_A psi_A). This ties the
+   tensorProduct factor ordering to the ApplyMultiQubitGate target-mask convention.
+   In tensorProduct[X, Y] the RIGHT factor Y carries the low (LSB) qubits. *)
+
+(* U on the low block: 2+2 qubits, psi_A on qubits {0,1} (targets=3) *)
+VerificationTest[
+  Module[{psiA, psiB, u},
+    SeedRandom[20260917];
+    psiA = RandomState[4]; psiB = RandomState[4]; u = CUEMember[4];
+    Norm[ApplyMultiQubitGate[tensorProduct[psiB, psiA], u, 3]
+         - tensorProduct[psiB, u . psiA], "Frobenius"] < 10^-10],
+  True,
+  TestID -> "ApplyMultiQubitGate-acts-on-single-tensor-factor-low-block"]
+
+(* Factor-order probe: the same gate must NOT act on the other factor. Guards against a
+   silent LSB/MSB swap between tensorProduct and the target mask. *)
+VerificationTest[
+  Module[{psiA, psiB, u},
+    SeedRandom[20260917];
+    psiA = RandomState[4]; psiB = RandomState[4]; u = CUEMember[4];
+    Norm[ApplyMultiQubitGate[tensorProduct[psiB, psiA], u, 3]
+         - tensorProduct[u . psiB, psiA], "Frobenius"] > 10^-6],
+  True,
+  TestID -> "ApplyMultiQubitGate-does-not-act-on-the-other-tensor-factor"]
+
+(* U on the high block: psi_B on qubits {2,3} (targets=12) *)
+VerificationTest[
+  Module[{psiA, psiB, u},
+    SeedRandom[20260917];
+    psiA = RandomState[4]; psiB = RandomState[4]; u = CUEMember[4];
+    Norm[ApplyMultiQubitGate[tensorProduct[psiB, psiA], u, 12]
+         - tensorProduct[u . psiB, psiA], "Frobenius"] < 10^-10],
+  True,
+  TestID -> "ApplyMultiQubitGate-acts-on-single-tensor-factor-high-block"]
+
+(* Interleaved product tensorProduct[loc, A, B]: B sits at the 1-bit positions of loc and
+   A at the 0-bit positions (per ExtractDigits). With loc=5, B lives on qubits {0,2}, so a
+   gate with targets=5 acts on B and targets=10 acts on A. *)
+VerificationTest[
+  Module[{psiA, psiB, u},
+    SeedRandom[20260917];
+    psiA = RandomState[4]; psiB = RandomState[4]; u = CUEMember[4];
+    Norm[ApplyMultiQubitGate[tensorProduct[5, psiA, psiB], u, 5]
+         - tensorProduct[5, psiA, u . psiB], "Frobenius"] < 10^-10],
+  True,
+  TestID -> "ApplyMultiQubitGate-acts-on-single-factor-interleaved-second-factor"]
+
+VerificationTest[
+  Module[{psiA, psiB, u},
+    SeedRandom[20260917];
+    psiA = RandomState[4]; psiB = RandomState[4]; u = CUEMember[4];
+    Norm[ApplyMultiQubitGate[tensorProduct[5, psiA, psiB], u, 10]
+         - tensorProduct[5, u . psiA, psiB], "Frobenius"] < 10^-10],
+  True,
+  TestID -> "ApplyMultiQubitGate-acts-on-single-factor-interleaved-first-factor"]
+
+(* Product density matrix: rho_B x (U rho_A U^dag) *)
+VerificationTest[
+  Module[{rhoA, rhoB, u},
+    SeedRandom[20260918];
+    rhoA = RandomDensityMatrix[4]; rhoB = RandomDensityMatrix[4]; u = CUEMember[4];
+    Norm[ApplyMultiQubitGate[tensorProduct[rhoB, rhoA], u, 3]
+         - tensorProduct[rhoB, u . rhoA . Dagger[u]], "Frobenius"] < 10^-10],
+  True,
+  TestID -> "ApplyMultiQubitGate-acts-on-single-tensor-factor-density-matrix"]
+
+(* Unequal factor dimensions: A is 1 qubit (targets=1), B is 3 qubits *)
+VerificationTest[
+  Module[{psiA, psiB, u},
+    SeedRandom[20260919];
+    psiA = RandomState[2]; psiB = RandomState[8]; u = CUEMember[2];
+    Norm[ApplyMultiQubitGate[tensorProduct[psiB, psiA], u, 1]
+         - tensorProduct[psiB, u . psiA], "Frobenius"] < 10^-10],
+  True,
+  TestID -> "ApplyMultiQubitGate-acts-on-single-tensor-factor-unequal-dimensions"]
