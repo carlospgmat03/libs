@@ -29,7 +29,7 @@ multi-qubit gate to the qubits selected by the bitmask targets (qubit k = bit k,
 ApplySwap::usage = "ApplySwap[state, j, k] swaps qubits j and k (0-indexed from the LSB) \
 in a state vector or density matrix. ApplySwap[state, {j, k}] is a convenience form."
 
-ApplyPermutation::usage = "MAYBE NOT WORKING WELL ApplyPermutation[state, perm] applies a qubit permutation to state \
+ApplyPermutation::usage = "ApplyPermutation[state, perm] applies a qubit permutation to state \
 (vector or density matrix). perm is a 0-indexed list {p_0, ..., p_{nq-1}} using push convention: \
 p_k is the output qubit that receives input qubit k (0-indexed from the LSB). \
 ApplyPermutation[state, {1,0}] is equivalent to ApplySwap[state, 0, 1]."
@@ -164,13 +164,26 @@ ApplyMultiQubitGate::dimerr =
       {u, 0, dRest - 1}, {u2, 0, dRest - 1}];
     Chop[statenew]]
 (* }}} *)
+ApplySwap::badqubit =
+  "Qubit indices `1` are invalid for a state of length `2` (length must be 2^nq, with 0 <= j,k < nq).";
 (* {{{ *) ApplySwap[state_, j_Integer, k_Integer] /; j === k := state
 ApplySwap[state_, j_Integer, k_Integer] :=
-  ApplyMultiQubitGate[state, {{1,0,0,0},{0,0,1,0},{0,1,0,0},{0,0,0,1}}, 2^j + 2^k]
+  Module[{nq = Log[2, Length[state]]},
+    If[!IntegerQ[nq] || j < 0 || k < 0 || j >= nq || k >= nq,
+      Message[ApplySwap::badqubit, {j, k}, Length[state]]; Return[$Failed]];
+    ApplyMultiQubitGate[state, {{1,0,0,0},{0,0,1,0},{0,1,0,0},{0,0,0,1}}, 2^j + 2^k]]
 ApplySwap[state_, {j_Integer, k_Integer}] := ApplySwap[state, j, k]
 (* }}} *)
+ApplyPermutation::baddim =
+  "Permutation length `1` is inconsistent with the state dimension `2`; expected length Log2[`2`].";
+ApplyPermutation::badperm =
+  "`1` is not a valid permutation of {0, ..., `2`}.";
 (* {{{ *) ApplyPermutation[state_?VectorQ, perm_List] :=
   Module[{nq = Length[perm], n = Length[state], idx},
+    If[2^nq =!= n,
+      Message[ApplyPermutation::baddim, nq, n]; Return[$Failed]];
+    If[Sort[perm] =!= Range[0, nq - 1],
+      Message[ApplyPermutation::badperm, perm, nq - 1]; Return[$Failed]];
     idx = Table[
       With[{b = Reverse[IntegerDigits[j-1, 2, nq]]},
         FromDigits[Reverse[b[[perm + 1]]], 2] + 1],
@@ -180,6 +193,10 @@ ApplySwap[state_, {j_Integer, k_Integer}] := ApplySwap[state, j, k]
 (* }}} *)
 (* {{{ *) ApplyPermutation[state_?MatrixQ, perm_List] :=
   Module[{nq = Length[perm], n = Length[state], idx},
+    If[2^nq =!= n,
+      Message[ApplyPermutation::baddim, nq, n]; Return[$Failed]];
+    If[Sort[perm] =!= Range[0, nq - 1],
+      Message[ApplyPermutation::badperm, perm, nq - 1]; Return[$Failed]];
     idx = Table[
       With[{b = Reverse[IntegerDigits[j-1, 2, nq]]},
         FromDigits[Reverse[b[[perm + 1]]], 2] + 1],

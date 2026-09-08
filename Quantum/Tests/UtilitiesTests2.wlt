@@ -213,6 +213,41 @@ VerificationTest[
   ApplySwap[{{0,0,0,0},{0,1,0,0},{0,0,0,0},{0,0,0,0}}, 0, 1],
   TestID -> "ApplyPermutation-density-matrix-matches-ApplySwap"]
 
+(* ApplySwap: qubit index out of range for the state's dimension raises a message and fails *)
+VerificationTest[
+  ApplySwap[{1, 2, 3, 4}, 0, 5],
+  $Failed,
+  {ApplySwap::badqubit},
+  TestID -> "ApplySwap-out-of-range-qubit-raises-message"]
+
+(* ApplySwap: state length that isn't a power of 2 raises a message and fails *)
+VerificationTest[
+  ApplySwap[{1, 2, 3}, 0, 1],
+  $Failed,
+  {ApplySwap::badqubit},
+  TestID -> "ApplySwap-non-power-of-2-length-raises-message"]
+
+(* ApplyPermutation: perm length inconsistent with state dimension raises a message and fails *)
+VerificationTest[
+  ApplyPermutation[{1, 2, 3, 4}, {0, 1, 2}],
+  $Failed,
+  {ApplyPermutation::baddim},
+  TestID -> "ApplyPermutation-baddim-raises-message"]
+
+(* ApplyPermutation: perm with a repeated index is not a valid permutation *)
+VerificationTest[
+  ApplyPermutation[{1, 2, 3, 4}, {0, 0}],
+  $Failed,
+  {ApplyPermutation::badperm},
+  TestID -> "ApplyPermutation-badperm-repeated-index-raises-message"]
+
+(* ApplyPermutation: matrix form also validates dimension and permutation validity *)
+VerificationTest[
+  ApplyPermutation[{{1,0,0,0},{0,1,0,0},{0,0,1,0},{0,0,0,1}}, {0, 5}],
+  $Failed,
+  {ApplyPermutation::badperm},
+  TestID -> "ApplyPermutation-matrix-badperm-raises-message"]
+
 (* PartialTrace invariance: a unitary acting only on the traced-out qubits cannot
    change the reduced state of the kept qubits, since
    Tr_B[(1_A x U_B) rho (1_A x U_B^dag)] = Tr_B[rho] by cyclicity on the B factor.
