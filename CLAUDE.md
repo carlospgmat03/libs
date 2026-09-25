@@ -1,4 +1,81 @@
-# CLAUDE.md — Quantum.wl Rewrite Project
+# CLAUDE.md
+
+## Overview
+
+Multi-language scientific computing library focused on quantum information, random matrix theory (RMT), spin chains, and tensor networks. Published at [github.com/carlospgmat03/libs](https://github.com/carlospgmat03/libs).
+
+## C++ Toolbox (`cpp/`)
+
+### Dependencies
+
+Requires `libitpp-dev` and `libtclap-dev` (Ubuntu packages).
+
+### Build Commands
+
+```bash
+cd cpp/
+
+make                    # Clean + build test_spins (default)
+make all                # Build all targets + documentation
+make test_spins         # Standard spin chain simulation
+make test_spins_fast    # Optimized build (-O3 -march=native)
+make test_spins2d       # 2D spin chain variant
+make test_rmt           # Random matrix theory tests
+make testing            # Runs testing.cpp with cfp_math + itpp_ext_math
+make documentation      # Generate Doxygen docs into ./doc/
+make clean              # Remove all compiled binaries and docs
+```
+
+Compiler flags come from `itpp-config --cflags` and `itpp-config --static --libs`. The Makefile also includes `~/makefile` for system-wide configuration.
+
+### Key Source Files
+
+- `spinchain.cpp` / `spinchain.h` — Spin chain Hamiltonian construction and diagonalization
+- `RMT.cpp` / `RMT.h` — Random matrix ensembles (GUE, GOE, CUE) and statistics
+- `purity_RMT.cpp` / `purity_RMT.h` — Purity and entanglement calculations
+- `itpp_ext_math.cpp` / `itpp_ext_math.h` — Extensions to the ITPP library
+- `cfp_math.cpp` / `cfp_math.h` — Mathematical utilities
+- `dev_random.cpp` — High-quality random number generation
+- `test_spins.cpp` — Main entry point for spin chain simulations (TCLAP CLI)
+
+## Mathematica Packages
+
+### Setup
+
+Add to `~/.Wolfram/Kernel/init.m`:
+```mathematica
+AppendTo[$Path, FileNameJoin[{"/home/" <> ToString[$Username], "libs"}]];
+```
+
+Then load with `<<Quantum\`` or `<<SpinChain\`` in any notebook.
+
+### Key Packages
+
+- `Quantum.m` — Core quantum information primitives: partial trace, entanglement entropy, random states/matrices, quantum gates, bitwise operations, RMT ensembles
+- `Quantum2.m` — Extended quantum operations
+- `SpinChain.m` — Spin chain specific constructions
+- `Carlos.m` — General mathematical/plotting utilities
+- `TheoreticalRMT.m` — RMT visualization and analytical results
+- `test.nb` — Test notebook for verifying the Mathematica libraries
+
+`Quantum.m` is being rewritten into a modular paclet under `Quantum/` (`Kernel/`, `Tests/`, `PacletInfo.wl`) with qudit generalization and `VerificationTest` coverage; `Quantum_legacy.m` is the frozen pre-rewrite snapshot. See the rewrite section below.
+
+## Julia (`julia/`)
+
+- `quantum.jl` — Quantum operations
+- `rmt.jl` — Random matrix implementations
+- `customs.jl` — Shared utilities
+
+## Architecture Notes
+
+- The same algorithms are implemented in multiple languages: C++ for performance-critical simulations, Mathematica for symbolic/interactive analysis, MATLAB and Julia for alternative implementations
+- C++ programs are standalone binaries with TCLAP command-line interfaces — check `--help` flags for available options
+- The Fortran 90 modules in `modules/` are legacy code
+- Maxima files (in `Maxima/`) were provided by Thomas Gorin for computing integrals of polynomials of unitary matrices with the Haar measure
+
+---
+
+# Quantum.wl Rewrite Project
 
 This file gives Claude Code the context it needs to work on this repository.
 Read this before making any changes.
