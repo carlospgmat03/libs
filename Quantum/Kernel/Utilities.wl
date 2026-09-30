@@ -44,6 +44,14 @@ PartialTrace::usage = "PartialTrace[rho, mask] traces out the qubits whose bits 
 mask, keeping the qubits whose bits are 1. rho can be a density matrix or a pure state \
 vector. Qubits are 0-indexed from the LSB."
 
+PartialTraceFirst::usage = "PartialTraceFirst[rho, dimFirst] traces out the first \
+subsystem of a bipartite density matrix rho on C^dimFirst \[CircleTimes] C^dimSecond \
+(KroneckerProduct ordering). dimSecond = Length[rho]/dimFirst."
+
+PartialTraceSecond::usage = "PartialTraceSecond[rho, dimSecond] traces out the second \
+subsystem of a bipartite density matrix rho on C^dimFirst \[CircleTimes] C^dimSecond \
+(KroneckerProduct ordering). dimFirst = Length[rho]/dimSecond."
+
 PartialTranspose::usage = "PartialTranspose[A, mask] partially transposes the subsystem \
 selected by the 1-bits of mask (0-indexed from the LSB)."
 
@@ -226,6 +234,22 @@ ApplyPermutation::badperm =
         {i, Length[psi]}],
       {dKeep, Length[psi]/dKeep}];
     Normal[mat . ConjugateTranspose[mat]]]
+(* }}} *)
+PartialTraceFirst::dim = "Matrix size `1` is not divisible by dimFirst = `2`.";
+(* {{{ *) PartialTraceFirst[rho_?SquareMatrixQ, dimFirst_Integer?Positive] :=
+  Module[{dimTotal = Length[rho], dimSecond},
+    If[! Divisible[dimTotal, dimFirst],
+      Message[PartialTraceFirst::dim, dimTotal, dimFirst]; Return[$Failed]];
+    dimSecond = dimTotal/dimFirst;
+    Sum[rho[[(i - 1) dimSecond + 1 ;; i dimSecond, (i - 1) dimSecond + 1 ;; i dimSecond]],
+      {i, dimFirst}]]
+(* }}} *)
+PartialTraceSecond::dim = "Matrix size `1` is not divisible by dimSecond = `2`.";
+(* {{{ *) PartialTraceSecond[rho_?SquareMatrixQ, dimSecond_Integer?Positive] :=
+  Module[{dimTotal = Length[rho]},
+    If[! Divisible[dimTotal, dimSecond],
+      Message[PartialTraceSecond::dim, dimTotal, dimSecond]; Return[$Failed]];
+    Sum[rho[[a ;; ;; dimSecond, a ;; ;; dimSecond]], {a, dimSecond}]]
 (* }}} *)
 (* {{{ *) PartialTranspose[A_?MatrixQ, mask_Integer] :=
   Table[
