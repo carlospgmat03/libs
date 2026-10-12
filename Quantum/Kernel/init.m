@@ -5,5 +5,6 @@ Get[FileNameJoin[{DirectoryName[$InputFileName], "Gates.wl"}]]
 Get[FileNameJoin[{DirectoryName[$InputFileName], "States.wl"}]]
 Get[FileNameJoin[{DirectoryName[$InputFileName], "Measures.wl"}]]
 Get[FileNameJoin[{DirectoryName[$InputFileName], "Channels.wl"}]]
+Get[FileNameJoin[{DirectoryName[$InputFileName], "Qudits.wl"}]]
 
 EndPackage[]
