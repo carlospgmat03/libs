@@ -110,7 +110,8 @@ CPQPauli::usage = "Complete positvity test for Pauli channels, with lambdas as t
 PositiveAndNegativeParts::usage = "PositiveAndNegativeParts[M_] returns the positve and negative parts of M such that M=M^+-M^- where M^{+-} are posive-semidefinite and positive, respectively."
 ComplementaryChannelFromKrausList::usage = "ComplementaryChannelFromKrausList[list][\[Rho]], computes the complementary channel accordingly Stinespring dilation theorem. Be aware that the complementary channel in general is rectangular, the dimension of the image is the Kraus rank."
 PositiveAndNegativeParts::usage = "PositiveAndNegativeParts[M_]: Gives a list with the positive and negative parts of the hermitian matrix M."
-KrausFromChoi::usage = "Follow its name"
+KrausFromChoi::usage = "Follow its name in ExId order, the correct order to perform Reshuffling."
+KrausFromChoiIdxEOrder::usage = "Follow its name in IdxE order, be careful, Reshuffling DOES NOT work here."
 
 
 Begin["Private`"] 
@@ -804,7 +805,9 @@ QuantumMapInProyectorBasis[channel_,particles_]:=Flatten[Table[Flatten[Table[Tr[
 KrausFromChoi[choi_]:=Select[
 Map[Sqrt[#[[1]]]Partition[Normalize[#[[2]]],Sqrt[Length[choi]]]&,choi//Eigensystem//Transpose]//Chop,MatrixRank[#]>0 &];
 
-KrausQubitParticles[channel_,particles_]:=KrausFromChoi[ChoiMatrixQubitParticles[channel,particles]];
+KrausFromChoiIdxEOrder[choi_]:=Select[Chop[(Sqrt[#1[[1]]] Transpose[Partition[Normalize[#1[[2]]],Sqrt[Length[choi]]]]&)/@Transpose[Eigensystem[choi]]],MatrixRank[#1]>0&];
+
+KrausQubitParticles[channel_,particles_]:=KrausFromChoiIdxEOrder[ChoiMatrixQubitParticles[channel,particles]];
 
 KrausQubitParticlesFromPauliProductBasis[channel_?MatrixQ]:=KrausFromChoi[Round[Sqrt[Length[channel]]]*ChoiJamiStateFromPauliProductBasis[channel]]
 
@@ -868,6 +871,4 @@ ReplaceAll[basis,Table[\[Phi][i][0]->0,{i,0,len-1}]]
 exportarSilvestre[]:=silvester
  
 EndPackage[]
-
-
 
