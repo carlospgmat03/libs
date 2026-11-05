@@ -1,6 +1,6 @@
 (* ::Package:: *)
 
-(* {{{ *) BeginPackage["Quantum`"]
+(* {{{ *) BeginPackage["QuantumLegacy`"]
 (* {{{ TODO
 Crear un swap matrix en el mismo espiritu que la CNOT. 
 }}} *)
@@ -154,7 +154,7 @@ PCEFigures[correlations_List]"
 ApplyMultiQubitGate::usage="ApplyMultiQubitGate[state_,gate_,targets_] Applies multiqubit gate, targets in binary. State can be a vector or a density matrix."
 (* }}} *)
 (* }}} *)
-Begin["Private`"] 
+Begin["`Private`"]
 (* {{{ Bitwise manipulation and basic math*)
 (* {{{ *) GetDigitQuantumPosition[index_, qubitPosition_] := 
  Module[{digits = Reverse[IntegerDigits[index, 2]]},
