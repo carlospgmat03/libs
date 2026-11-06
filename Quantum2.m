@@ -1,6 +1,6 @@
 (* ::Package:: *)
 
-(* {{{ *) BeginPackage["Quantum2`",{"Carlos`", "Quantum`"}]
+(* {{{ *) BeginPackage["Quantum2`",{"Carlos`", "QuantumLegacy`"}]
 exportarSilvestre::usage = "lo que dice. sin argumentos."
 Isingterm::usage = "Isingterm[i_,j_,N_]"
 IsingChain::usage = "IsingChain[J_,N_]"
