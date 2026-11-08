@@ -1,6 +1,6 @@
 (* ::Package:: *)
 
-(* {{{ *) BeginPackage["SpinChain`",{"Carlos`", "Quantum`"}]
+(* {{{ *) BeginPackage["SpinChain`",{"Carlos`", "QuantumLegacy`"}]
 (* {{{ Primitives *)
 ApplyMagnetickKick::usage = 
   "ApplyMagnetickKick[state_, b_, target_] applies a magnetic kick with field strength b to the specified target qubit in the quantum state. \
@@ -52,7 +52,7 @@ Begin["Private`"]
   For[i = 0, i < Length[state]/2, i++,
    pos = {MergeTwoIntegers[0, i, Power[2, Target]], 
       MergeTwoIntegers[1, i, Power[2, Target]]} + 1;
-   statenew[[pos]] = RotationMatrix.statenew[[pos]];];
+   statenew[[pos]] = RotationMatrix . statenew[[pos]];];
   statenew]
 (* }}} *)
 (* {{{ *) ApplyMagnetickKick[state_?VectorQ, b_] := 
@@ -194,7 +194,7 @@ SpinChainIsingMatrix[Qubits_] := Table[{Mod[i, Qubits], Mod[i + 1, Qubits]}, {i,
 
 SpinGridIsingMatrix[{nx_, ny_}] := Join[Table[{i, i + 1 + If[Mod[i, nx] == nx - 1, -nx, 0]}, {i, 0, nx ny - 1}], Table[{i, Mod[i + nx, nx ny]}, {i, 0, nx ny - 1}]]
 
-MatrixPauliMagneticField[MagneticField_, Qubits_] := MagneticField.{SumSigmaX[Qubits], SumSigmaY[Qubits], SumSigmaZ[Qubits]}
+MatrixPauliMagneticField[MagneticField_, Qubits_] := MagneticField . {SumSigmaX[Qubits], SumSigmaY[Qubits], SumSigmaZ[Qubits]}
 HamiltonianMagenitcChain[MagneticField_, J_, Qubits_] := MatrixPauliMagneticField[MagneticField, Qubits] + J IsingMatrix[SpinChainIsingMatrix[Qubits], Qubits]
 HamiltonianMagenitcGrid[MagneticField_, J_, {nx_, ny_}] := MatrixPauliMagneticField[MagneticField, nx ny] + J IsingMatrix[SpinGridIsingMatrix[{nx, ny}]]
 (* }}} *)

@@ -1,6 +1,6 @@
 (* ::Package:: *)
 
-(* {{{ *) BeginPackage["Quantum2`",{"Carlos`", "Quantum`"}]
+(* {{{ *) BeginPackage["Quantum2`",{"Carlos`", "QuantumLegacy`"}]
 exportarSilvestre::usage = "lo que dice. sin argumentos."
 Isingterm::usage = "Isingterm[i_,j_,N_]"
 IsingChain::usage = "IsingChain[J_,N_]"
@@ -103,7 +103,8 @@ ChoiMatrixFromR::usage = "ChoiMatrixFromR[R_] constructs Choi Matrix from Matrix
 ChoiJamiStateFromPauliProductBasis::usage = "ChoiJamiStateFromPauliProductBasis[channelmatrix_] Constructs  Choi matrix from a channel written in the Pauli Product basis."
 Purify::usage = "Purify[\[Rho]_] Purification of rho with a system of the same dimension. The option random->True can be used for random purifications."
 ChoiMatrixQubitParticles::usage = "ChoiMatrixQubitParticles[channel_,particles_]."
-QuantumMapInProyectorBasis::usage = "QuantumMapInProyectorBasis[channel_,particles_]."
+QuantumMapInProyectorBasis::usage = "QuantumMapInProyectorBasis[channel_,dim_]."
+QuantumMapInProyectorBasisParticles::usage = "QuantumMapInProyectorBasis[channel_,particles_] for qubit particles, for general dimension systems use QuantumMapInProyectorBasis instead."
 KrausQubitParticles::usage = "KrausQubitParticles[channel_,particles_]."
 KrausQubitParticlesFromPauliProductBasis::usage = "KrausQubitParticlesFromPauliProductBasis[channel_?MatrixQ]."
 CPQPauli::usage = "Complete positvity test for Pauli channels, with lambdas as the input, CPQPauli[\[Lambda]_]."
@@ -800,8 +801,8 @@ Sum[Sqrt[vals[[i]]]Flatten[KroneckerProduct[vecs[[i]],U . vecs[[i]]]],{i,1,Dimen
 
 ChoiMatrixQubitParticles[channel_,particles_]:=ArrayFlatten[Table[channel[Proyector[BasisState[i,2^particles],BasisState[j,2^particles]]],{i,0,2^particles-1},{j,0,2^particles-1}]];
 
-QuantumMapInProyectorBasis[channel_,particles_]:=Flatten[Table[Flatten[Table[Tr[Dagger[Proyector[BasisState[k,2^particles],BasisState[l,2^particles]]] . channel[Proyector[BasisState[i,2^particles],BasisState[j,2^particles]]]],{i,0,2^particles-1},{j,0,2^particles-1}]],{k,0,2^particles-1},{l,0,2^particles-1}],1];
-
+QuantumMapInProyectorBasisParticles[channel_,particles_]:=Flatten[Table[Flatten[Table[Tr[Dagger[Proyector[BasisState[k,2^particles],BasisState[l,2^particles]]] . channel[Proyector[BasisState[i,2^particles],BasisState[j,2^particles]]]],{i,0,2^particles-1},{j,0,2^particles-1}]],{k,0,2^particles-1},{l,0,2^particles-1}],1];
+QuantumMapInProyectorBasis[channel_,dim_]:=Flatten[Table[Flatten[Table[Tr[Dagger[Proyector[BasisState[k,dim],BasisState[l,dim]]] . channel[Proyector[BasisState[i,dim],BasisState[j,dim]]]],{i,0,dim-1},{j,0,dim-1}]],{k,0,dim-1},{l,0,dim-1}],1]
 KrausFromChoi[choi_]:=Select[
 Map[Sqrt[#[[1]]]Partition[Normalize[#[[2]]],Sqrt[Length[choi]]]&,choi//Eigensystem//Transpose]//Chop,MatrixRank[#]>0 &];
 

@@ -58,7 +58,7 @@ Then load with `<<Quantum\`` or `<<SpinChain\`` in any notebook.
 - `TheoreticalRMT.m` — RMT visualization and analytical results
 - `test.nb` — Test notebook for verifying the Mathematica libraries
 
-`Quantum.m` is being rewritten into a modular paclet under `Quantum/` (`Kernel/`, `Tests/`, `PacletInfo.wl`) with qudit generalization and `VerificationTest` coverage; `Quantum_legacy.m` is the frozen pre-rewrite snapshot. See the rewrite section below.
+`Quantum.m` is being rewritten into a modular paclet under `Quantum/` (`Kernel/`, `Tests/`, `PacletInfo.wl`) with qudit generalization and `VerificationTest` coverage; `QuantumLegacy.m` is the frozen pre-rewrite snapshot. See the rewrite section below.
 
 ## Julia (`julia/`)
 
